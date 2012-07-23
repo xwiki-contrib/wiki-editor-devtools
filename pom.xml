@@ -36,6 +36,6 @@
   <description>XWiki Platform - Editor Tools - Parent POM</description>
   <modules>
     <module>xwiki-platform-editor-tool-autocomplete</module>
-    <!--module>xwiki-platform-editor-tool-hilighting</module-->
+    <module>xwiki-platform-editor-tool-highlighting</module>
   </modules>
 </project>

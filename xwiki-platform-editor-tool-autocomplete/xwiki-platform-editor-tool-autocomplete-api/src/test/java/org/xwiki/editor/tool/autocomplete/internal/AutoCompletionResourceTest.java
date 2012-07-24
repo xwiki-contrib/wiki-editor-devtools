@@ -22,6 +22,7 @@ package org.xwiki.editor.tool.autocomplete.internal;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.context.Context;
 import org.jmock.Expectations;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.script.service.ScriptService;
@@ -51,8 +52,25 @@ public class AutoCompletionResourceTest extends AbstractMockingComponentTestCase
         registerMockComponent(ScriptService.class, "test");
     }
 
+    private class AncillaryTestClass
+    {
+        public void method()
+        {
+        }
+    }
+
     private class TestClass
     {
+        public AncillaryTestClass doWork()
+        {
+            return new AncillaryTestClass();
+        }
+
+        public String getSomething()
+        {
+            return "";
+        }
+
         public void method1()
         {
         }
@@ -112,6 +130,30 @@ public class AutoCompletionResourceTest extends AbstractMockingComponentTestCase
     }
 
     @Test
+    public void getAutoCompletionHintsForMethodWhenJustAfterTheDot() throws Exception
+    {
+        setUpMocks(createTestVelocityContext("key", new TestClass()));
+
+        Hints hints = this.resource.getAutoCompletionHints(5, "$key.");
+
+        Assert.assertEquals(5, hints.getHints().size());
+        assertThat(hints.getHints(), containsInAnyOrder(
+            "doWork(...) AncillaryTestClass", "something String", "getSomething(...) String", "method1(...)",
+            "method2(...) String"));
+    }
+
+    @Test
+    public void getAutoCompletionHintsForMethodsWhenGetter() throws Exception
+    {
+        setUpMocks(createTestVelocityContext("key", new TestClass()));
+
+        Hints hints = this.resource.getAutoCompletionHints(6, "$key.s");
+
+        Assert.assertEquals(2, hints.getHints().size());
+        assertThat(hints.getHints(), containsInAnyOrder("something String", "getSomething(...) String"));
+    }
+
+    @Test
     public void getAutoCompletionHintsForMethod() throws Exception
     {
         setUpMocks(createTestVelocityContext("key", new TestClass()));
@@ -132,6 +174,19 @@ public class AutoCompletionResourceTest extends AbstractMockingComponentTestCase
 
         Assert.assertEquals(1, hints.getHints().size());
         assertThat(hints.getHints(), containsInAnyOrder("test"));
+    }
+
+    @Test
+    @Ignore("Not working yet")
+    public void getAutoCompletionHintsWhenSetDoneAbove() throws Exception
+    {
+        setUpMocks(createTestVelocityContext("key", new TestClass()));
+
+        String velocity = "#set ($mydoc = $key.doWork())\n"
+            + "$";
+        Hints hints = this.resource.getAutoCompletionHints(velocity.length(), velocity);
+
+        Assert.assertEquals(2, hints.getHints().size());
     }
 
     private void setUpMocks(final VelocityContext velocityContext) throws Exception

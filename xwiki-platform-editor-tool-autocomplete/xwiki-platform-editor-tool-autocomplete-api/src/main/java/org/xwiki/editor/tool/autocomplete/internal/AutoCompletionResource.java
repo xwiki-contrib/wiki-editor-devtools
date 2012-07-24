@@ -94,6 +94,14 @@ public class AutoCompletionResource implements XWikiRestComponent
                 // Get the block after the dollar
                 int blockPos = this.parser.getVar(chars, dollarPos, velocityBlock, context);
                 // if newPos matches the current position then it means we have a valid block for autocompletion
+
+                // Note: we need to handle the special case where the cursor is just after the dot since getVar will
+                // not return it!
+                if (blockPos + 1 == offset && chars[blockPos] == '.') {
+                    blockPos++;
+                    velocityBlock.append('.');
+                }
+
                 if (blockPos == offset) {
 
                     // Get the property before the first dot
@@ -104,10 +112,23 @@ public class AutoCompletionResource implements XWikiRestComponent
                     if (methodPos < blockPos) {
                         // Get methods!
                         if (chars[methodPos] == '.') {
-                            propertyBlock = new StringBuffer();
-                            methodPos = this.parser.getMethodOrProperty(chars, methodPos, propertyBlock, context);
-                            if (methodPos == blockPos) {
-                                String fragment = propertyBlock.toString().substring(1);
+
+                            String fragment = "";
+                            boolean autoCompleteMethods = false;
+
+                            // Handle the case where the cursor is just after the dot
+                            if (methodPos + 1 == offset) {
+                                autoCompleteMethods = true;
+                            } else {
+                                propertyBlock = new StringBuffer();
+                                methodPos = this.parser.getMethodOrProperty(chars, methodPos, propertyBlock, context);
+                                if (methodPos == blockPos) {
+                                    autoCompleteMethods = true;
+                                    fragment = propertyBlock.toString().substring(1);
+                                }
+                            }
+
+                            if (autoCompleteMethods) {
                                 // Find methods using Reflection
                                 results.addAll(getMethods(propertyName, fragment, velocityContext));
                             }
@@ -119,7 +140,7 @@ public class AutoCompletionResource implements XWikiRestComponent
                 }
 
             } catch (InvalidVelocityException e) {
-
+                 throw new RuntimeException(e);
             }
         }
 
@@ -166,9 +187,19 @@ public class AutoCompletionResource implements XWikiRestComponent
 
         if (methodNames.isEmpty()) {
             for (Method method : propertyClass.getClass().getDeclaredMethods()) {
-                if (method.getName().startsWith(fragmentToMatch)) {
+                String methodName = method.getName().toLowerCase();
+                if (methodName.startsWith(fragmentToMatch)
+                    || methodName.startsWith("get" + fragmentToMatch.toLowerCase()))
+                {
                     // Don't print void return types!
                     String returnType = method.getReturnType().getSimpleName();
+
+                    // Add simplified velocity without the get()
+                    if (methodName.startsWith("get" + fragmentToMatch.toLowerCase())) {
+                        methodNames.add(StringUtils.uncapitalize(methodName.substring(3))
+                            + (returnType == "void" ? "" : " " + returnType));
+                    }
+
                     methodNames.add(method.getName() + "(...)" + (returnType == "void" ? "" : " " + returnType));
                 }
             }
@@ -176,5 +207,4 @@ public class AutoCompletionResource implements XWikiRestComponent
 
         return methodNames;
     }
-
 }

@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
-import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 
@@ -43,7 +43,7 @@ import org.xwiki.velocity.internal.util.VelocityParserContext;
 /**
  * REST Resource for returning autocompletion hints. The content to autocomplete is passed in the request body and the
  * position of the cursor is passed as a request paramer named {@code offset}.
- *
+ * 
  * @version $Id$
  * @since 4.1M2
  */
@@ -59,8 +59,9 @@ public class AutoCompletionResource implements XWikiRestComponent
 
     private VelocityParser parser = new VelocityParser();
 
-    @GET
-    public Hints getAutoCompletionHints(@QueryParam("offset") int offset, String content)
+    @POST
+    public Hints getAutoCompletionHints(@QueryParam("offset") int offset, @QueryParam("syntax") String syntax,
+        String content)
     {
         Hints hints = new Hints();
 
@@ -140,7 +141,7 @@ public class AutoCompletionResource implements XWikiRestComponent
                 }
 
             } catch (InvalidVelocityException e) {
-                 throw new RuntimeException(e);
+                throw new RuntimeException(e);
             }
         }
 
@@ -174,11 +175,10 @@ public class AutoCompletionResource implements XWikiRestComponent
         Object propertyClass = velocityContext.get(propertyName);
 
         // Allow special handling for classes that have registered a custom introspection handler
-        if (this.componentManager.hasComponent(AutoCompletionMethodFinder.class, propertyName))
-        {
+        if (this.componentManager.hasComponent(AutoCompletionMethodFinder.class, propertyName)) {
             try {
-                AutoCompletionMethodFinder finder = this.componentManager.getInstance(
-                    AutoCompletionMethodFinder.class, propertyName);
+                AutoCompletionMethodFinder finder =
+                    this.componentManager.getInstance(AutoCompletionMethodFinder.class, propertyName);
                 methodNames.addAll(finder.findMethods(propertyClass.getClass()));
             } catch (ComponentLookupException e) {
                 // Component not found, continue with standard finder...
@@ -189,8 +189,7 @@ public class AutoCompletionResource implements XWikiRestComponent
             for (Method method : propertyClass.getClass().getDeclaredMethods()) {
                 String methodName = method.getName().toLowerCase();
                 if (methodName.startsWith(fragmentToMatch)
-                    || methodName.startsWith("get" + fragmentToMatch.toLowerCase()))
-                {
+                    || methodName.startsWith("get" + fragmentToMatch.toLowerCase())) {
                     // Don't print void return types!
                     String returnType = method.getReturnType().getSimpleName();
 

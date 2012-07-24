@@ -42,7 +42,8 @@ import org.xwiki.velocity.internal.util.VelocityParserContext;
 
 /**
  * REST Resource for returning autocompletion hints. The content to autocomplete is passed in the request body and the
- * position of the cursor is passed as a request paramer named {@code offset}.
+ * position of the cursor is passed as a request paramer named {@code offset}. Note that the passed content is supposed
+ * to be wiki content and at the moment autocompletion is only performed on the content inside Velocity macros.
  * 
  * @version $Id$
  * @since 4.1M2
@@ -59,6 +60,8 @@ public class AutoCompletionResource implements XWikiRestComponent
 
     private VelocityParser parser = new VelocityParser();
 
+    private static final String VELOCITY_MACRO = "{{velocity}}";
+
     @POST
     public Hints getAutoCompletionHints(@QueryParam("offset") int offset, @QueryParam("syntax") String syntax,
         String content)
@@ -67,7 +70,12 @@ public class AutoCompletionResource implements XWikiRestComponent
 
         // Only do something if the content is defined and not empty and if offset is >= 0
         if (!StringUtils.isEmpty(content) && offset > -1) {
-            hints = hints.withHints(getHints(content, offset));
+            // Step 1: Find the current Velocity macro content.
+            int velocityContentPos = content.lastIndexOf(VELOCITY_MACRO, offset);
+            if (velocityContentPos > -1) {
+                hints = hints.withHints(getHints(content.substring(velocityContentPos + VELOCITY_MACRO.length(),
+                    offset), offset - velocityContentPos - VELOCITY_MACRO.length()));
+            }
         }
 
         return hints;

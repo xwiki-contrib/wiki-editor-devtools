@@ -48,7 +48,7 @@ public class DefaultAutoCompletionMethodFinder extends AbstractAutoCompletionMet
     {
         List<String> methodNames = new ArrayList<String>();
 
-        for (Method method : propertyClass.getClass().getDeclaredMethods()) {
+        for (Method method : propertyClass.getDeclaredMethods()) {
             String methodName = method.getName().toLowerCase();
             if (methodName.startsWith(fragmentToMatch)
                 || methodName.startsWith(GETTER_KEYWORD + fragmentToMatch.toLowerCase())) {

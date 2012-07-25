@@ -44,9 +44,9 @@ public class DefaultAutoCompletionMethodFinder extends AbstractAutoCompletionMet
     private static final String GETTER_KEYWORD = "get";
 
     @Override
-    public List<String> findMethods(Class propertyClass, String fragmentToMatch)
+    public List<HintData> findMethods(Class propertyClass, String fragmentToMatch)
     {
-        List<String> methodNames = new ArrayList<String>();
+        List<HintData> hintData = new ArrayList<HintData>();
 
         for (Method method : propertyClass.getDeclaredMethods()) {
             String methodName = method.getName().toLowerCase();
@@ -57,13 +57,14 @@ public class DefaultAutoCompletionMethodFinder extends AbstractAutoCompletionMet
 
                 // Add simplified velocity without the get()
                 if (methodName.startsWith(GETTER_KEYWORD + fragmentToMatch.toLowerCase())) {
-                    methodNames.add(printMethod(StringUtils.uncapitalize(methodName.substring(3)), returnType));
+                    String getter = StringUtils.uncapitalize(methodName.substring(3));
+                    hintData.add(new HintData(getter, printMethod(getter, returnType)));
                 }
 
-                methodNames.add(printMethod(method.getName(), returnType));
+                hintData.add(new HintData(method.getName(), printMethod(method.getName(), returnType)));
             }
         }
 
-        return methodNames;
+        return hintData;
     }
 }

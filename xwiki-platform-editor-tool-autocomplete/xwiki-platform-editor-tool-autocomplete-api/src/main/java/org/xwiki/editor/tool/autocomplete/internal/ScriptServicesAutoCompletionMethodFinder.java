@@ -52,16 +52,16 @@ public class ScriptServicesAutoCompletionMethodFinder extends AbstractAutoComple
     private ComponentManager componentManager;
 
     @Override
-    public List<String> findMethods(Class variableClass, String fragmentToMatch)
+    public List<HintData> findMethods(Class variableClass, String fragmentToMatch)
     {
-        List<String> results = new ArrayList<String>();
+        List<HintData> results = new ArrayList<HintData>();
 
         List<ComponentDescriptor<ScriptService>> descriptors =
             this.componentManager.getComponentDescriptorList((Type) ScriptService.class);
 
         for (ComponentDescriptor<ScriptService> descriptor : descriptors) {
             if (descriptor.getRoleHint().startsWith(fragmentToMatch)) {
-                results.add(descriptor.getRoleHint());
+                results.add(new HintData(descriptor.getRoleHint(), descriptor.getRoleHint()));
             }
         }
 

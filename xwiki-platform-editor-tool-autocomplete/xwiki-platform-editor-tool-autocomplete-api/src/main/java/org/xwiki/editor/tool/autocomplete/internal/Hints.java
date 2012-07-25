@@ -42,15 +42,15 @@ public class Hints
      * @see #getHints()
      */
     @XmlElement(name = "hint")
-    protected List<String> hints;
+    private List<HintData> hints;
 
     /**
      * @return the autocompletion hints
      */
-    public List<String> getHints()
+    public List<HintData> getHints()
     {
         if (this.hints == null) {
-            this.hints = new ArrayList<String>();
+            this.hints = new ArrayList<HintData>();
         }
         return this.hints;
     }
@@ -61,9 +61,10 @@ public class Hints
      * @param values the autocompletion hints to populate the instance with
      * @return the {@link Hints} containing the passed hints
      */
-    public Hints withHints(String... values) {
+    public Hints withHints(HintData... values)
+    {
         if (values != null) {
-            for (String value: values) {
+            for (HintData value: values) {
                 getHints().add(value);
             }
         }
@@ -76,7 +77,8 @@ public class Hints
      * @param values the autocompletion hints to populate the instance with
      * @return the {@link Hints} containing the passed hints
      */
-    public Hints withHints(Collection<String> values) {
+    public Hints withHints(Collection<HintData> values)
+    {
         if (values != null) {
             getHints().addAll(values);
         }

@@ -22,6 +22,7 @@ package org.xwiki.editor.tool.autocomplete;
 import java.util.List;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.editor.tool.autocomplete.internal.HintData;
 
 /**
  * Allows contributing special hints. For example for Script Services, instead of returning a hint of {@code get} which
@@ -40,5 +41,5 @@ public interface AutoCompletionMethodFinder
      * @param fragmentToMatch the filter to only return methods matching the passed string
      * @return the autocompletion hints
      */
-    List<String> findMethods(Class variableClass, String fragmentToMatch);
+    List<HintData> findMethods(Class variableClass, String fragmentToMatch);
 }

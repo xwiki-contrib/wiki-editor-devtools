@@ -101,7 +101,7 @@ public class AutoCompletionResourceTest extends AbstractMockingComponentTestCase
         // Verify we can get keys from the Velocity Context and its inner context too. We test this since our
         // Velocity tools are put in an inner Velocity Context.
         Assert.assertEquals(2, hints.getHints().size());
-        assertThat(hints.getHints(), containsInAnyOrder("key1", "key2"));
+        assertThat(hints.getHints(), containsInAnyOrder(new HintData("key1", "key1"), new HintData("key2", "key2")));
     }
 
     @Test
@@ -113,7 +113,7 @@ public class AutoCompletionResourceTest extends AbstractMockingComponentTestCase
         Hints hints = this.resource.getAutoCompletionHints(velocity.length(), "xwiki/2.0", velocity);
 
         Assert.assertEquals(1, hints.getHints().size());
-        assertThat(hints.getHints(), containsInAnyOrder("key"));
+        assertThat(hints.getHints(), containsInAnyOrder(new HintData("key", "key")));
     }
 
     @Test
@@ -143,12 +143,12 @@ public class AutoCompletionResourceTest extends AbstractMockingComponentTestCase
     {
         setUpMocks("$key.", createTestVelocityContext("key", new TestClass()));
 
-        final List<String> expectedMethods = Arrays.asList(
-            "doWork(...) AncillaryTestClass",
-            "something String",
-            "getSomething(...) String",
-            "method1(...)",
-            "method2(...) String");
+        final List<HintData> expectedMethods = Arrays.asList(
+            new HintData("doWork", "doWork(...) AncillaryTestClass"),
+            new HintData("something", "something String"),
+            new HintData("getSomething", "getSomething(...) String"),
+            new HintData("method1", "method1(...)"),
+            new HintData("method2", "method2(...) String"));
         setUpMethodFinderMock(expectedMethods, "", TestClass.class);
 
         String velocity = "{{velocity}}$key.";
@@ -158,11 +158,11 @@ public class AutoCompletionResourceTest extends AbstractMockingComponentTestCase
 
         // Verify methods are returned sorted
         Assert.assertEquals(Arrays.asList(
-            "doWork(...) AncillaryTestClass",
-            "getSomething(...) String",
-            "method1(...)",
-            "method2(...) String",
-            "something String"), hints.getHints());
+            new HintData("doWork", "doWork(...) AncillaryTestClass"),
+            new HintData("getSomething", "getSomething(...) String"),
+            new HintData("method1", "method1(...)"),
+            new HintData("method2", "method2(...) String"),
+            new HintData("something", "something String")), hints.getHints());
     }
 
     @Test
@@ -170,9 +170,9 @@ public class AutoCompletionResourceTest extends AbstractMockingComponentTestCase
     {
         setUpMocks("$key.s", createTestVelocityContext("key", new TestClass()));
 
-        final List<String> expectedMethods = Arrays.asList(
-            "something String",
-            "getSomething(...) String");
+        final List<HintData> expectedMethods = Arrays.asList(
+            new HintData("something", "something String"),
+            new HintData("getSomething", "getSomething(...) String"));
         setUpMethodFinderMock(expectedMethods, "s", TestClass.class);
 
         String velocity = "{{velocity}}$key.s";
@@ -186,9 +186,9 @@ public class AutoCompletionResourceTest extends AbstractMockingComponentTestCase
     {
         setUpMocks("$key.m", createTestVelocityContext("key", new TestClass()));
 
-        final List<String> expectedMethods = Arrays.asList(
-            "method1(...)",
-            "method2(...) String");
+        final List<HintData> expectedMethods = Arrays.asList(
+            new HintData("method", "method1(...)"),
+            new HintData("method2", "method2(...) String"));
         setUpMethodFinderMock(expectedMethods, "m", TestClass.class);
 
         String velocity = "{{velocity}}$key.m";
@@ -207,7 +207,7 @@ public class AutoCompletionResourceTest extends AbstractMockingComponentTestCase
         Hints hints = this.resource.getAutoCompletionHints(velocity.length(), "xwiki/2.0", velocity);
 
         Assert.assertEquals(1, hints.getHints().size());
-        assertThat(hints.getHints(), containsInAnyOrder("test"));
+        assertThat(hints.getHints(), containsInAnyOrder(new HintData("test", "test")));
     }
 
     @Test
@@ -223,7 +223,7 @@ public class AutoCompletionResourceTest extends AbstractMockingComponentTestCase
         Assert.assertEquals(2, hints.getHints().size());
     }
 
-    private void setUpMethodFinderMock(final List<String> expectedMethodNames, final String fragmentToMatch,
+    private void setUpMethodFinderMock(final List<HintData> expectedMethodNames, final String fragmentToMatch,
         final Class methodClass) throws Exception
     {
         final AutoCompletionMethodFinder finder = getComponentManager().getInstance(AutoCompletionMethodFinder.class);

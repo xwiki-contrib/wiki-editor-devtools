@@ -19,7 +19,6 @@
  */
 package org.xwiki.editor.tool.autocomplete.internal;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,6 +33,9 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.editor.tool.autocomplete.AutoCompletionMethodFinder;
+import org.xwiki.editor.tool.autocomplete.TargetContent;
+import org.xwiki.editor.tool.autocomplete.TargetContentLocator;
+import org.xwiki.editor.tool.autocomplete.TargetContentType;
 import org.xwiki.rest.XWikiRestComponent;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.internal.util.InvalidVelocityException;
@@ -41,9 +43,8 @@ import org.xwiki.velocity.internal.util.VelocityParser;
 import org.xwiki.velocity.internal.util.VelocityParserContext;
 
 /**
- * REST Resource for returning autocompletion hints. The content to autocomplete is passed in the request body and the
- * position of the cursor is passed as a request paramer named {@code offset}. Note that the passed content is supposed
- * to be wiki content and at the moment autocompletion is only performed on the content inside Velocity macros.
+ * REST Resource for returning autocompletion hints. The content to autocomplete is passed in the request body,
+ * the position of the cursor and the syntax in which the content is written in are passed as request parameters.
  * 
  * @version $Id$
  * @since 4.1M2
@@ -52,35 +53,59 @@ import org.xwiki.velocity.internal.util.VelocityParserContext;
 @Path("/autocomplete")
 public class AutoCompletionResource implements XWikiRestComponent
 {
+    /**
+     * Used to get the Velocity Context from which we retrieve the list of bound variables that are used for
+     * autocompletion.
+     */
     @Inject
     private VelocityManager velocityManager;
 
+    /**
+     * Used to dynamically find Autocompletion Method finder to handle specific cases.
+     * @see AutoCompletionMethodFinder
+     */
     @Inject
     private ComponentManager componentManager;
 
+    @Inject
+    private AutoCompletionMethodFinder defaultAutoCompletionMethodFinder;
+
+    @Inject
+    private TargetContentLocator targetContentLocator;
+
+    /**
+     * A Velocity Parser that we use to help parse Velocity content for figuring out autocompletion.
+     */
     private VelocityParser parser = new VelocityParser();
 
-    private static final String VELOCITY_MACRO = "{{velocity}}";
-
+    /**
+     * Main REST entry point for getting Autocompletion hints.
+     *
+     * @param offset the position of the cursor in the full content
+     * @param syntaxId the syntax in which the content is written in
+     * @param content the full wiki content
+     * @return the list of autocompletion hints
+     */
     @POST
-    public Hints getAutoCompletionHints(@QueryParam("offset") int offset, @QueryParam("syntax") String syntax,
+    public Hints getAutoCompletionHints(@QueryParam("offset") int offset, @QueryParam("syntax") String syntaxId,
         String content)
     {
         Hints hints = new Hints();
 
-        // Only do something if the content is defined and not empty and if offset is >= 0
-        if (!StringUtils.isEmpty(content) && offset > -1) {
-            // Step 1: Find the current Velocity macro content.
-            int velocityContentPos = content.lastIndexOf(VELOCITY_MACRO, offset);
-            if (velocityContentPos > -1) {
-                hints = hints.withHints(getHints(content.substring(velocityContentPos + VELOCITY_MACRO.length(),
-                    offset), offset - velocityContentPos - VELOCITY_MACRO.length()));
-            }
+        // Only support autocompletion on Velocity ATM
+        TargetContent targetContent = this.targetContentLocator.locate(content, syntaxId, offset);
+        if (targetContent.getType() == TargetContentType.VELOCITY) {
+            hints = hints.withHints(getHints(targetContent.getContent(), targetContent.getPosition()));
         }
 
         return hints;
     }
 
+    /**
+     * @param content the Velocity content to autocomplete
+     * @param offset the position of the cursor relative to the Velocity content
+     * @return the list of autocompletion hints
+     */
     private List<String> getHints(String content, int offset)
     {
         List<String> results = new ArrayList<String>();
@@ -156,6 +181,14 @@ public class AutoCompletionResource implements XWikiRestComponent
         return results;
     }
 
+    /**
+     * Find out all Velocity variable names bound in the Velocity Context.
+     *
+     * @param fragmentToMatch the prefix to filter with in order to return only variable whose names start with the
+     *        passed string
+     * @param velocityContext the Velocity Context from which to get the bound variables
+     * @return the Velocity variables
+     */
     private List<String> getVelocityContextKeys(String fragmentToMatch, VelocityContext velocityContext)
     {
         List<String> keys = new ArrayList<String>();
@@ -168,6 +201,13 @@ public class AutoCompletionResource implements XWikiRestComponent
         return keys;
     }
 
+    /**
+     * Add variables to the passed results list.
+     *
+     * @param results the list of variable names
+     * @param keys the keys containing the variables to add
+     * @param fragmentToMatch the filter in order to only add variable whose names start with the passed string
+     */
     private void addVelocityKeys(List<String> results, Object[] keys, String fragmentToMatch)
     {
         for (Object key : keys) {
@@ -177,39 +217,31 @@ public class AutoCompletionResource implements XWikiRestComponent
         }
     }
 
-    private List<String> getMethods(String propertyName, String fragmentToMatch, VelocityContext velocityContext)
+    /**
+     * @param variableName the variable name corresponding to the class for which to find the methods
+     * @param fragmentToMatch the filter to only return methods matching the passed string
+     * @param velocityContext the Velocity Context from which to get the Class corresponding to the variable name
+     * @return the method names found in the Class pointed to by the passed variableName name
+     */
+    private List<String> getMethods(String variableName, String fragmentToMatch, VelocityContext velocityContext)
     {
         List<String> methodNames = new ArrayList<String>();
-        Object propertyClass = velocityContext.get(propertyName);
+        Object propertyClass = velocityContext.get(variableName);
 
         // Allow special handling for classes that have registered a custom introspection handler
-        if (this.componentManager.hasComponent(AutoCompletionMethodFinder.class, propertyName)) {
+        if (this.componentManager.hasComponent(AutoCompletionMethodFinder.class, variableName)) {
             try {
                 AutoCompletionMethodFinder finder =
-                    this.componentManager.getInstance(AutoCompletionMethodFinder.class, propertyName);
-                methodNames.addAll(finder.findMethods(propertyClass.getClass()));
+                    this.componentManager.getInstance(AutoCompletionMethodFinder.class, variableName);
+                methodNames.addAll(finder.findMethods(propertyClass.getClass(), fragmentToMatch));
             } catch (ComponentLookupException e) {
-                // Component not found, continue with standard finder...
+                // Component not found, continue with default finder...
             }
         }
 
         if (methodNames.isEmpty()) {
-            for (Method method : propertyClass.getClass().getDeclaredMethods()) {
-                String methodName = method.getName().toLowerCase();
-                if (methodName.startsWith(fragmentToMatch)
-                    || methodName.startsWith("get" + fragmentToMatch.toLowerCase())) {
-                    // Don't print void return types!
-                    String returnType = method.getReturnType().getSimpleName();
-
-                    // Add simplified velocity without the get()
-                    if (methodName.startsWith("get" + fragmentToMatch.toLowerCase())) {
-                        methodNames.add(StringUtils.uncapitalize(methodName.substring(3))
-                            + (returnType == "void" ? "" : " " + returnType));
-                    }
-
-                    methodNames.add(method.getName() + "(...)" + (returnType == "void" ? "" : " " + returnType));
-                }
-            }
+            methodNames.addAll(
+                this.defaultAutoCompletionMethodFinder.findMethods(propertyClass.getClass(), fragmentToMatch));
         }
 
         return methodNames;

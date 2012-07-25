@@ -1,2 +1,4 @@
 org.xwiki.editor.tool.autocomplete.internal.AutoCompletionResource
+org.xwiki.editor.tool.autocomplete.internal.DefaultAutoCompletionMethodFinder
 org.xwiki.editor.tool.autocomplete.internal.ScriptServicesAutoCompletionMethodFinder
+org.xwiki.editor.tool.autocomplete.internal.DefaultTargetContentLocator

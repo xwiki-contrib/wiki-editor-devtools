@@ -17,28 +17,14 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.editor.tool.autocomplete;
+package org.xwiki.editor.tool.autocomplete.internal;
 
-import java.util.List;
+import org.xwiki.editor.tool.autocomplete.AutoCompletionMethodFinder;
 
-import org.xwiki.component.annotation.Role;
-
-/**
- * Allows contributing special hints. For example for Script Services, instead of returning a hint of {@code get} which
- * is the method provided by {@link org.xwiki.script.service.ScriptServiceManager} (the class type of {@code services})
- * we return the component hints of all registered {@link org.xwiki.script.service.ScriptService} components found in
- * the wiki.
- *
- * @version $Id$
- * @since 4.1M2
- */
-@Role
-public interface AutoCompletionMethodFinder
+public abstract class AbstractAutoCompletionMethodFinder implements AutoCompletionMethodFinder
 {
-    /**
-     * @param variableClass the class for which to find methods to return as autocompletion hints
-     * @param fragmentToMatch the filter to only return methods matching the passed string
-     * @return the autocompletion hints
-     */
-    List<String> findMethods(Class variableClass, String fragmentToMatch);
+    protected String printMethod(String methodName, String returnType)
+    {
+        return methodName + "(...)" + (returnType == null || returnType.equals("void") ? "" : " " + returnType);
+    }
 }

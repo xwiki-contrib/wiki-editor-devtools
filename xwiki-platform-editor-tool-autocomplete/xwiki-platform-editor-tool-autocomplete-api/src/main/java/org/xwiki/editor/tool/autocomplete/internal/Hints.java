@@ -38,9 +38,15 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "hints")
 public class Hints
 {
+    /**
+     * @see #getHints()
+     */
     @XmlElement(name = "hint")
     protected List<String> hints;
 
+    /**
+     * @return the autocompletion hints
+     */
     public List<String> getHints()
     {
         if (this.hints == null) {
@@ -49,8 +55,14 @@ public class Hints
         return this.hints;
     }
 
+    /**
+     * Build an instance of {@link Hints}.
+     *
+     * @param values the autocompletion hints to populate the instance with
+     * @return the {@link Hints} containing the passed hints
+     */
     public Hints withHints(String... values) {
-        if (values!= null) {
+        if (values != null) {
             for (String value: values) {
                 getHints().add(value);
             }
@@ -58,8 +70,14 @@ public class Hints
         return this;
     }
 
+    /**
+     * Build an instance of {@link Hints}.
+     *
+     * @param values the autocompletion hints to populate the instance with
+     * @return the {@link Hints} containing the passed hints
+     */
     public Hints withHints(Collection<String> values) {
-        if (values!= null) {
+        if (values != null) {
             getHints().addAll(values);
         }
         return this;

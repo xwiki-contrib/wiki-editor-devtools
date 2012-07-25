@@ -30,7 +30,6 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.editor.tool.autocomplete.AutoCompletionMethodFinder;
 import org.xwiki.script.service.ScriptService;
 
 /**
@@ -43,13 +42,17 @@ import org.xwiki.script.service.ScriptService;
 @Component
 @Named("services")
 @Singleton
-public class ScriptServicesAutoCompletionMethodFinder implements AutoCompletionMethodFinder
+public class ScriptServicesAutoCompletionMethodFinder extends AbstractAutoCompletionMethodFinder
 {
+    /**
+     * Used to get Component descriptors for existing script services to get their Role Hints which are the
+     * autocompletion hints we wish to return.
+     */
     @Inject
     private ComponentManager componentManager;
 
     @Override
-    public List<String> findMethods(Class clazz)
+    public List<String> findMethods(Class variableClass, String fragmentToMatch)
     {
         List<String> results = new ArrayList<String>();
 
@@ -57,7 +60,9 @@ public class ScriptServicesAutoCompletionMethodFinder implements AutoCompletionM
             this.componentManager.getComponentDescriptorList((Type) ScriptService.class);
 
         for (ComponentDescriptor<ScriptService> descriptor : descriptors) {
-            results.add(descriptor.getRoleHint());
+            if (descriptor.getRoleHint().startsWith(fragmentToMatch)) {
+                results.add(descriptor.getRoleHint());
+            }
         }
 
         return results;

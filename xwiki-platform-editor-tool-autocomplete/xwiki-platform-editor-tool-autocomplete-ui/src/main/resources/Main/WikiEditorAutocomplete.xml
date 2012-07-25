@@ -176,5 +176,185 @@ document.observe('xwiki:dom:loaded', function() {
       <use>always</use>
     </property>
   </object>
+  <object>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <name>Main.WikiEditorAutocomplete</name>
+    <number>1</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>78698de7-8ae8-4dcb-99a2-ef20db107c1b</guid>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>(function() {
+var TIMEOUT_VALUE = 150;
+var initialize = function () {
+  if (typeof(CodeMirror) == 'undefined') {
+    // The download + loading of the CodeMirror js is done asynchronously, so we need to wait for it to load.
+    setTimeout(initialize, TIMEOUT_VALUE);
+  } else { 
+    CodeMirror.simpleHint = function(editor, getHints) {
+      // We want a single cursor position.
+      if (editor.somethingSelected()) return;
+      //don't show completion if the token is empty
+      var tempToken = editor.getTokenAt(editor.getCursor());
+      if(!(/[\S]/gi.test(tempToken.string))) return;
+  
+      var result = getHints(editor);
+      if (!result || !result.list.length) return;
+      var completions = result.list;
+      function insert(str) {
+        editor.replaceRange(str, result.from, result.to);
+      }
+      // When there is only one completion, use it directly.
+      if (completions.length == 1) {insert(completions[0]); return true;}
+  
+      // Build the select widget
+      var complete = document.createElement("div");
+      complete.className = "CodeMirror-completions";
+      var sel = complete.appendChild(document.createElement("select"));
+      // Opera doesn't move the selection when pressing up/down in a
+      // multi-select, but it does properly support the size property on
+      // single-selects, so no multi-select is necessary.
+      if (!window.opera) sel.multiple = true;
+      for (var i = 0; i &lt; completions.length; ++i) {
+        var opt = sel.appendChild(document.createElement("option"));
+        opt.appendChild(document.createTextNode(completions[i].description));
+      }
+      sel.firstChild.selected = true;
+      sel.size = Math.min(10, completions.length);
+      var pos = editor.cursorCoords();
+      complete.style.left = pos.x + "px";
+      complete.style.top = pos.yBot + "px";
+      document.body.appendChild(complete);
+      // If we're at the edge of the screen, then we want the menu to appear on the left of the cursor.
+      var winW = window.innerWidth || Math.max(document.body.offsetWidth, document.documentElement.offsetWidth);
+      if(winW - pos.x &lt; sel.clientWidth)
+        complete.style.left = (pos.x - sel.clientWidth) + "px";
+      // Hack to hide the scrollbar.
+      if (completions.length &lt;= 10)
+        complete.style.width = (sel.clientWidth - 1) + "px";
+  
+      var done = false;
+      function close() {
+        if (done) return;
+        done = true;
+        complete.parentNode.removeChild(complete);
+      }
+      function pick() {
+        insert(completions[sel.selectedIndex].name);
+        close();
+        setTimeout(function(){editor.focus();}, 50);
+      }
+      CodeMirror.connect(sel, "blur", close);
+      CodeMirror.connect(sel, "keydown", function(event) {
+        var code = event.keyCode;
+        // Enter
+        if (code == 13) {CodeMirror.e_stop(event); pick();}
+        // Escape
+        else if (code == 27) {CodeMirror.e_stop(event); close(); editor.focus();}
+        else if (code != 38 &amp;&amp; code != 40) {
+          close(); editor.focus();
+          // Pass the event to the CodeMirror instance so that it can handle things like backspace properly.
+          editor.triggerOnKeyDown(event);
+          setTimeout(function(){CodeMirror.simpleHint(editor, getHints);}, 50);
+        }
+      });
+      CodeMirror.connect(sel, "dblclick", pick);
+  
+      sel.focus();
+      // Opera sometimes ignores focusing a freshly created node
+      if (window.opera) setTimeout(function(){if (!done) sel.focus();}, 100);
+      return true;
+    };
+  }
+}
+    
+document.observe('xwiki:dom:loaded', function() {
+  initialize();    
+});
+
+})();</code>
+    </property>
+    <property>
+      <name>simple-hint.js extended to support additional information</name>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>always</use>
+    </property>
+  </object>
   <content/>
 </xwikidoc>

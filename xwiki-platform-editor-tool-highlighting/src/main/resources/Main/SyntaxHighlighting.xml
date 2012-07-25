@@ -12,8 +12,8 @@
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1312185816000</creationDate>
-  <date>1318862445000</date>
-  <contentUpdateDate>1318862445000</contentUpdateDate>
+  <date>1343242594000</date>
+  <contentUpdateDate>1343242594000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <template/>
@@ -7608,7 +7608,7 @@ var initCodeMirrorModules = function() {
     importScript("$xwiki.zipexplorer.getFileLink($doc, $attachmentName, 'mode/xwiki/xwiki.js')");
 
     // Support for simple Autocomplete
-    importScript("$xwiki.zipexplorer.getFileLink($doc, $attachmentName, 'lib/util/simple-hint.js')");    
+    // NOTE: replaced by our customized simple-hint JSX found in the Autocomplete page. importScript("$xwiki.zipexplorer.getFileLink($doc, $attachmentName, 'lib/util/simple-hint.js')");    
 
     // Autocomplete hook that allows an extension point for autocomplete implementations for each mode.
     CodeMirror.commands.autocomplete = function(cm) {
@@ -7909,7 +7909,11 @@ var importScript = function(src) {
 
 .activeline {
   background: none repeat scroll 0 0 #E0ECFF !important;
-}</code>
+}
+
+## Autocomplete suggest window
+
+</code>
     </property>
     <property>
       <name>CodeMirror styling</name>

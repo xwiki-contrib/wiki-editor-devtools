@@ -7680,7 +7680,8 @@ var initCodeMirror = function (propertyPattern, objectTitlePattern, codeMirrorMo
         hlLine = codeMirror.setLineClass(codeMirror.getCursor().line, 'activeline');
       },
       /* Autocomplete support. */
-      extraKeys: {'Shift-Ctrl-Space': 'autocomplete'}
+      extraKeys: {'Ctrl-Space': 'autocomplete',
+                  'Shift-Ctrl-Space': 'autocomplete'}
     });
     var hlLine = codeMirror.setLineClass(0, 'activeline');
     

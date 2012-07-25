@@ -154,8 +154,8 @@ var initialize = function () {
       });
 
       return {list: hints,
-              from: {line: cursor.line, ch: token.start},
-              to: {line: cursor.line, ch: token.end}};
+              from: {line: cursor.line, ch: cursor.ch},
+              to: {line: cursor.line, ch: cursor.ch}};
     }
   }
 }

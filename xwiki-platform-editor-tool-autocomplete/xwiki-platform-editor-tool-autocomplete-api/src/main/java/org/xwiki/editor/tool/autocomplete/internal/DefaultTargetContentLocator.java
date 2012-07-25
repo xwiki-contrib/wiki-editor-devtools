@@ -38,14 +38,29 @@ import org.xwiki.rendering.block.match.MacroBlockMatcher;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 
+/**
+ * Finds the content and content type at the cursor position.
+ *
+ * @version $Id$
+ * @since 4.2M2
+ */
 @Component
 @Singleton
 public class DefaultTargetContentLocator implements TargetContentLocator
 {
+    /**
+     * Special marker to be able to help discover the content and type at the cursor position.
+     */
     private static final String MARKER = "xwikiautocompletionmarker";
 
-    private static MacroBlockMatcher VELOCITY_MACRO_MATCHER = new MacroBlockMatcher("velocity");
+    /**
+     * Name of the Velocity macro in the XDOM.
+     */
+    private static final MacroBlockMatcher VELOCITY_MACRO_MATCHER = new MacroBlockMatcher("velocity");
 
+    /**
+     * Used to dynamically find the Parser for the content syntax.
+     */
     @Inject
     private ComponentManager componentManager;
 
@@ -91,6 +106,10 @@ public class DefaultTargetContentLocator implements TargetContentLocator
         return targetContent;
     }
 
+    /**
+     * @param syntaxId the syntax id of the whole content (eg "xwiki/2.0")
+     * @return the Parser for parsing the whole content
+     */
     private Parser getParser(String syntaxId)
     {
         Parser parser;

@@ -30,7 +30,7 @@ import org.xwiki.component.annotation.Role;
  * the wiki.
  *
  * @version $Id$
- * @since 4.1M2
+ * @since 4.2M2
  */
 @Role
 public interface AutoCompletionMethodFinder

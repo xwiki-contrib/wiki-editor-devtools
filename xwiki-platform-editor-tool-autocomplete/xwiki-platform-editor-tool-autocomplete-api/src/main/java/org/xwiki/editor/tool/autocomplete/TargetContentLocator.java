@@ -21,8 +21,22 @@ package org.xwiki.editor.tool.autocomplete;
 
 import org.xwiki.component.annotation.Role;
 
+/**
+ * Allows discovering the syntax of the content under the current cursor position.
+ *
+ * @version $Id$
+ * @since 4.2M2
+ */
 @Role
 public interface TargetContentLocator
 {
+    /**
+     * @param content the whole content from which we need to extract the content and type at the cursor position
+     *                (eg the whole content could be written in wiki syntax and the content at the cursor position
+     *                could be Velocity content)
+     * @param syntaxId the syntax in which the whole content is written in (eg "xwiki/2.0")
+     * @param currentPosition the position of the cursor
+     * @return the content and type at the cursor position
+     */
     TargetContent locate(String content, String syntaxId, int currentPosition);
 }

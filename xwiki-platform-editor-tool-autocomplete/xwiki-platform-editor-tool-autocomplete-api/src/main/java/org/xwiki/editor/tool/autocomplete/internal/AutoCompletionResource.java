@@ -47,7 +47,7 @@ import org.xwiki.velocity.internal.util.VelocityParserContext;
  * the position of the cursor and the syntax in which the content is written in are passed as request parameters.
  * 
  * @version $Id$
- * @since 4.1M2
+ * @since 4.2M2
  */
 @Component("org.xwiki.editor.tool.autocomplete.internal.AutoCompletionResource")
 @Path("/autocomplete")
@@ -67,9 +67,15 @@ public class AutoCompletionResource implements XWikiRestComponent
     @Inject
     private ComponentManager componentManager;
 
+    /**
+     * Used to autodiscover method hints.
+     */
     @Inject
     private AutoCompletionMethodFinder defaultAutoCompletionMethodFinder;
 
+    /**
+     * Used to extract the content and the type under the cursor position.
+     */
     @Inject
     private TargetContentLocator targetContentLocator;
 
@@ -137,45 +143,85 @@ public class AutoCompletionResource implements XWikiRestComponent
                 }
 
                 if (blockPos == offset) {
-
-                    // Get the property before the first dot
-                    StringBuffer propertyBlock = new StringBuffer();
-                    int methodPos = this.parser.getMethodOrProperty(chars, dollarPos, propertyBlock, context);
-                    String propertyName = propertyBlock.toString().substring(1);
-
-                    if (methodPos < blockPos) {
-                        // Get methods!
-                        if (chars[methodPos] == '.') {
-
-                            String fragment = "";
-                            boolean autoCompleteMethods = false;
-
-                            // Handle the case where the cursor is just after the dot
-                            if (methodPos + 1 == offset) {
-                                autoCompleteMethods = true;
-                            } else {
-                                propertyBlock = new StringBuffer();
-                                methodPos = this.parser.getMethodOrProperty(chars, methodPos, propertyBlock, context);
-                                if (methodPos == blockPos) {
-                                    autoCompleteMethods = true;
-                                    fragment = propertyBlock.toString().substring(1);
-                                }
-                            }
-
-                            if (autoCompleteMethods) {
-                                // Find methods using Reflection
-                                results.addAll(getMethods(propertyName, fragment, velocityContext));
-                            }
-                        }
-                    } else {
-                        String fragment = propertyBlock.toString().substring(1);
-                        results.addAll(getVelocityContextKeys(fragment, velocityContext));
-                    }
+                    results.addAll(
+                        getMethodsOrVariableHints(chars, dollarPos, blockPos, offset, velocityContext));
                 }
 
             } catch (InvalidVelocityException e) {
                 throw new RuntimeException(e);
             }
+        }
+
+        return results;
+    }
+
+    /**
+     * @param chars the content to parse
+     * @param dollarPos the position of the dollar symbol
+     * @param blockPos the position in the content after the whole fragment starting with the dollar symbol
+     * @param offset the position in the whole content of the cursor
+     * @param velocityContext the velocity context used to get the variables bound in the Velocity Context
+     * @return the list of hints
+     * @throws InvalidVelocityException when the code to parse is not what's expected
+     */
+    private List<String> getMethodsOrVariableHints(char[] chars, int dollarPos, int blockPos, int offset,
+        VelocityContext velocityContext) throws InvalidVelocityException
+    {
+        List<String> results = new ArrayList<String>();
+        VelocityParserContext context = new VelocityParserContext();
+
+        // Get the property before the first dot
+        StringBuffer propertyBlock = new StringBuffer();
+        int methodPos = this.parser.getMethodOrProperty(chars, dollarPos, propertyBlock, context);
+        String propertyName = propertyBlock.toString().substring(1);
+
+        if (methodPos < blockPos) {
+            // Get methods!
+            if (chars[methodPos] == '.') {
+                results.addAll(getMethods(chars, propertyName, blockPos, methodPos, offset, velocityContext));
+            }
+        } else {
+            String fragment = propertyBlock.toString().substring(1);
+            results.addAll(getVelocityContextKeys(fragment, velocityContext));
+        }
+
+        return results;
+    }
+
+    /**
+     * @param chars the content to parse
+     * @param propertyName the name of the property on which we want to find methods
+     * @param blockPos the position in the content after the whole fragment starting with the dollar symbol
+     * @param methodPos the position in the content after the whole fragment starting with the dollar symbol
+     * @param offset the position in the whole content of the cursor
+     * @param velocityContext the velocity context used to get the variables bound in the Velocity Context
+     * @return the list of hints
+     * @throws InvalidVelocityException when the code to parse is not what's expected
+     */
+    private List<String> getMethods(char[] chars, String propertyName, int blockPos, int methodPos, int offset,
+        VelocityContext velocityContext) throws InvalidVelocityException
+    {
+        List<String> results = new ArrayList<String>();
+        VelocityParserContext context = new VelocityParserContext();
+
+        String fragment = "";
+        boolean autoCompleteMethods = false;
+
+        // Handle the case where the cursor is just after the dot
+        if (methodPos + 1 == offset) {
+            autoCompleteMethods = true;
+        } else {
+            StringBuffer propertyBlock = new StringBuffer();
+            int newMethodPos = this.parser.getMethodOrProperty(chars, methodPos, propertyBlock, context);
+            if (newMethodPos == blockPos) {
+                autoCompleteMethods = true;
+                fragment = propertyBlock.toString().substring(1);
+            }
+        }
+
+        if (autoCompleteMethods) {
+            // Find methods using Reflection
+            results.addAll(getMethods(propertyName, fragment, velocityContext));
         }
 
         return results;

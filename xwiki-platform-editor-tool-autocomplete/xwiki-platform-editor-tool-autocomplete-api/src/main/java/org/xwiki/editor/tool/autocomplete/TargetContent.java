@@ -22,14 +22,36 @@ package org.xwiki.editor.tool.autocomplete;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
+/**
+ * Represents the content and type at the cursor position (eg the whole content could be written in wiki syntax and
+ * the content at the cursor position could be Velocity content). Also provides the position of the cursor relative
+ * to the content.
+ *
+ * @version $Id$
+ * @since 4.2M2
+ */
 public class TargetContent
 {
+    /**
+     * @see #getContent()
+     */
     private String content;
 
+    /**
+     * @see #getType()
+     */
     private TargetContentType type;
 
+    /**
+     * @see #getPosition()
+     */
     private int position;
 
+    /**
+     * @param content see {@link #getContent()}
+     * @param position see {@link #getPosition()}
+     * @param type see {@link #getType()}
+     */
     public TargetContent(String content, int position, TargetContentType type)
     {
         this.content = content;
@@ -37,16 +59,25 @@ public class TargetContent
         this.type = type;
     }
 
+    /**
+     * @return the content
+     */
     public String getContent()
     {
         return this.content;
     }
 
+    /**
+     * @return the content type (velocity, etc)
+     */
     public TargetContentType getType()
     {
         return this.type;
     }
 
+    /**
+     * @return the current position of the cursor relative to the content
+     */
     public int getPosition()
     {
         return this.position;

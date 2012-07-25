@@ -19,7 +19,16 @@
  */
 package org.xwiki.editor.tool.autocomplete;
 
+/**
+ * Represents the type of content at the cursor position.
+ *
+ * @version $Id$
+ * @since 4.2M2
+ */
 public enum TargetContentType
 {
+    /**
+     * Velocity content.
+     */
     VELOCITY;
 }

@@ -21,8 +21,21 @@ package org.xwiki.editor.tool.autocomplete.internal;
 
 import org.xwiki.editor.tool.autocomplete.AutoCompletionMethodFinder;
 
+/**
+ * Helper class when writing {@link AutoCompletionMethodFinder}s.
+ *
+ * @version $Id$
+ * @since 4.2M2
+ */
 public abstract class AbstractAutoCompletionMethodFinder implements AutoCompletionMethodFinder
 {
+    /**
+     * Pretty print a method hint.
+     *
+     * @param methodName the method name to print
+     * @param returnType the type returned by the method
+     * @return the pretty printed string representing the method hint
+     */
     protected String printMethod(String methodName, String returnType)
     {
         return methodName + "(...)" + (returnType == null || returnType.equals("void") ? "" : " " + returnType);

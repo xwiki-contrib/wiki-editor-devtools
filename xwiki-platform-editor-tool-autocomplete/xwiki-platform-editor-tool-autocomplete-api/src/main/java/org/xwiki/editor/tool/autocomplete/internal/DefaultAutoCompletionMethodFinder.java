@@ -27,18 +27,22 @@ import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.editor.tool.autocomplete.AutoCompletionMethodFinder;
 
 /**
  * Returns autocompletion hints by finding all methods using introspection.
  *
  * @version $Id$
- * @since 4.1M2
+ * @since 4.2M2
  */
 @Component
 @Singleton
 public class DefaultAutoCompletionMethodFinder extends AbstractAutoCompletionMethodFinder
 {
+    /**
+     * Keyword prefix for getter methods.
+     */
+    private static final String GETTER_KEYWORD = "get";
+
     @Override
     public List<String> findMethods(Class propertyClass, String fragmentToMatch)
     {
@@ -47,12 +51,12 @@ public class DefaultAutoCompletionMethodFinder extends AbstractAutoCompletionMet
         for (Method method : propertyClass.getClass().getDeclaredMethods()) {
             String methodName = method.getName().toLowerCase();
             if (methodName.startsWith(fragmentToMatch)
-                || methodName.startsWith("get" + fragmentToMatch.toLowerCase())) {
+                || methodName.startsWith(GETTER_KEYWORD + fragmentToMatch.toLowerCase())) {
                 // Don't print void return types!
                 String returnType = method.getReturnType().getSimpleName();
 
                 // Add simplified velocity without the get()
-                if (methodName.startsWith("get" + fragmentToMatch.toLowerCase())) {
+                if (methodName.startsWith(GETTER_KEYWORD + fragmentToMatch.toLowerCase())) {
                     methodNames.add(printMethod(StringUtils.uncapitalize(methodName.substring(3)), returnType));
                 }
 

@@ -155,6 +155,14 @@ public class AutoCompletionResourceTest extends AbstractMockingComponentTestCase
         Hints hints = this.resource.getAutoCompletionHints(velocity.length(), "xwiki/2.0", velocity);
 
         Assert.assertEquals(5, hints.getHints().size());
+
+        // Verify methods are returned sorted
+        Assert.assertEquals(Arrays.asList(
+            "doWork(...) AncillaryTestClass",
+            "getSomething(...) String",
+            "method1(...)",
+            "method2(...) String",
+            "something String"), hints.getHints());
     }
 
     @Test

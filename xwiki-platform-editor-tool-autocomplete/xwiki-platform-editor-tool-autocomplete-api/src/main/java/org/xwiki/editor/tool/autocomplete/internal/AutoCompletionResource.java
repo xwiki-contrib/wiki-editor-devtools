@@ -20,6 +20,7 @@
 package org.xwiki.editor.tool.autocomplete.internal;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -289,6 +290,9 @@ public class AutoCompletionResource implements XWikiRestComponent
             methodNames.addAll(
                 this.defaultAutoCompletionMethodFinder.findMethods(propertyClass.getClass(), fragmentToMatch));
         }
+
+        // Sort hints
+        Collections.sort(methodNames);
 
         return methodNames;
     }

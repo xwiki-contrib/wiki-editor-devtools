@@ -78,4 +78,24 @@ public class DefaultAutoCompletionMethodFinderTest extends AbstractMockingCompon
             new HintData("ethod1", "method1(String, AncillaryTestClass, int) void")
         ));
     }
+
+    @Test
+    public void findMethodsWhenMatchingGetter()
+    {
+        List<HintData> hints = this.finder.findMethods(TestClass.class, "so");
+
+        assertThat(hints, containsInAnyOrder(
+            new HintData("mething", "something String")
+        ));
+    }
+
+    @Test
+    public void findMethodsWhenCamelCaseMatching()
+    {
+        List<HintData> hints = this.finder.findMethods(TestClass.class, "getSo");
+
+        assertThat(hints, containsInAnyOrder(
+            new HintData("mething", "getSomething() String")
+        ));
+    }
 }

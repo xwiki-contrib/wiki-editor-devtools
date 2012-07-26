@@ -40,29 +40,68 @@ public abstract class AbstractAutoCompletionMethodFinder implements AutoCompleti
      */
     protected String printMethod(String methodName, Method method)
     {
-        StringBuilder pretty = new StringBuilder();
-
         // Step 1: Add method name
-        pretty.append(methodName);
-
         // Step 2: Add parameters
-        pretty.append('(');
+        // Step 3: Add return type (Don't print void return types!)
+        return new StringBuilder()
+            .append(methodName)
+            .append(getParameters(method))
+            .append(getReturnType(method))
+            .toString();
+    }
+
+    /**
+     * Pretty print a shorthand hint.
+     *
+     * @param methodName the shorthand name to print
+     * @param method the method for which to print the return type
+     * @return the pretty printed string representing the shorthand hint
+     */
+    protected String printShorthand(String methodName, Method method)
+    {
+        // Step 1: Add method name
+        // Step 2: Add return type (Don't print void return types!)
+        return new StringBuilder()
+            .append(methodName)
+            .append(getReturnType(method))
+            .toString();
+    }
+
+    /**
+     * @param method the method from which to extract the parameters
+     * @return the pretty-printed method parameters
+     */
+    private StringBuilder getParameters(Method method)
+    {
+        StringBuilder builder = new StringBuilder();
+
+        builder.append('(');
         Class<?>[] parameterTypes = method.getParameterTypes();
         for (int i = 0; i < parameterTypes.length; i++) {
-            pretty.append(parameterTypes[i].getSimpleName());
+            builder.append(parameterTypes[i].getSimpleName());
             if (i < parameterTypes.length - 1) {
-                pretty.append(", ");
+                builder.append(", ");
             }
         }
-        pretty.append(')');
+        builder.append(')');
 
-        // Step 3: Add return type (Don't print void return types!)
+        return builder;
+    }
+
+    /**
+     * @param method the method from which to extract the return type
+     * @return the pretty-printed method return type
+     */
+    private StringBuilder getReturnType(Method method)
+    {
+        StringBuilder builder = new StringBuilder();
+
         String returnType = method.getReturnType().getSimpleName();
         if (returnType != null) {
-            pretty.append(' ');
-            pretty.append(returnType);
+            builder.append(' ');
+            builder.append(returnType);
         }
 
-        return pretty.toString();
+        return builder;
     }
 }

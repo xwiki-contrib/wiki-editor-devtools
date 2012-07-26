@@ -47,22 +47,24 @@ public class DefaultAutoCompletionMethodFinder extends AbstractAutoCompletionMet
     public List<HintData> findMethods(Class propertyClass, String fragmentToMatch)
     {
         List<HintData> hintData = new ArrayList<HintData>();
+        String lowerCaseFragment = fragmentToMatch.toLowerCase();
 
         for (Method method : propertyClass.getDeclaredMethods()) {
             String methodName = method.getName().toLowerCase();
-            if (methodName.startsWith(fragmentToMatch)
-                || methodName.startsWith(GETTER_KEYWORD + fragmentToMatch.toLowerCase()))
+            if (methodName.startsWith(lowerCaseFragment)
+                || methodName.startsWith(GETTER_KEYWORD + lowerCaseFragment))
             {
                 // Add simplified velocity without the get()
-                if (methodName.startsWith(GETTER_KEYWORD + fragmentToMatch.toLowerCase())) {
+                if (methodName.startsWith(GETTER_KEYWORD + lowerCaseFragment)) {
                     String getter = StringUtils.uncapitalize(methodName.substring(3));
-                    hintData.add(new HintData(getter, printMethod(getter, method)));
+                    hintData.add(new HintData(StringUtils.removeStart(getter, fragmentToMatch),
+                        printShorthand(getter, method)));
+                } else {
+                    // Remove the fragmentToMatch from the returned hint name since we want the client side to just
+                    // append our returned result where the cursor is.
+                    hintData.add(new HintData(StringUtils.removeStart(method.getName(), fragmentToMatch),
+                        printMethod(method.getName(), method)));
                 }
-
-                // Remove the fragmentToMatch from the returned hint name since we want the client side to just append
-                // our returned result where the cursor is.
-                hintData.add(new HintData(StringUtils.removeStart(method.getName(), fragmentToMatch),
-                    printMethod(method.getName(), method)));
             }
         }
 

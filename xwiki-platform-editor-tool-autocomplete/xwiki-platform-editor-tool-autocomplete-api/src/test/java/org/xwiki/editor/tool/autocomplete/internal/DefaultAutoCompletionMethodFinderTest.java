@@ -28,6 +28,8 @@ import org.junit.Test;
 import org.xwiki.test.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.MockingRequirement;
 
+import junit.framework.Assert;
+
 /**
  * Unit tests for {@link DefaultAutoCompletionMethodFinder}.
  *
@@ -66,6 +68,11 @@ public class DefaultAutoCompletionMethodFinderTest extends AbstractMockingCompon
         {
             return "";
         }
+
+        // Simulates an aspectj method
+        public void ajc$something()
+        {
+        }
     }
 
     @Test
@@ -98,4 +105,13 @@ public class DefaultAutoCompletionMethodFinderTest extends AbstractMockingCompon
             new HintData("mething", "getSomething() String")
         ));
     }
+
+    @Test
+    public void excludeAspectJMethods()
+    {
+        List<HintData> hints = this.finder.findMethods(TestClass.class, "a");
+
+        Assert.assertEquals(0, hints.size());
+    }
+
 }

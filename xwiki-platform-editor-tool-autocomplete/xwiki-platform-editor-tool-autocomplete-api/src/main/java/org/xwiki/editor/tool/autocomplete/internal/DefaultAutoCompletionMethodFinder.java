@@ -43,6 +43,11 @@ public class DefaultAutoCompletionMethodFinder extends AbstractAutoCompletionMet
      */
     private static final String GETTER_KEYWORD = "get";
 
+    /**
+     * Prefix of methods injected by AspectJ that we need to exclude
+     */
+    private static final String ASPECTJ_METHOD_PREFIX = "ajc$";
+
     @Override
     public List<HintData> findMethods(Class propertyClass, String fragmentToMatch)
     {
@@ -51,8 +56,8 @@ public class DefaultAutoCompletionMethodFinder extends AbstractAutoCompletionMet
 
         for (Method method : propertyClass.getDeclaredMethods()) {
             String methodName = method.getName().toLowerCase();
-            if (methodName.startsWith(lowerCaseFragment)
-                || methodName.startsWith(GETTER_KEYWORD + lowerCaseFragment))
+            if (!methodName.startsWith(ASPECTJ_METHOD_PREFIX) && (methodName.startsWith(lowerCaseFragment)
+                || methodName.startsWith(GETTER_KEYWORD + lowerCaseFragment)))
             {
                 // Add simplified velocity without the get()
                 if (methodName.startsWith(GETTER_KEYWORD + lowerCaseFragment) 

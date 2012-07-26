@@ -237,7 +237,6 @@ public class AutoCompletionResourceTest extends AbstractMockingComponentTestCase
                 will(returnValue(expectedMethodNames));
             }
         });
-
     }
 
     private void setUpMocks(final String expectedContent, final VelocityContext velocityContext) throws Exception

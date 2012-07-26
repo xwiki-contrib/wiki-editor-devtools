@@ -61,22 +61,6 @@ public class Hints
      * @param values the autocompletion hints to populate the instance with
      * @return the {@link Hints} containing the passed hints
      */
-    public Hints withHints(HintData... values)
-    {
-        if (values != null) {
-            for (HintData value: values) {
-                getHints().add(value);
-            }
-        }
-        return this;
-    }
-
-    /**
-     * Build an instance of {@link Hints}.
-     *
-     * @param values the autocompletion hints to populate the instance with
-     * @return the {@link Hints} containing the passed hints
-     */
     public Hints withHints(Collection<HintData> values)
     {
         if (values != null) {

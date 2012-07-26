@@ -93,8 +93,8 @@ public class HintData implements Comparable<HintData>
         }
         HintData rhs = (HintData) object;
         return new EqualsBuilder()
-            .append(this.name, rhs.name)
-            .append(this.description, rhs.description)
+            .append(getName(), rhs.getName())
+            .append(getDescription(), getDescription())
             .isEquals();
     }
 

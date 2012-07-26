@@ -25,6 +25,7 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -40,7 +41,7 @@ import org.xwiki.rendering.parser.Parser;
 
 /**
  * Finds the content and content type at the cursor position.
- *
+ * 
  * @version $Id$
  * @since 4.2M2
  */
@@ -64,6 +65,12 @@ public class DefaultTargetContentLocator implements TargetContentLocator
     @Inject
     private ComponentManager componentManager;
 
+    /**
+     * Logging framework.
+     */
+    @Inject
+    private Logger logger;
+
     // TODO: Only supports Velocity at the moment
     @Override
     public TargetContent locate(String content, String syntaxId, int currentPosition)
@@ -84,22 +91,21 @@ public class DefaultTargetContentLocator implements TargetContentLocator
                 XDOM xdom = parser.parse(new StringReader(modifiedContent.toString()));
 
                 // Find the matching Velocity macro
-                List<Block> velocityMacroBlocks =
-                    xdom.getBlocks(VELOCITY_MACRO_MATCHER, Block.Axes.DESCENDANT);
+                List<Block> velocityMacroBlocks = xdom.getBlocks(VELOCITY_MACRO_MATCHER, Block.Axes.DESCENDANT);
                 for (Block velocityMacroBlock : velocityMacroBlocks) {
                     MacroBlock macroBlock = (MacroBlock) velocityMacroBlock;
                     int pos = macroBlock.getContent().indexOf(MARKER);
                     if (pos != -1) {
                         // We've found it, exit!
                         // Remove the marker...
-                        String cleanContent =
-                            macroBlock.getContent().substring(0, macroBlock.getContent().length() - MARKER.length());
+                        String cleanContent = macroBlock.getContent().substring(0, pos);
                         targetContent = new TargetContent(cleanContent, pos, TargetContentType.VELOCITY);
                         break;
                     }
                 }
             } catch (ParseException e) {
                 // Failed to parser content for some reason, don't do autocompletion
+                logger.warn("Failed to find the content and content type at the cursor position", e);
             }
         }
 

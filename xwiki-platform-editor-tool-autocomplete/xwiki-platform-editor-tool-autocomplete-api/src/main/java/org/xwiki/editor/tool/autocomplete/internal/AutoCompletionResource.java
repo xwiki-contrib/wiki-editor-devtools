@@ -30,6 +30,7 @@ import javax.ws.rs.QueryParam;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.velocity.VelocityContext;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -44,8 +45,8 @@ import org.xwiki.velocity.internal.util.VelocityParser;
 import org.xwiki.velocity.internal.util.VelocityParserContext;
 
 /**
- * REST Resource for returning autocompletion hints. The content to autocomplete is passed in the request body,
- * the position of the cursor and the syntax in which the content is written in are passed as request parameters.
+ * REST Resource for returning autocompletion hints. The content to autocomplete is passed in the request body, the
+ * position of the cursor and the syntax in which the content is written in are passed as request parameters.
  * 
  * @version $Id$
  * @since 4.2M2
@@ -63,6 +64,7 @@ public class AutoCompletionResource implements XWikiRestComponent
 
     /**
      * Used to dynamically find Autocompletion Method finder to handle specific cases.
+     * 
      * @see AutoCompletionMethodFinder
      */
     @Inject
@@ -81,13 +83,19 @@ public class AutoCompletionResource implements XWikiRestComponent
     private TargetContentLocator targetContentLocator;
 
     /**
+     * Logging framework.
+     */
+    @Inject
+    private Logger logger;
+
+    /**
      * A Velocity Parser that we use to help parse Velocity content for figuring out autocompletion.
      */
     private VelocityParser parser = new VelocityParser();
 
     /**
      * Main REST entry point for getting Autocompletion hints.
-     *
+     * 
      * @param offset the position of the cursor in the full content
      * @param syntaxId the syntax in which the content is written in
      * @param content the full wiki content
@@ -144,11 +152,11 @@ public class AutoCompletionResource implements XWikiRestComponent
                 }
 
                 if (blockPos == offset) {
-                    results.addAll(
-                        getMethodsOrVariableHints(chars, dollarPos, blockPos, offset, velocityContext));
+                    results.addAll(getMethodsOrVariableHints(chars, dollarPos, blockPos, offset, velocityContext));
                 }
 
             } catch (InvalidVelocityException e) {
+                logger.error("Failed to get autocomplete hints", e);
                 throw new RuntimeException(e);
             }
         }
@@ -233,9 +241,9 @@ public class AutoCompletionResource implements XWikiRestComponent
 
     /**
      * Find out all Velocity variable names bound in the Velocity Context.
-     *
+     * 
      * @param fragmentToMatch the prefix to filter with in order to return only variable whose names start with the
-     *        passed string
+     *            passed string
      * @param velocityContext the Velocity Context from which to get the bound variables
      * @return the Velocity variables
      */
@@ -253,7 +261,7 @@ public class AutoCompletionResource implements XWikiRestComponent
 
     /**
      * Add variables to the passed results list.
-     *
+     * 
      * @param results the list of variable names
      * @param keys the keys containing the variables to add
      * @param fragmentToMatch the filter in order to only add variable whose names start with the passed string
@@ -292,8 +300,8 @@ public class AutoCompletionResource implements XWikiRestComponent
         }
 
         if (hintData.isEmpty()) {
-            hintData.addAll(
-                this.defaultAutoCompletionMethodFinder.findMethods(propertyClass.getClass(), fragmentToMatch));
+            hintData.addAll(this.defaultAutoCompletionMethodFinder.findMethods(propertyClass.getClass(),
+                fragmentToMatch));
         }
 
         return hintData;

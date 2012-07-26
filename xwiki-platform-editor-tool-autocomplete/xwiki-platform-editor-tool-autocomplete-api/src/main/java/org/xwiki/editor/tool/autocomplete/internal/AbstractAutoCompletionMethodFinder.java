@@ -68,6 +68,23 @@ public abstract class AbstractAutoCompletionMethodFinder implements AutoCompleti
     }
 
     /**
+     * Pretty print a shorthand hint.
+     *
+     * @param methodName the shorthand name to print
+     * @param returnType the class return type
+     * @return the pretty printed string representing the shorthand hint
+     */
+    protected String printShorthand(String methodName, Class returnType)
+    {
+        // Step 1: Add method name
+        // Step 2: Add return type (Don't print void return types!)
+        return new StringBuilder()
+            .append(methodName)
+            .append(returnType == null ? "" : " " + returnType.getSimpleName())
+            .toString();
+    }
+
+    /**
      * @param method the method from which to extract the parameters
      * @return the pretty-printed method parameters
      */

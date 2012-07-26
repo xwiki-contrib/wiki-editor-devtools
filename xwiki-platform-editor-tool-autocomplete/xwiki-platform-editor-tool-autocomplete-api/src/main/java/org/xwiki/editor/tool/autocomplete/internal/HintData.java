@@ -94,7 +94,7 @@ public class HintData implements Comparable<HintData>
         HintData rhs = (HintData) object;
         return new EqualsBuilder()
             .append(getName(), rhs.getName())
-            .append(getDescription(), getDescription())
+            .append(getDescription(), rhs.getDescription())
             .isEquals();
     }
 

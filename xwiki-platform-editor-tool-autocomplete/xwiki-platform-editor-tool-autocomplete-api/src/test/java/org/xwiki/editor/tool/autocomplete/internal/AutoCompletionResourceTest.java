@@ -101,7 +101,10 @@ public class AutoCompletionResourceTest extends AbstractMockingComponentTestCase
         // Verify we can get keys from the Velocity Context and its inner context too. We test this since our
         // Velocity tools are put in an inner Velocity Context.
         Assert.assertEquals(2, hints.getHints().size());
-        assertThat(hints.getHints(), containsInAnyOrder(new HintData("key1", "key1"), new HintData("key2", "key2")));
+
+        // Also verifies that hints are sorted
+        Assert.assertEquals(Arrays.asList(new HintData("key1", "key1"), new HintData("key2", "key2")),
+            hints.getHints());
     }
 
     @Test

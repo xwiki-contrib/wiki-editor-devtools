@@ -153,6 +153,9 @@ public class AutoCompletionResource implements XWikiRestComponent
             }
         }
 
+        // Sort hints
+        Collections.sort(results);
+
         return results;
     }
 
@@ -290,9 +293,6 @@ public class AutoCompletionResource implements XWikiRestComponent
             hintData.addAll(
                 this.defaultAutoCompletionMethodFinder.findMethods(propertyClass.getClass(), fragmentToMatch));
         }
-
-        // Sort hints
-        Collections.sort(hintData);
 
         return hintData;
     }

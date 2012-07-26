@@ -27,6 +27,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.manager.ComponentManager;
@@ -61,7 +62,10 @@ public class ScriptServicesAutoCompletionMethodFinder extends AbstractAutoComple
 
         for (ComponentDescriptor<ScriptService> descriptor : descriptors) {
             if (descriptor.getRoleHint().startsWith(fragmentToMatch)) {
-                results.add(new HintData(descriptor.getRoleHint(), descriptor.getRoleHint()));
+                // Remove the fragmentToMatch from the returned hint name since we want the client side to just append
+                // our returned result where the cursor is.
+                results.add(new HintData(StringUtils.removeStart(descriptor.getRoleHint(), fragmentToMatch),
+                    descriptor.getRoleHint()));
             }
         }
 

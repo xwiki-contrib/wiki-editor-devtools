@@ -116,7 +116,7 @@ public class AutoCompletionResourceTest extends AbstractMockingComponentTestCase
         Hints hints = this.resource.getAutoCompletionHints(velocity.length(), "xwiki/2.0", velocity);
 
         Assert.assertEquals(1, hints.getHints().size());
-        assertThat(hints.getHints(), containsInAnyOrder(new HintData("key", "key")));
+        assertThat(hints.getHints(), containsInAnyOrder(new HintData("y", "key")));
     }
 
     @Test
@@ -210,7 +210,7 @@ public class AutoCompletionResourceTest extends AbstractMockingComponentTestCase
         Hints hints = this.resource.getAutoCompletionHints(velocity.length(), "xwiki/2.0", velocity);
 
         Assert.assertEquals(1, hints.getHints().size());
-        assertThat(hints.getHints(), containsInAnyOrder(new HintData("test", "test")));
+        assertThat(hints.getHints(), containsInAnyOrder(new HintData("est", "test")));
     }
 
     @Test

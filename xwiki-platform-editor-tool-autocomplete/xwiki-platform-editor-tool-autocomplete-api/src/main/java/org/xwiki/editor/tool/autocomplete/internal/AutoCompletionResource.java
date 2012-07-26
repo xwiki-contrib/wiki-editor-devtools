@@ -262,7 +262,9 @@ public class AutoCompletionResource implements XWikiRestComponent
     {
         for (Object key : keys) {
             if (key instanceof String && ((String) key).startsWith(fragmentToMatch)) {
-                results.add(new HintData((String) key, (String) key));
+                // Remove the fragmentToMatch from the returned hint name since we want the client side to just append
+                // our returned result where the cursor is.
+                results.add(new HintData(StringUtils.removeStart((String) key, fragmentToMatch), (String) key));
             }
         }
     }

@@ -61,7 +61,10 @@ public class DefaultAutoCompletionMethodFinder extends AbstractAutoCompletionMet
                     hintData.add(new HintData(getter, printMethod(getter, returnType)));
                 }
 
-                hintData.add(new HintData(method.getName(), printMethod(method.getName(), returnType)));
+                // Remove the fragmentToMatch from the returned hint name since we want the client side to just append
+                // our returned result where the cursor is.
+                hintData.add(new HintData(StringUtils.removeStart(method.getName(), fragmentToMatch),
+                    printMethod(method.getName(), returnType)));
             }
         }
 

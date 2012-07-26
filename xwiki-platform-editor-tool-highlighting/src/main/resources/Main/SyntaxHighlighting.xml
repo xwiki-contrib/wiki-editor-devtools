@@ -12,8 +12,8 @@
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1312185816000</creationDate>
-  <date>1343242594000</date>
-  <contentUpdateDate>1343242594000</contentUpdateDate>
+  <date>1343304121000</date>
+  <contentUpdateDate>1343304121000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <template/>
@@ -7599,7 +7599,7 @@ var initCodeMirrorModules = function() {
     importScript("$xwiki.zipexplorer.getFileLink($doc, $attachmentName, 'mode/css/css.js')");
     // JavaScript Mode
     importScript("$xwiki.zipexplorer.getFileLink($doc, $attachmentName, 'mode/javascript/javascript.js')");
-    // Velocity
+    // Velocity Mode
     importScript("$xwiki.zipexplorer.getFileLink($doc, $attachmentName, 'mode/velocity/velocity.js')");
     // XWiki Syntax/Macros
     importScript("$xwiki.zipexplorer.getFileLink($doc, $attachmentName, 'mode/xwikitags/xwikitags.js')");
@@ -7619,6 +7619,10 @@ var initCodeMirrorModules = function() {
       	CodeMirror.simpleHint(cm, autocompleteImplementation);
       }
     }
+      
+    // Match highlighting
+    importScript("$xwiki.zipexplorer.getFileLink($doc, $attachmentName, 'lib/util/match-highlighter.js')");
+    importScript("$xwiki.zipexplorer.getFileLink($doc, $attachmentName, 'lib/util/searchcursor.js')");
 
     initCodeMirrors();
   }
@@ -7672,12 +7676,16 @@ var initCodeMirror = function (propertyPattern, objectTitlePattern, codeMirrorMo
           return toggleFullscreenEditing(codeMirror);
         }
       },
-      /* Active line highlighting. */
-      onCursorActivity: function() {
-        /* Clear previous line highlighting. */
-        codeMirror.setLineClass(hlLine, null);
-        /* Highlight current line. */
-        hlLine = codeMirror.setLineClass(codeMirror.getCursor().line, 'activeline');
+      onCursorActivity: function(editor) {
+        /* Active line highlighting. */
+        
+        // Clear previous line highlighting.
+        editor.setLineClass(hlLine, null, null);
+        // Highlight current line.
+		hlLine = editor.setLineClass(editor.getCursor().line, null, "activeline"); 
+      
+        /* Match highlighting. */
+        editor.matchHighlight("CodeMirror-matchhighlight");
       },
       /* Autocomplete support. */
       extraKeys: {'Ctrl-Space': 'autocomplete',
@@ -7911,9 +7919,15 @@ var importScript = function(src) {
   background: none repeat scroll 0 0 #E0ECFF !important;
 }
 
-## Autocomplete suggest window
+## Match highlighter
 
-</code>
+#set ($strongerHighlightColor = '#FFFF44')
+span.CodeMirror-matchhighlight {
+    background: none repeat scroll 0 0 $strongerHighlightColor;
+}
+.CodeMirror-focused span.CodeMirror-matchhighlight {
+    background: none repeat scroll 0 0 $strongerHighlightColor;
+}</code>
     </property>
     <property>
       <name>CodeMirror styling</name>

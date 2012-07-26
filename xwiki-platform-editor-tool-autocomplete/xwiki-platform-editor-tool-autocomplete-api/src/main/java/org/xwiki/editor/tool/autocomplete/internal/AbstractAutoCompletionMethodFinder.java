@@ -19,6 +19,8 @@
  */
 package org.xwiki.editor.tool.autocomplete.internal;
 
+import java.lang.reflect.Method;
+
 import org.xwiki.editor.tool.autocomplete.AutoCompletionMethodFinder;
 
 /**
@@ -33,11 +35,34 @@ public abstract class AbstractAutoCompletionMethodFinder implements AutoCompleti
      * Pretty print a method hint.
      *
      * @param methodName the method name to print
-     * @param returnType the type returned by the method
+     * @param method the method to pretty print
      * @return the pretty printed string representing the method hint
      */
-    protected String printMethod(String methodName, String returnType)
+    protected String printMethod(String methodName, Method method)
     {
-        return methodName + "(...)" + (returnType == null || returnType.equals("void") ? "" : " " + returnType);
+        StringBuilder pretty = new StringBuilder();
+
+        // Step 1: Add method name
+        pretty.append(methodName);
+
+        // Step 2: Add parameters
+        pretty.append('(');
+        Class<?>[] parameterTypes = method.getParameterTypes();
+        for (int i = 0; i < parameterTypes.length; i++) {
+            pretty.append(parameterTypes[i].getSimpleName());
+            if (i < parameterTypes.length - 1) {
+                pretty.append(", ");
+            }
+        }
+        pretty.append(')');
+
+        // Step 3: Add return type (Don't print void return types!)
+        String returnType = method.getReturnType().getSimpleName();
+        if (returnType != null) {
+            pretty.append(' ');
+            pretty.append(returnType);
+        }
+
+        return pretty.toString();
     }
 }

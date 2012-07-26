@@ -106,4 +106,10 @@ public class HintData implements Comparable<HintData>
             .append(this.description)
             .toHashCode();
     }
+
+    @Override
+    public String toString()
+    {
+        return String.format("name = [%s], description = [%s]", getName(), getDescription());
+    }
 }

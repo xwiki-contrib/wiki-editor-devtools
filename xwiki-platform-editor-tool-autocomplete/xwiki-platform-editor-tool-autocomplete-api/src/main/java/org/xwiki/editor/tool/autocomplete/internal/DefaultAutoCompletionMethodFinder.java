@@ -51,20 +51,18 @@ public class DefaultAutoCompletionMethodFinder extends AbstractAutoCompletionMet
         for (Method method : propertyClass.getDeclaredMethods()) {
             String methodName = method.getName().toLowerCase();
             if (methodName.startsWith(fragmentToMatch)
-                || methodName.startsWith(GETTER_KEYWORD + fragmentToMatch.toLowerCase())) {
-                // Don't print void return types!
-                String returnType = method.getReturnType().getSimpleName();
-
+                || methodName.startsWith(GETTER_KEYWORD + fragmentToMatch.toLowerCase()))
+            {
                 // Add simplified velocity without the get()
                 if (methodName.startsWith(GETTER_KEYWORD + fragmentToMatch.toLowerCase())) {
                     String getter = StringUtils.uncapitalize(methodName.substring(3));
-                    hintData.add(new HintData(getter, printMethod(getter, returnType)));
+                    hintData.add(new HintData(getter, printMethod(getter, method)));
                 }
 
                 // Remove the fragmentToMatch from the returned hint name since we want the client side to just append
                 // our returned result where the cursor is.
                 hintData.add(new HintData(StringUtils.removeStart(method.getName(), fragmentToMatch),
-                    printMethod(method.getName(), returnType)));
+                    printMethod(method.getName(), method)));
             }
         }
 

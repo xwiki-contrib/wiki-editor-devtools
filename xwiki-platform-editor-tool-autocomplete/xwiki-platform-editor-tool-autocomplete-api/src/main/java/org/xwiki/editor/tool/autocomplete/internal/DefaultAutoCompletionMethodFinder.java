@@ -59,7 +59,7 @@ public class DefaultAutoCompletionMethodFinder extends AbstractAutoCompletionMet
                     && method.getParameterTypes().length == 0)
                 {
                     String getter = StringUtils.uncapitalize(method.getName().substring(3));
-                    hintData.add(new HintData(StringUtils.removeStart(getter, fragmentToMatch),
+                    hintData.add(new HintData(getter.substring(fragmentToMatch.length()),
                         printShorthand(getter, method)));
                 } else {
                     // Remove the fragmentToMatch from the returned hint name since we want the client side to just

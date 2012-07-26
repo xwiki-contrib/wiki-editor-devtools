@@ -55,8 +55,10 @@ public class DefaultAutoCompletionMethodFinder extends AbstractAutoCompletionMet
                 || methodName.startsWith(GETTER_KEYWORD + lowerCaseFragment))
             {
                 // Add simplified velocity without the get()
-                if (methodName.startsWith(GETTER_KEYWORD + lowerCaseFragment)) {
-                    String getter = StringUtils.uncapitalize(methodName.substring(3));
+                if (methodName.startsWith(GETTER_KEYWORD + lowerCaseFragment) 
+                    && method.getParameterTypes().length == 0)
+                {
+                    String getter = StringUtils.uncapitalize(method.getName().substring(3));
                     hintData.add(new HintData(StringUtils.removeStart(getter, fragmentToMatch),
                         printShorthand(getter, method)));
                 } else {

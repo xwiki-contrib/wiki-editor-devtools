@@ -156,8 +156,8 @@ public class AutoCompletionResource implements XWikiRestComponent
                 }
 
             } catch (InvalidVelocityException e) {
-                logger.error("Failed to get autocomplete hints", e);
-                throw new RuntimeException(e);
+                this.logger.debug("Failed to get autocomplete hints for content [{}] at offset [{}]",
+                    new Object[] { content, offset, e});
             }
         }
 

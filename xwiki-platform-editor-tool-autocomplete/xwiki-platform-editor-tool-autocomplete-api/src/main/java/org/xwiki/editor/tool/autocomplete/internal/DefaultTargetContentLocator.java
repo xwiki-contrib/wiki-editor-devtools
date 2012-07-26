@@ -105,7 +105,8 @@ public class DefaultTargetContentLocator implements TargetContentLocator
                 }
             } catch (ParseException e) {
                 // Failed to parser content for some reason, don't do autocompletion
-                logger.warn("Failed to find the content and content type at the cursor position", e);
+                this.logger.debug("Failed to find the content [{}] with syntax [{}] at the cursor position [{}]",
+                    new Object[] {content, syntaxId, currentPosition, e});
             }
         }
 

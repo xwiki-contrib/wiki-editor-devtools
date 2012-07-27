@@ -1,0 +1,2 @@
+org.xwiki.editor.tool.autocomplete.internal.XWikiAutoCompletionMethodFinder
+org.xwiki.editor.tool.autocomplete.internal.ContextAutoCompletionMethodFinder

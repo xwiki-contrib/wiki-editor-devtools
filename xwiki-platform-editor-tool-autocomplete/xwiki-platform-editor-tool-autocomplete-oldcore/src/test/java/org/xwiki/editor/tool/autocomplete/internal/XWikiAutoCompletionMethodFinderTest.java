@@ -21,8 +21,6 @@ package org.xwiki.editor.tool.autocomplete.internal;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 import java.util.Vector;
 
 import org.jmock.Expectations;
@@ -37,12 +35,9 @@ import org.xwiki.test.annotation.MockingRequirement;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
 import com.xpn.xwiki.plugin.XWikiPluginManager;
 
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.junit.Assert.assertThat;
-
 /**
  * Unit tests for {@link XWikiAutoCompletionMethodFinder}.
- *
+ * 
  * @version $Id$
  * @since 4.2M2
  */
@@ -74,7 +69,7 @@ public class XWikiAutoCompletionMethodFinderTest extends AbstractMockingComponen
         {
             {
                 oneOf(defaultMethodFinder).findMethods(TestClass.class, "t");
-                will(returnValue(new ArrayList<HintData>()));
+                will(returnValue(new Hints()));
                 oneOf(pluginManager).getPlugins();
                 will(returnValue(new Vector<String>(Arrays.asList("tag", "query"))));
                 oneOf(pluginManager).getPlugin("tag");
@@ -82,10 +77,10 @@ public class XWikiAutoCompletionMethodFinderTest extends AbstractMockingComponen
             }
         });
 
-        List<HintData> hints = this.finder.findMethods(TestClass.class, "t");
+        Hints hints = this.finder.findMethods(TestClass.class, "t");
 
-        Assert.assertEquals(1, hints.size());
-        Assert.assertEquals("ag", hints.get(0).getName());
-        Assert.assertEquals("tag " + plugin.getClass().getSimpleName(), hints.get(0).getDescription());
+        Assert.assertEquals(1, hints.getHints().size());
+        Assert.assertEquals("ag", hints.getHints().get(0).getName());
+        Assert.assertEquals("tag " + plugin.getClass().getSimpleName(), hints.getHints().get(0).getDescription());
     }
 }

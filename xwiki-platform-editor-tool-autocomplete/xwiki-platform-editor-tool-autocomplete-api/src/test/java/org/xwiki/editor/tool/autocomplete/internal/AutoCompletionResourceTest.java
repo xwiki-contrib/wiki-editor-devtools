@@ -82,6 +82,11 @@ public class AutoCompletionResourceTest extends AbstractMockingComponentTestCase
         {
             return "";
         }
+        
+        public String getSomething(String parameter)
+        {
+            return "";
+        }
 
         public void method1()
         {
@@ -295,14 +300,13 @@ public class AutoCompletionResourceTest extends AbstractMockingComponentTestCase
         setUpMocks("$key.s", createTestVelocityContext("key", new TestClass()));
 
         final Hints expectedMethods =
-            new Hints().withHints(new HintData("something", "something String"), new HintData("getSomething",
-                "getSomething(...) String"));
+            new Hints().withHints(new HintData("something", "something String"));
         setUpMethodFinderMock(expectedMethods, "s", TestClass.class);
 
         String velocity = "{{velocity}}$key.s";
         Hints hints = this.resource.getAutoCompletionHints(velocity.length(), "xwiki/2.0", velocity);
 
-        Assert.assertEquals(2, hints.getHints().size());
+        Assert.assertEquals(1, hints.getHints().size());
     }
 
     @Test

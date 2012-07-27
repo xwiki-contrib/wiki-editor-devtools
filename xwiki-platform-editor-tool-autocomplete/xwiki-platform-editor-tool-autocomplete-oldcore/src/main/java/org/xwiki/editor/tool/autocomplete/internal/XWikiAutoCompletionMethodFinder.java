@@ -19,8 +19,6 @@
  */
 package org.xwiki.editor.tool.autocomplete.internal;
 
-import java.util.List;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -33,7 +31,7 @@ import com.xpn.xwiki.plugin.XWikiPluginManager;
 
 /**
  * Returns autocompletion hints for the the {@link com.xpn.xwiki.XWiki} class, with special support for plugins.
- *
+ * 
  * @version $Id$
  * @since 4.2M2
  */
@@ -49,9 +47,9 @@ public class XWikiAutoCompletionMethodFinder extends AbstractXWikiContextAutoCom
     private AutoCompletionMethodFinder defaultAutoCompletionMethodFinder;
 
     @Override
-    public List<HintData> findMethods(Class variableClass, String fragmentToMatch)
+    public Hints findMethods(Class variableClass, String fragmentToMatch)
     {
-        List<HintData> hintData = this.defaultAutoCompletionMethodFinder.findMethods(variableClass, fragmentToMatch);
+        Hints hints = this.defaultAutoCompletionMethodFinder.findMethods(variableClass, fragmentToMatch);
 
         // Add plugins matching the passed fragment
         String lowerCaseFragment = fragmentToMatch.toLowerCase();
@@ -60,17 +58,17 @@ public class XWikiAutoCompletionMethodFinder extends AbstractXWikiContextAutoCom
             if (pluginName.toLowerCase().startsWith(lowerCaseFragment)) {
                 String hintName = StringUtils.removeStart(pluginName, fragmentToMatch);
                 String shorthand = printShorthand(pluginName, pluginManager.getPlugin(pluginName).getClass());
-                hintData.add(new HintData(hintName, shorthand));
+                hints.withHints(new HintData(hintName, shorthand));
             }
         }
 
-        return hintData;
+        return hints;
     }
 
     /**
      * Makes it easy for extending classes to override how the Plugin Manager is retrieved (useful for example when
      * writing unit tests).
-     *
+     * 
      * @return the plugin manager instance
      */
     protected XWikiPluginManager getPluginManager()

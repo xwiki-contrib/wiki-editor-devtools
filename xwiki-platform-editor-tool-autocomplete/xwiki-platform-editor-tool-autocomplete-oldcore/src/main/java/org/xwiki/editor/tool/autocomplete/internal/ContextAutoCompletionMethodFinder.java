@@ -19,8 +19,6 @@
  */
 package org.xwiki.editor.tool.autocomplete.internal;
 
-import java.util.List;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -33,7 +31,7 @@ import com.xpn.xwiki.XWikiContext;
 /**
  * Returns autocompletion hints for the the {@link com.xpn.xwiki.api.Context} class, with special support for context
  * keys.
- *
+ * 
  * @version $Id$
  * @since 4.2M2
  */
@@ -48,9 +46,9 @@ public class ContextAutoCompletionMethodFinder extends AbstractXWikiContextAutoC
     private AutoCompletionMethodFinder defaultAutoCompletionMethodFinder;
 
     @Override
-    public List<HintData> findMethods(Class variableClass, String fragmentToMatch)
+    public Hints findMethods(Class variableClass, String fragmentToMatch)
     {
-        List<HintData> hintData = this.defaultAutoCompletionMethodFinder.findMethods(variableClass, fragmentToMatch);
+        Hints hints = this.defaultAutoCompletionMethodFinder.findMethods(variableClass, fragmentToMatch);
 
         // Add context keys matching the passed fragment
         String lowerCaseFragment = fragmentToMatch.toLowerCase();
@@ -59,10 +57,10 @@ public class ContextAutoCompletionMethodFinder extends AbstractXWikiContextAutoC
             if (key instanceof String && ((String) key).toLowerCase().startsWith(lowerCaseFragment)) {
                 String hintName = StringUtils.removeStart((String) key, fragmentToMatch);
                 String shorthand = printShorthand((String) key, context.get(key).getClass());
-                hintData.add(new HintData(hintName, shorthand));
+                hints.withHints(new HintData(hintName, shorthand));
             }
         }
 
-        return hintData;
+        return hints;
     }
 }

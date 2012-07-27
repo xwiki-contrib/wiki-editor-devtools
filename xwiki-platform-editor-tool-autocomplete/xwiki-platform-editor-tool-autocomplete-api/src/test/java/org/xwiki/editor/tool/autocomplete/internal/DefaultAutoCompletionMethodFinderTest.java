@@ -59,6 +59,11 @@ public class DefaultAutoCompletionMethodFinderTest extends AbstractMockingCompon
             return "";
         }
 
+        public String getSomething(String parameter)
+        {
+            return "";
+        }
+
         public void method1(String param1, AncillaryTestClass param2, int param3)
         {
         }
@@ -99,7 +104,10 @@ public class DefaultAutoCompletionMethodFinderTest extends AbstractMockingCompon
     {
         Hints hints = this.finder.findMethods(TestClass.class, "getSo");
 
-        assertThat(hints.getHints(), containsInAnyOrder(new HintData("getSomething", "getSomething() String")));
+        assertThat(
+            hints.getHints(),
+            containsInAnyOrder(new HintData("getSomething", "getSomething() String"), new HintData("getSomething",
+                "getSomething(String) String")));
     }
 
     @Test

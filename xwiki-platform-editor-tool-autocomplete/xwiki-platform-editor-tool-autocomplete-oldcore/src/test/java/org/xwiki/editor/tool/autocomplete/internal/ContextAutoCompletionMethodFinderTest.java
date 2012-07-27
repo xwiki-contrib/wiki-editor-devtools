@@ -38,7 +38,7 @@ import com.xpn.xwiki.XWikiContext;
 
 /**
  * Unit tests for {@link org.xwiki.editor.tool.autocomplete.internal.ContextAutoCompletionMethodFinder}.
- *
+ * 
  * @version $Id$
  * @since 4.2M2
  */
@@ -71,7 +71,7 @@ public class ContextAutoCompletionMethodFinderTest extends AbstractMockingCompon
         {
             {
                 oneOf(defaultMethodFinder).findMethods(TestClass.class, "");
-                will(returnValue(new ArrayList<HintData>()));
+                will(returnValue(new Hints()));
                 oneOf(execution).getContext();
                 will(returnValue(executionContext));
                 oneOf(context).keySet();
@@ -81,8 +81,8 @@ public class ContextAutoCompletionMethodFinderTest extends AbstractMockingCompon
             }
         });
 
-        List<HintData> hints = this.finder.findMethods(TestClass.class, "");
+        Hints hints = this.finder.findMethods(TestClass.class, "");
 
-        Assert.assertEquals(1, hints.size());
+        Assert.assertEquals(1, hints.getHints().size());
     }
 }

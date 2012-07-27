@@ -52,7 +52,7 @@ public class DefaultAutoCompletionMethodFinder extends AbstractAutoCompletionMet
         Hints hints = new Hints();
         String lowerCaseFragment = fragmentToMatch.toLowerCase();
 
-        for (Method method : propertyClass.getDeclaredMethods()) {
+        for (Method method : propertyClass.getMethods()) {
             String methodName = method.getName().toLowerCase();
             if (!methodName.startsWith(ASPECTJ_METHOD_PREFIX)
                 && (methodName.startsWith(lowerCaseFragment) || methodName.startsWith(GETTER_KEYWORD

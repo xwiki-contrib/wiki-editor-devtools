@@ -22,25 +22,24 @@ package org.xwiki.editor.tool.autocomplete.internal;
 import java.util.List;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.editor.tool.autocomplete.AutoCompletionMethodFinder;
 
-import com.xpn.xwiki.plugin.XWikiPluginManager;
+import com.xpn.xwiki.XWikiContext;
 
 /**
- * Returns autocompletion hints for the the {@link com.xpn.xwiki.XWiki} class, with special support for plugins.
+ * Returns autocompletion hints for the the {@link com.xpn.xwiki.api.Context} class, with special support for context
+ * keys.
  *
  * @version $Id$
  * @since 4.2M1
  */
-@Component
-@Named("xwiki")
+@Component(hints = { "context", "xcontext" })
 @Singleton
-public class XWikiAutoCompletionMethodFinder extends AbstractXWikiContextAutoCompletionMethodFinder
+public class ContextAutoCompletionMethodFinder extends AbstractXWikiContextAutoCompletionMethodFinder
 {
     /**
      * Used to find all methods.
@@ -53,28 +52,17 @@ public class XWikiAutoCompletionMethodFinder extends AbstractXWikiContextAutoCom
     {
         List<HintData> hintData = this.defaultAutoCompletionMethodFinder.findMethods(variableClass, fragmentToMatch);
 
-        // Add plugins matching the passed fragment
+        // Add context keys matching the passed fragment
         String lowerCaseFragment = fragmentToMatch.toLowerCase();
-        XWikiPluginManager pluginManager = getPluginManager();
-        for (String pluginName : pluginManager.getPlugins()) {
-            if (pluginName.toLowerCase().startsWith(lowerCaseFragment)) {
-                String hintName = StringUtils.removeStart(pluginName, fragmentToMatch);
-                String shorthand = printShorthand(pluginName, pluginManager.getPlugin(pluginName).getClass());
+        XWikiContext context = getXWikiContext();
+        for (Object key : context.keySet()) {
+            if (key instanceof String && ((String) key).toLowerCase().startsWith(lowerCaseFragment)) {
+                String hintName = StringUtils.removeStart((String) key, fragmentToMatch);
+                String shorthand = printShorthand((String) key, context.get(key).getClass());
                 hintData.add(new HintData(hintName, shorthand));
             }
         }
 
         return hintData;
-    }
-
-    /**
-     * Makes it easy for extending classes to override how the Plugin Manager is retrieved (useful for example when
-     * writing unit tests).
-     *
-     * @return the plugin manager instance
-     */
-    protected XWikiPluginManager getPluginManager()
-    {
-        return getXWikiContext().getWiki().getPluginManager();
     }
 }

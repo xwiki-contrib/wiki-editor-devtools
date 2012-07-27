@@ -51,6 +51,11 @@
       <version>${commons.version}</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <scope>test</scope>
+    </dependency>
     <!-- Since we're mocking a class, we need this dependency -->
     <dependency>
       <groupId>org.jmock</groupId>

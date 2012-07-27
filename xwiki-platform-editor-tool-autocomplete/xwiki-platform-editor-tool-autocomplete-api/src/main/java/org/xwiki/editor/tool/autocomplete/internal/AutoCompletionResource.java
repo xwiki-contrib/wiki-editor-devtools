@@ -139,7 +139,6 @@ public class AutoCompletionResource implements XWikiRestComponent
             StringBuffer velocityBlock = new StringBuffer();
             VelocityParserContext context = new VelocityParserContext();
             try {
-
                 // Get the block after the dollar
                 int blockPos = this.parser.getVar(chars, dollarPos, velocityBlock, context);
                 // if newPos matches the current position then it means we have a valid block for autocompletion
@@ -157,7 +156,7 @@ public class AutoCompletionResource implements XWikiRestComponent
 
             } catch (InvalidVelocityException e) {
                 this.logger.debug("Failed to get autocomplete hints for content [{}] at offset [{}]",
-                    new Object[] { content, offset, e});
+                    new Object[] {content, offset, e});
             }
         }
 

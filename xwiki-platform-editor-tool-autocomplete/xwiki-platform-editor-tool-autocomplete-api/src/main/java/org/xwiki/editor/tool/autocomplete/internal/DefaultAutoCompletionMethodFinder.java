@@ -44,7 +44,7 @@ public class DefaultAutoCompletionMethodFinder extends AbstractAutoCompletionMet
     private static final String GETTER_KEYWORD = "get";
 
     /**
-     * Prefix of methods injected by AspectJ that we need to exclude
+     * Prefix of methods injected by AspectJ that we need to exclude.
      */
     private static final String ASPECTJ_METHOD_PREFIX = "ajc$";
 

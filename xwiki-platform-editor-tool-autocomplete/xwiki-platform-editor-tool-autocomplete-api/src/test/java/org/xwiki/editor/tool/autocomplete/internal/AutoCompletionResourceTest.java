@@ -31,6 +31,7 @@ import org.apache.velocity.context.Context;
 import org.jmock.Expectations;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.slf4j.Logger;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.editor.tool.autocomplete.AutoCompletionMethodFinder;
 import org.xwiki.editor.tool.autocomplete.TargetContent;
@@ -43,6 +44,12 @@ import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.annotation.MockingRequirement;
 import org.xwiki.velocity.VelocityManager;
 
+/**
+ * Unit tests for {@link AutoCompletionResource}.
+ *
+ * @version $Id$
+ * @since 4.2M1
+ */
 @ComponentList({ScriptServicesAutoCompletionMethodFinder.class})
 public class AutoCompletionResourceTest extends AbstractMockingComponentTestCase
 {
@@ -113,6 +120,19 @@ public class AutoCompletionResourceTest extends AbstractMockingComponentTestCase
         setUpMocks("$ke", createTestVelocityContext("key", "value", "otherKey", "otherValue"));
 
         String velocity = "{{velocity}}$ke";
+        Hints hints = this.resource.getAutoCompletionHints(velocity.length(), "xwiki/2.0", velocity);
+
+        Assert.assertEquals(1, hints.getHints().size());
+        assertThat(hints.getHints(), containsInAnyOrder(new HintData("y", "key")));
+    }
+
+    @Test
+    @Ignore("Velocity Parser is buggy ATM and doesn't handle it!")
+    public void getAutoCompletionHintsWhenDollarSignFollowedByBangOrCurlyBracketSymbol() throws Exception
+    {
+        setUpMocks("$!ke", createTestVelocityContext("key", "value", "otherKey", "otherValue"));
+
+        String velocity = "{{velocity}}$!ke";
         Hints hints = this.resource.getAutoCompletionHints(velocity.length(), "xwiki/2.0", velocity);
 
         Assert.assertEquals(1, hints.getHints().size());
@@ -251,6 +271,9 @@ public class AutoCompletionResourceTest extends AbstractMockingComponentTestCase
                 oneOf(locator).locate(with(any(String.class)), with(equal("xwiki/2.0")), with(any(Integer.class)));
                 will(returnValue(
                     new TargetContent(expectedContent, expectedContent.length(), TargetContentType.VELOCITY)));
+
+                // Ignore all calls to debug().
+                ignoring(any(Logger.class)).method("debug");
             }
         });
     }

@@ -129,16 +129,16 @@ public class AutoCompletionResource implements XWikiRestComponent
         char[] chars = content.toCharArray();
         VelocityContext velocityContext = this.velocityManager.getVelocityContext();
 
-        // Use case 1: The offset is just after the dollar sign
-        if (offset > 0 && chars[offset - 1] == '$') {
-            // Find all objects bound to the Velocity Context. We need to also look in the chained context since this
-            // is where we store Velocity Tools
-            results = getVelocityContextKeys("", velocityContext);
-        } else {
-            // Find the dollar sign before the current position
-            int dollarPos = StringUtils.lastIndexOf(content, '$', offset);
-
-            if (dollarPos > -1) {
+        // Find the dollar sign before the current position
+        int dollarPos = StringUtils.lastIndexOf(content, '$', offset);
+        if (dollarPos > -1) {
+            // Special case for when there's no variable after the dollar position since the Velocity Parser doesn't
+            // support parsing this case.
+            if (isCursorDirectlyAfterDollar(chars, dollarPos, offset)) {
+                // Find all objects bound to the Velocity Context. We need to also look in the chained context since
+                // this is where we store Velocity Tools
+                results = getVelocityContextKeys("", velocityContext);
+            } else {
                 StringBuffer velocityBlock = new StringBuffer();
                 VelocityParserContext context = new VelocityParserContext();
                 try {
@@ -168,6 +168,26 @@ public class AutoCompletionResource implements XWikiRestComponent
         Collections.sort(results.getHints());
 
         return results;
+    }
+
+    /**
+     * @param chars the content to parse
+     * @param dollarPos the position of the dollar symbol
+     * @param offset the position in the whole content of the cursor
+     * @return false if there's a velocity variable after the dollar sign
+     */
+    private boolean isCursorDirectlyAfterDollar(char[] chars, int dollarPos, int offset)
+    {
+        boolean result = true;
+
+        for (int i = dollarPos; i < offset; i++) {
+            if (chars[i] != '$' && chars[i] != '!' && chars[i] != '{') {
+                result = false;
+                break;
+            }
+        }
+
+        return result;
     }
 
     /**

@@ -126,6 +126,44 @@ public class AutoCompletionResourceTest extends AbstractMockingComponentTestCase
     }
 
     @Test
+    public void getAutoCompletionHintsWhenOnlyDollarAndBangSigns() throws Exception
+    {
+        setUpMocks("$!", createTestVelocityContext("key", "value", "otherKey", "otherValue"));
+
+        String velocity = "{{velocity}}$!";
+        Hints hints = this.resource.getAutoCompletionHints(velocity.length(), "xwiki/2.0", velocity);
+
+        Assert.assertEquals(2, hints.getHints().size());
+        assertThat(hints.getHints(), containsInAnyOrder(
+            new HintData("key", "key"),
+            new HintData("otherKey", "otherKey")));
+    }
+
+    @Test
+    public void getAutoCompletionHintsWhenOnlyDollarAndCurlyBracketSigns() throws Exception
+    {
+        setUpMocks("${", createTestVelocityContext("key", "value"));
+
+        String velocity = "{{velocity}}${";
+        Hints hints = this.resource.getAutoCompletionHints(velocity.length(), "xwiki/2.0", velocity);
+
+        Assert.assertEquals(1, hints.getHints().size());
+        assertThat(hints.getHints(), containsInAnyOrder(new HintData("key", "key")));
+    }
+
+    @Test
+    public void getAutoCompletionHintsWhenOnlyDollarBangAndCurlyBracketSigns() throws Exception
+    {
+        setUpMocks("$!{", createTestVelocityContext("key", "value"));
+
+        String velocity = "{{velocity}}$!{";
+        Hints hints = this.resource.getAutoCompletionHints(velocity.length(), "xwiki/2.0", velocity);
+
+        Assert.assertEquals(1, hints.getHints().size());
+        assertThat(hints.getHints(), containsInAnyOrder(new HintData("key", "key")));
+    }
+
+    @Test
     public void getAutoCompletionHintsWhenDollarSignFollowedBySomeLetters() throws Exception
     {
         setUpMocks("$ke", createTestVelocityContext("key", "value", "otherKey", "otherValue"));

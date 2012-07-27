@@ -23,6 +23,8 @@ import java.lang.reflect.Method;
 
 import org.xwiki.editor.tool.autocomplete.AutoCompletionMethodFinder;
 
+import com.xpn.xwiki.util.Programming;
+
 /**
  * Helper class when writing {@link AutoCompletionMethodFinder}s.
  *
@@ -47,6 +49,7 @@ public abstract class AbstractAutoCompletionMethodFinder implements AutoCompleti
             .append(methodName)
             .append(getParameters(method))
             .append(getReturnType(method))
+            .append(getProgrammingRights(method))
             .toString();
     }
 
@@ -64,6 +67,7 @@ public abstract class AbstractAutoCompletionMethodFinder implements AutoCompleti
         return new StringBuilder()
             .append(methodName)
             .append(getReturnType(method))
+            .append(getProgrammingRights(method))
             .toString();
     }
 
@@ -117,6 +121,23 @@ public abstract class AbstractAutoCompletionMethodFinder implements AutoCompleti
         if (returnType != null) {
             builder.append(' ');
             builder.append(returnType);
+        }
+
+        return builder;
+    }
+
+    /**
+     * @param method the method from which to check if PR are needed
+     * @return the pretty text to signify to the user that PR are needed for this method
+     */
+    private StringBuilder getProgrammingRights(Method method)
+    {
+        StringBuilder builder = new StringBuilder();
+
+        Programming programming = method.getAnnotation(Programming.class);
+        if (programming != null) {
+            builder.append(' ');
+            builder.append("(Programming Rights)");
         }
 
         return builder;

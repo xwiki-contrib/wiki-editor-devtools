@@ -28,6 +28,8 @@ import org.junit.Test;
 import org.xwiki.test.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.MockingRequirement;
 
+import com.xpn.xwiki.util.Programming;
+
 import junit.framework.Assert;
 
 /**
@@ -64,6 +66,7 @@ public class DefaultAutoCompletionMethodFinderTest extends AbstractMockingCompon
         {
         }
 
+        @Programming
         public String method2()
         {
             return "";
@@ -81,7 +84,7 @@ public class DefaultAutoCompletionMethodFinderTest extends AbstractMockingCompon
         List<HintData> hints = this.finder.findMethods(TestClass.class, "m");
 
         assertThat(hints, containsInAnyOrder(
-            new HintData("ethod2", "method2() String"),
+            new HintData("ethod2", "method2() String (Programming Rights)"),
             new HintData("ethod1", "method1(String, AncillaryTestClass, int) void")
         ));
     }

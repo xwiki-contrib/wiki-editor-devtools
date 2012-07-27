@@ -158,8 +158,8 @@ public class AutoCompletionResource implements XWikiRestComponent
                     }
 
                 } catch (InvalidVelocityException e) {
-                    this.logger.debug("Failed to get autocomplete hints for content [{}] at offset [{}]",
-                        new Object[] {content, offset, e});
+                    this.logger.debug("Failed to get autocomplete hints for content [{}] at offset [{}]", new Object[] {
+                    content, offset, e});
                 }
             }
         }
@@ -327,20 +327,22 @@ public class AutoCompletionResource implements XWikiRestComponent
         Hints hints = new Hints();
         Object propertyClass = velocityContext.get(variableName);
 
-        // Allow special handling for classes that have registered a custom introspection handler
-        if (this.componentManager.hasComponent(AutoCompletionMethodFinder.class, variableName)) {
-            try {
-                AutoCompletionMethodFinder finder =
-                    this.componentManager.getInstance(AutoCompletionMethodFinder.class, variableName);
-                hints.withHints(finder.findMethods(propertyClass.getClass(), fragmentToMatch));
-            } catch (ComponentLookupException e) {
-                // Component not found, continue with default finder...
+        if (propertyClass != null) {
+            // Allow special handling for classes that have registered a custom introspection handler
+            if (this.componentManager.hasComponent(AutoCompletionMethodFinder.class, variableName)) {
+                try {
+                    AutoCompletionMethodFinder finder =
+                        this.componentManager.getInstance(AutoCompletionMethodFinder.class, variableName);
+                    hints.withHints(finder.findMethods(propertyClass.getClass(), fragmentToMatch));
+                } catch (ComponentLookupException e) {
+                    // Component not found, continue with default finder...
+                }
             }
-        }
 
-        if (hints.isEmpty()) {
-            hints.withHints(this.defaultAutoCompletionMethodFinder.findMethods(propertyClass.getClass(),
-                fragmentToMatch));
+            if (hints.isEmpty()) {
+                hints.withHints(this.defaultAutoCompletionMethodFinder.findMethods(propertyClass.getClass(),
+                    fragmentToMatch));
+            }
         }
 
         return hints;

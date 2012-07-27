@@ -23,7 +23,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.editor.tool.autocomplete.AutoCompletionMethodFinder;
 
@@ -56,9 +55,8 @@ public class XWikiAutoCompletionMethodFinder extends AbstractXWikiContextAutoCom
         XWikiPluginManager pluginManager = getPluginManager();
         for (String pluginName : pluginManager.getPlugins()) {
             if (pluginName.toLowerCase().startsWith(lowerCaseFragment)) {
-                String hintName = StringUtils.removeStart(pluginName, fragmentToMatch);
                 String shorthand = printShorthand(pluginName, pluginManager.getPlugin(pluginName).getClass());
-                hints.withHints(new HintData(hintName, shorthand));
+                hints.withHints(new HintData(pluginName, shorthand));
             }
         }
 

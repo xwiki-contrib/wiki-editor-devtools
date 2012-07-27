@@ -22,7 +22,6 @@ package org.xwiki.editor.tool.autocomplete.internal;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.editor.tool.autocomplete.AutoCompletionMethodFinder;
 
@@ -55,9 +54,8 @@ public class ContextAutoCompletionMethodFinder extends AbstractXWikiContextAutoC
         XWikiContext context = getXWikiContext();
         for (Object key : context.keySet()) {
             if (key instanceof String && ((String) key).toLowerCase().startsWith(lowerCaseFragment)) {
-                String hintName = StringUtils.removeStart((String) key, fragmentToMatch);
                 String shorthand = printShorthand((String) key, context.get(key).getClass());
-                hints.withHints(new HintData(hintName, shorthand));
+                hints.withHints(new HintData((String) key, shorthand));
             }
         }
 

@@ -54,7 +54,7 @@ import org.xwiki.velocity.VelocityManager;
 public class AutoCompletionResourceTest extends AbstractMockingComponentTestCase
 {
     @MockingRequirement(exceptions = {ComponentManager.class})
-    private AutoCompletionResource resource;
+    private TestableAutoCompletionResource resource;
 
     @Override
     public void configure() throws Exception
@@ -366,13 +366,12 @@ public class AutoCompletionResourceTest extends AbstractMockingComponentTestCase
 
     private void setUpMocks(final String expectedContent, final VelocityContext velocityContext) throws Exception
     {
-        final VelocityManager velocityManager = getComponentManager().getInstance(VelocityManager.class);
+        this.resource.setVelocityContext(velocityContext);
+
         final TargetContentLocator locator = getComponentManager().getInstance(TargetContentLocator.class);
         getMockery().checking(new Expectations()
         {
             {
-                oneOf(velocityManager).getVelocityContext();
-                will(returnValue(velocityContext));
                 oneOf(locator).locate(with(any(String.class)), with(equal("xwiki/2.0")), with(any(Integer.class)));
                 will(returnValue(new TargetContent(expectedContent, expectedContent.length(),
                     TargetContentType.VELOCITY)));

@@ -36,11 +36,15 @@ import org.xwiki.editor.tool.autocomplete.AutoCompletionMethodFinder;
 import org.xwiki.editor.tool.autocomplete.TargetContent;
 import org.xwiki.editor.tool.autocomplete.TargetContentLocator;
 import org.xwiki.editor.tool.autocomplete.TargetContentType;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rest.XWikiRestComponent;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.internal.util.InvalidVelocityException;
 import org.xwiki.velocity.internal.util.VelocityParser;
 import org.xwiki.velocity.internal.util.VelocityParserContext;
+
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * REST Resource for returning autocompletion hints. The content to autocomplete is passed in the request body, the
@@ -127,7 +131,7 @@ public class AutoCompletionResource implements XWikiRestComponent
     {
         Hints results = new Hints();
         char[] chars = content.toCharArray();
-        VelocityContext velocityContext = this.velocityManager.getVelocityContext();
+        VelocityContext velocityContext = getVelocityContext();
 
         // Find the dollar sign before the current position
         int dollarPos = StringUtils.lastIndexOf(content, '$', offset);
@@ -346,5 +350,34 @@ public class AutoCompletionResource implements XWikiRestComponent
         }
 
         return hints;
+    }
+
+    /**
+     * @return the Velocity Context used to find existing bound variables
+     */
+    protected VelocityContext getVelocityContext()
+    {
+        VelocityContext velocityContext = this.velocityManager.getVelocityContext();
+
+        // We add the "doc", "tdoc" and "sdoc" mappings since we don't get them from the Velocity Manager as they are
+        // normally added based on the document passed in the request. However since we return the same method names
+        // whatever the doc, we can manually add them.
+        XWikiDocument fakeDocument = createFakeXWikiDocument();
+        velocityContext.put("doc", fakeDocument);
+        velocityContext.put("sdoc", fakeDocument);
+        velocityContext.put("tdoc", fakeDocument);
+
+        return velocityContext;
+    }
+
+    /**
+     * @return a fake XWiki Document instance
+     */
+    protected XWikiDocument createFakeXWikiDocument()
+    {
+        // Note: Creating an XWikiDocument instance requires that the static component manager be set up
+        // unfortunately...
+        Utils.setComponentManager(this.componentManager);
+        return new XWikiDocument(new DocumentReference("notusedwiki", "notusedspace", "notusedpage"));
     }
 }

@@ -19,9 +19,7 @@
  */
 package org.xwiki.editor.tool.autocomplete.internal;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 
 import javax.inject.Inject;
 import javax.ws.rs.POST;
@@ -110,8 +108,12 @@ public class AutoCompletionResource implements XWikiRestComponent
         // Only support autocompletion on Velocity ATM
         TargetContent targetContent = this.targetContentLocator.locate(content, syntaxId, offset);
         if (targetContent.getType() == TargetContentType.VELOCITY) {
-            hints = hints.withHints(getHints(targetContent.getContent(), targetContent.getPosition()));
+            hints = getHints(targetContent.getContent(), targetContent.getPosition());
         }
+
+        // Subtract the temporary user input size from the initial offset to get the absolute start offset of the user's
+        // input.
+        hints.withStartOffset(offset - hints.getStartOffset());
 
         return hints;
     }
@@ -121,9 +123,9 @@ public class AutoCompletionResource implements XWikiRestComponent
      * @param offset the position of the cursor relative to the Velocity content
      * @return the list of autocompletion hints
      */
-    private List<HintData> getHints(String content, int offset)
+    private Hints getHints(String content, int offset)
     {
-        List<HintData> results = new ArrayList<HintData>();
+        Hints results = new Hints();
         char[] chars = content.toCharArray();
         VelocityContext velocityContext = this.velocityManager.getVelocityContext();
 
@@ -131,7 +133,7 @@ public class AutoCompletionResource implements XWikiRestComponent
         if (offset > 0 && chars[offset - 1] == '$') {
             // Find all objects bound to the Velocity Context. We need to also look in the chained context since this
             // is where we store Velocity Tools
-            results.addAll(getVelocityContextKeys("", velocityContext));
+            results = getVelocityContextKeys("", velocityContext);
         } else {
             // Find the dollar sign before the current position
             int dollarPos = StringUtils.lastIndexOf(content, '$', offset);
@@ -152,7 +154,7 @@ public class AutoCompletionResource implements XWikiRestComponent
                     }
 
                     if (blockPos == offset) {
-                        results.addAll(getMethodsOrVariableHints(chars, dollarPos, blockPos, offset, velocityContext));
+                        results = getMethodsOrVariableHints(chars, dollarPos, blockPos, offset, velocityContext);
                     }
 
                 } catch (InvalidVelocityException e) {
@@ -163,7 +165,7 @@ public class AutoCompletionResource implements XWikiRestComponent
         }
 
         // Sort hints
-        Collections.sort(results);
+        Collections.sort(results.getHints());
 
         return results;
     }
@@ -177,10 +179,10 @@ public class AutoCompletionResource implements XWikiRestComponent
      * @return the list of hints
      * @throws InvalidVelocityException when the code to parse is not what's expected
      */
-    private List<HintData> getMethodsOrVariableHints(char[] chars, int dollarPos, int blockPos, int offset,
+    private Hints getMethodsOrVariableHints(char[] chars, int dollarPos, int blockPos, int offset,
         VelocityContext velocityContext) throws InvalidVelocityException
     {
-        List<HintData> results = new ArrayList<HintData>();
+        Hints results = new Hints();
 
         // Get the property before the first dot.
         int methodPos = -1;
@@ -204,10 +206,15 @@ public class AutoCompletionResource implements XWikiRestComponent
             String variableName = new String(chars, variableStartPos, endPos - variableStartPos);
 
             if (methodPos > -1) {
-                results.addAll(getMethods(chars, variableName, blockPos, methodPos, offset, velocityContext));
+                results = getMethods(chars, variableName, blockPos, methodPos, offset, velocityContext);
 
+                // Set the temporary start offset as the size of the user's input.
+                results.withStartOffset(blockPos - methodPos - 1);
             } else {
-                results.addAll(getVelocityContextKeys(variableName, velocityContext));
+                results = getVelocityContextKeys(variableName, velocityContext);
+
+                // Set the temporary start offset as the size of the user's input.
+                results.withStartOffset(variableName.length());
             }
         }
 
@@ -224,10 +231,10 @@ public class AutoCompletionResource implements XWikiRestComponent
      * @return the list of hints
      * @throws InvalidVelocityException when the code to parse is not what's expected
      */
-    private List<HintData> getMethods(char[] chars, String propertyName, int blockPos, int methodPos, int offset,
+    private Hints getMethods(char[] chars, String propertyName, int blockPos, int methodPos, int offset,
         VelocityContext velocityContext) throws InvalidVelocityException
     {
-        List<HintData> results = new ArrayList<HintData>();
+        Hints results = new Hints();
         VelocityParserContext context = new VelocityParserContext();
 
         String fragment = "";
@@ -247,7 +254,7 @@ public class AutoCompletionResource implements XWikiRestComponent
 
         if (autoCompleteMethods) {
             // Find methods using Reflection
-            results.addAll(getMethods(propertyName, fragment, velocityContext));
+            results = getMethods(propertyName, fragment, velocityContext);
         }
 
         return results;
@@ -261,16 +268,16 @@ public class AutoCompletionResource implements XWikiRestComponent
      * @param velocityContext the Velocity Context from which to get the bound variables
      * @return the Velocity variables
      */
-    private List<HintData> getVelocityContextKeys(String fragmentToMatch, VelocityContext velocityContext)
+    private Hints getVelocityContextKeys(String fragmentToMatch, VelocityContext velocityContext)
     {
-        List<HintData> hintData = new ArrayList<HintData>();
+        Hints hints = new Hints();
 
-        addVelocityKeys(hintData, velocityContext.getKeys(), fragmentToMatch);
+        addVelocityKeys(hints, velocityContext.getKeys(), fragmentToMatch);
         if (velocityContext.getChainedContext() != null) {
-            addVelocityKeys(hintData, velocityContext.getChainedContext().getKeys(), fragmentToMatch);
+            addVelocityKeys(hints, velocityContext.getChainedContext().getKeys(), fragmentToMatch);
         }
 
-        return hintData;
+        return hints;
     }
 
     /**
@@ -280,13 +287,11 @@ public class AutoCompletionResource implements XWikiRestComponent
      * @param keys the keys containing the variables to add
      * @param fragmentToMatch the filter in order to only add variable whose names start with the passed string
      */
-    private void addVelocityKeys(List<HintData> results, Object[] keys, String fragmentToMatch)
+    private void addVelocityKeys(Hints results, Object[] keys, String fragmentToMatch)
     {
         for (Object key : keys) {
             if (key instanceof String && ((String) key).startsWith(fragmentToMatch)) {
-                // Remove the fragmentToMatch from the returned hint name since we want the client side to just append
-                // our returned result where the cursor is.
-                results.add(new HintData(StringUtils.removeStart((String) key, fragmentToMatch), (String) key));
+                results.withHints(new HintData((String) key, (String) key));
             }
         }
     }
@@ -297,9 +302,9 @@ public class AutoCompletionResource implements XWikiRestComponent
      * @param velocityContext the Velocity Context from which to get the Class corresponding to the variable name
      * @return the method names found in the Class pointed to by the passed variableName name
      */
-    private List<HintData> getMethods(String variableName, String fragmentToMatch, VelocityContext velocityContext)
+    private Hints getMethods(String variableName, String fragmentToMatch, VelocityContext velocityContext)
     {
-        List<HintData> hintData = new ArrayList<HintData>();
+        Hints hints = new Hints();
         Object propertyClass = velocityContext.get(variableName);
 
         // Allow special handling for classes that have registered a custom introspection handler
@@ -307,17 +312,17 @@ public class AutoCompletionResource implements XWikiRestComponent
             try {
                 AutoCompletionMethodFinder finder =
                     this.componentManager.getInstance(AutoCompletionMethodFinder.class, variableName);
-                hintData.addAll(finder.findMethods(propertyClass.getClass(), fragmentToMatch));
+                hints.withHints(finder.findMethods(propertyClass.getClass(), fragmentToMatch));
             } catch (ComponentLookupException e) {
                 // Component not found, continue with default finder...
             }
         }
 
-        if (hintData.isEmpty()) {
-            hintData.addAll(this.defaultAutoCompletionMethodFinder.findMethods(propertyClass.getClass(),
+        if (hints.isEmpty()) {
+            hints.withHints(this.defaultAutoCompletionMethodFinder.findMethods(propertyClass.getClass(),
                 fragmentToMatch));
         }
 
-        return hintData;
+        return hints;
     }
 }

@@ -19,17 +19,15 @@
  */
 package org.xwiki.editor.tool.autocomplete;
 
-import java.util.List;
-
 import org.xwiki.component.annotation.Role;
-import org.xwiki.editor.tool.autocomplete.internal.HintData;
+import org.xwiki.editor.tool.autocomplete.internal.Hints;
 
 /**
  * Allows contributing special hints. For example for Script Services, instead of returning a hint of {@code get} which
  * is the method provided by {@link org.xwiki.script.service.ScriptServiceManager} (the class type of {@code services})
  * we return the component hints of all registered {@link org.xwiki.script.service.ScriptService} components found in
  * the wiki.
- *
+ * 
  * @version $Id$
  * @since 4.2M2
  */
@@ -41,5 +39,5 @@ public interface AutoCompletionMethodFinder
      * @param fragmentToMatch the filter to only return methods matching the passed string
      * @return the autocompletion hints
      */
-    List<HintData> findMethods(Class variableClass, String fragmentToMatch);
+    Hints findMethods(Class variableClass, String fragmentToMatch);
 }

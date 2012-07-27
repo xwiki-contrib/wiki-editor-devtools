@@ -30,7 +30,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * Represents a list of hints that are returned.
- *
+ * 
  * @version $Id$
  * @since 4.2M2
  */
@@ -45,6 +45,12 @@ public class Hints
     private List<HintData> hints;
 
     /**
+     * @see #getStartOffset()
+     */
+    @XmlElement(name = "startOffset")
+    private int startOffset;
+
+    /**
      * @return the autocompletion hints
      */
     public List<HintData> getHints()
@@ -57,7 +63,23 @@ public class Hints
 
     /**
      * Build an instance of {@link Hints}.
-     *
+     * 
+     * @param values the autocompletion hints to populate the instance with
+     * @return the {@link Hints} containing the passed hints
+     */
+    public Hints withHints(HintData... values)
+    {
+        if (values != null) {
+            for (HintData value : values) {
+                getHints().add(value);
+            }
+        }
+        return this;
+    }
+
+    /**
+     * Build an instance of {@link Hints}.
+     * 
      * @param values the autocompletion hints to populate the instance with
      * @return the {@link Hints} containing the passed hints
      */
@@ -67,5 +89,47 @@ public class Hints
             getHints().addAll(values);
         }
         return this;
+    }
+
+    /**
+     * @return the replaceFrom
+     */
+    public int getStartOffset()
+    {
+        return startOffset;
+    }
+
+    /**
+     * Build an instance of {@link Hints}.
+     * 
+     * @param startOffset the start of the user input that needs to be replaced on the client side with the selected
+     *            autocompletion hint.
+     * @return the {@link Hints} containing the passed hints
+     */
+    public Hints withStartOffset(int startOffset)
+    {
+        this.startOffset = startOffset;
+
+        return this;
+    }
+
+    /**
+     * Build an instance of {@link Hints}.
+     * 
+     * @param otherHints another instance to populate this instance with
+     * @return the {@link Hints} containing also the hints from the passed instance
+     */
+    public Hints withHints(Hints otherHints)
+    {
+        this.withHints(otherHints.getHints());
+        return this;
+    }
+
+    /**
+     * @return true if the list of hints is empty.
+     */
+    public boolean isEmpty()
+    {
+        return getHints().isEmpty();
     }
 }

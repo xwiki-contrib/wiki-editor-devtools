@@ -21,8 +21,7 @@ package org.xwiki.editor.tool.autocomplete.internal;
 
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.assertThat;
-
-import java.util.List;
+import junit.framework.Assert;
 
 import org.junit.Test;
 import org.xwiki.test.AbstractMockingComponentTestCase;
@@ -30,11 +29,9 @@ import org.xwiki.test.annotation.MockingRequirement;
 
 import com.xpn.xwiki.util.Programming;
 
-import junit.framework.Assert;
-
 /**
  * Unit tests for {@link DefaultAutoCompletionMethodFinder}.
- *
+ * 
  * @version $Id$
  * @since 4.2M1
  */
@@ -81,40 +78,36 @@ public class DefaultAutoCompletionMethodFinderTest extends AbstractMockingCompon
     @Test
     public void findMethodsWhenMatching()
     {
-        List<HintData> hints = this.finder.findMethods(TestClass.class, "m");
+        Hints hints = this.finder.findMethods(TestClass.class, "m");
 
-        assertThat(hints, containsInAnyOrder(
-            new HintData("ethod2", "method2() String (Programming Rights)"),
-            new HintData("ethod1", "method1(String, AncillaryTestClass, int) void")
-        ));
+        assertThat(
+            hints.getHints(),
+            containsInAnyOrder(new HintData("method2", "method2() String (Programming Rights)"), new HintData(
+                "method1", "method1(String, AncillaryTestClass, int) void")));
     }
 
     @Test
     public void findMethodsWhenMatchingGetter()
     {
-        List<HintData> hints = this.finder.findMethods(TestClass.class, "so");
+        Hints hints = this.finder.findMethods(TestClass.class, "so");
 
-        assertThat(hints, containsInAnyOrder(
-            new HintData("mething", "something String")
-        ));
+        assertThat(hints.getHints(), containsInAnyOrder(new HintData("something", "something String")));
     }
 
     @Test
     public void findMethodsWhenCamelCaseMatching()
     {
-        List<HintData> hints = this.finder.findMethods(TestClass.class, "getSo");
+        Hints hints = this.finder.findMethods(TestClass.class, "getSo");
 
-        assertThat(hints, containsInAnyOrder(
-            new HintData("mething", "getSomething() String")
-        ));
+        assertThat(hints.getHints(), containsInAnyOrder(new HintData("getSomething", "getSomething() String")));
     }
 
     @Test
     public void excludeAspectJMethods()
     {
-        List<HintData> hints = this.finder.findMethods(TestClass.class, "a");
+        Hints hints = this.finder.findMethods(TestClass.class, "a");
 
-        Assert.assertEquals(0, hints.size());
+        Assert.assertEquals(0, hints.getHints().size());
     }
 
 }

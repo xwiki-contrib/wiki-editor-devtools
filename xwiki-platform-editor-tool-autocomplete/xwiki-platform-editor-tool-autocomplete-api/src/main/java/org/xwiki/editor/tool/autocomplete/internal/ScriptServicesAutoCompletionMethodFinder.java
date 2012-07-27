@@ -20,14 +20,12 @@
 package org.xwiki.editor.tool.autocomplete.internal;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.manager.ComponentManager;
@@ -36,7 +34,7 @@ import org.xwiki.script.service.ScriptService;
 /**
  * Returns autocompletion hints for the {@code services} Velocity binding by returning the full list of all
  * {@link ScriptService} bindings that exist.
- *
+ * 
  * @version $Id$
  * @since 4.2M2
  */
@@ -53,19 +51,16 @@ public class ScriptServicesAutoCompletionMethodFinder extends AbstractAutoComple
     private ComponentManager componentManager;
 
     @Override
-    public List<HintData> findMethods(Class variableClass, String fragmentToMatch)
+    public Hints findMethods(Class variableClass, String fragmentToMatch)
     {
-        List<HintData> results = new ArrayList<HintData>();
+        Hints results = new Hints();
 
         List<ComponentDescriptor<ScriptService>> descriptors =
             this.componentManager.getComponentDescriptorList((Type) ScriptService.class);
 
         for (ComponentDescriptor<ScriptService> descriptor : descriptors) {
             if (descriptor.getRoleHint().startsWith(fragmentToMatch)) {
-                // Remove the fragmentToMatch from the returned hint name since we want the client side to just append
-                // our returned result where the cursor is.
-                results.add(new HintData(StringUtils.removeStart(descriptor.getRoleHint(), fragmentToMatch),
-                    descriptor.getRoleHint()));
+                results.withHints(new HintData(descriptor.getRoleHint(), descriptor.getRoleHint()));
             }
         }
 

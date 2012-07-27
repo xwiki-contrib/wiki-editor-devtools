@@ -20,8 +20,6 @@
 package org.xwiki.editor.tool.autocomplete.internal;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.inject.Singleton;
 
@@ -49,9 +47,9 @@ public class DefaultAutoCompletionMethodFinder extends AbstractAutoCompletionMet
     private static final String ASPECTJ_METHOD_PREFIX = "ajc$";
 
     @Override
-    public List<HintData> findMethods(Class propertyClass, String fragmentToMatch)
+    public Hints findMethods(Class propertyClass, String fragmentToMatch)
     {
-        List<HintData> hintData = new ArrayList<HintData>();
+        Hints hints = new Hints();
         String lowerCaseFragment = fragmentToMatch.toLowerCase();
 
         for (Method method : propertyClass.getDeclaredMethods()) {
@@ -64,17 +62,13 @@ public class DefaultAutoCompletionMethodFinder extends AbstractAutoCompletionMet
                     && method.getParameterTypes().length == 0)
                 {
                     String getter = StringUtils.uncapitalize(method.getName().substring(3));
-                    hintData.add(new HintData(getter.substring(fragmentToMatch.length()),
-                        printShorthand(getter, method)));
+                    hints.withHints(new HintData(getter, printShorthand(getter, method)));
                 } else {
-                    // Remove the fragmentToMatch from the returned hint name since we want the client side to just
-                    // append our returned result where the cursor is.
-                    hintData.add(new HintData(StringUtils.removeStart(method.getName(), fragmentToMatch),
-                        printMethod(method.getName(), method)));
+                    hints.withHints(new HintData(method.getName(), printMethod(method.getName(), method)));
                 }
             }
         }
 
-        return hintData;
+        return hints;
     }
 }

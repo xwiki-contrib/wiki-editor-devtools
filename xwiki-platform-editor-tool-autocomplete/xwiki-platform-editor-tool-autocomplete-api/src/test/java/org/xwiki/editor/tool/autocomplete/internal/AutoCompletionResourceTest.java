@@ -94,6 +94,17 @@ public class AutoCompletionResourceTest extends AbstractMockingComponentTestCase
     }
 
     @Test
+    public void getAutoCompletionHintsWhenNoDollarSign() throws Exception
+    {
+        setUpMocks("whatever", createTestVelocityContext());
+
+        String velocity = "{{velocity}}whatever";
+        Hints hints = this.resource.getAutoCompletionHints(velocity.length(), "xwiki/2.0", velocity);
+
+        Assert.assertEquals(0, hints.getHints().size());
+    }
+
+    @Test
     public void getAutoCompletionHintsWhenOnlyDollarSign() throws Exception
     {
         Context innerContext = new VelocityContext();

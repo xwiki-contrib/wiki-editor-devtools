@@ -136,27 +136,29 @@ public class AutoCompletionResource implements XWikiRestComponent
             // Find the dollar sign before the current position
             int dollarPos = StringUtils.lastIndexOf(content, '$', offset);
 
-            StringBuffer velocityBlock = new StringBuffer();
-            VelocityParserContext context = new VelocityParserContext();
-            try {
-                // Get the block after the dollar
-                int blockPos = this.parser.getVar(chars, dollarPos, velocityBlock, context);
-                // if newPos matches the current position then it means we have a valid block for autocompletion
+            if (dollarPos > -1) {
+                StringBuffer velocityBlock = new StringBuffer();
+                VelocityParserContext context = new VelocityParserContext();
+                try {
+                    // Get the block after the dollar
+                    int blockPos = this.parser.getVar(chars, dollarPos, velocityBlock, context);
+                    // if newPos matches the current position then it means we have a valid block for autocompletion
 
-                // Note: we need to handle the special case where the cursor is just after the dot since getVar will
-                // not return it!
-                if (blockPos + 1 == offset && chars[blockPos] == '.') {
-                    blockPos++;
-                    velocityBlock.append('.');
+                    // Note: we need to handle the special case where the cursor is just after the dot since getVar
+                    // will not return it!
+                    if (blockPos + 1 == offset && chars[blockPos] == '.') {
+                        blockPos++;
+                        velocityBlock.append('.');
+                    }
+
+                    if (blockPos == offset) {
+                        results.addAll(getMethodsOrVariableHints(chars, dollarPos, blockPos, offset, velocityContext));
+                    }
+
+                } catch (InvalidVelocityException e) {
+                    this.logger.debug("Failed to get autocomplete hints for content [{}] at offset [{}]",
+                        new Object[] {content, offset, e});
                 }
-
-                if (blockPos == offset) {
-                    results.addAll(getMethodsOrVariableHints(chars, dollarPos, blockPos, offset, velocityContext));
-                }
-
-            } catch (InvalidVelocityException e) {
-                this.logger.debug("Failed to get autocomplete hints for content [{}] at offset [{}]",
-                    new Object[] {content, offset, e});
             }
         }
 

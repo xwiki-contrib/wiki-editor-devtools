@@ -29,14 +29,10 @@ import junit.framework.Assert;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.context.Context;
 import org.jmock.Expectations;
-import org.jmock.lib.legacy.ClassImposteriser;
-import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContext;
 import org.xwiki.editor.tool.autocomplete.AutoCompletionMethodFinder;
 import org.xwiki.editor.tool.autocomplete.TargetContent;
 import org.xwiki.editor.tool.autocomplete.TargetContentLocator;
@@ -46,8 +42,7 @@ import org.xwiki.script.service.ScriptServiceManager;
 import org.xwiki.test.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.annotation.MockingRequirement;
-
-import com.xpn.xwiki.XWikiContext;
+import org.xwiki.velocity.VelocityManager;
 
 /**
  * Unit tests for {@link AutoCompletionResource}.
@@ -60,12 +55,6 @@ public class AutoCompletionResourceTest extends AbstractMockingComponentTestCase
 {
     @MockingRequirement(exceptions = {ComponentManager.class})
     private AutoCompletionResource resource;
-
-    @Before
-    public void setImposteriser()
-    {
-        getMockery().setImposteriser(ClassImposteriser.INSTANCE);
-    }
 
     @Override
     public void configure() throws Exception
@@ -377,18 +366,12 @@ public class AutoCompletionResourceTest extends AbstractMockingComponentTestCase
 
     private void setUpMocks(final String expectedContent, final VelocityContext velocityContext) throws Exception
     {
-        final Execution execution = getComponentManager().getInstance(Execution.class);
-        final ExecutionContext executionContext = new ExecutionContext();
-        final XWikiContext xwikiContext = getMockery().mock(XWikiContext.class);
-        executionContext.setProperty("xwikicontext", xwikiContext);
-
+        final VelocityManager velocityManager = getComponentManager().getInstance(VelocityManager.class);
         final TargetContentLocator locator = getComponentManager().getInstance(TargetContentLocator.class);
         getMockery().checking(new Expectations()
         {
             {
-                oneOf(execution).getContext();
-                will(returnValue(executionContext));
-                oneOf(xwikiContext).get("vcontext");
+                oneOf(velocityManager).getVelocityContext();
                 will(returnValue(velocityContext));
                 oneOf(locator).locate(with(any(String.class)), with(equal("xwiki/2.0")), with(any(Integer.class)));
                 will(returnValue(new TargetContent(expectedContent, expectedContent.length(),

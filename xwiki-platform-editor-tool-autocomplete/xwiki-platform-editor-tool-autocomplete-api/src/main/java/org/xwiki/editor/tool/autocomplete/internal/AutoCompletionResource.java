@@ -32,18 +32,15 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.context.Execution;
 import org.xwiki.editor.tool.autocomplete.AutoCompletionMethodFinder;
 import org.xwiki.editor.tool.autocomplete.TargetContent;
 import org.xwiki.editor.tool.autocomplete.TargetContentLocator;
 import org.xwiki.editor.tool.autocomplete.TargetContentType;
-import org.xwiki.model.internal.DefaultModelContext;
 import org.xwiki.rest.XWikiRestComponent;
+import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.internal.util.InvalidVelocityException;
 import org.xwiki.velocity.internal.util.VelocityParser;
 import org.xwiki.velocity.internal.util.VelocityParserContext;
-
-import com.xpn.xwiki.XWikiContext;
 
 /**
  * REST Resource for returning autocompletion hints. The content to autocomplete is passed in the request body, the
@@ -57,10 +54,11 @@ import com.xpn.xwiki.XWikiContext;
 public class AutoCompletionResource implements XWikiRestComponent
 {
     /**
-     * Used to get the Velocity Context.
+     * Used to get the Velocity Context from which we retrieve the list of bound variables that are used for
+     * autocompletion.
      */
     @Inject
-    private Execution execution;
+    private VelocityManager velocityManager;
 
     /**
      * Used to dynamically find Autocompletion Method finder to handle specific cases.
@@ -129,7 +127,7 @@ public class AutoCompletionResource implements XWikiRestComponent
     {
         Hints results = new Hints();
         char[] chars = content.toCharArray();
-        VelocityContext velocityContext = (VelocityContext) getXWikiContext().get("vcontext");
+        VelocityContext velocityContext = this.velocityManager.getVelocityContext();
 
         // Find the dollar sign before the current position
         int dollarPos = StringUtils.lastIndexOf(content, '$', offset);
@@ -160,8 +158,8 @@ public class AutoCompletionResource implements XWikiRestComponent
                     }
 
                 } catch (InvalidVelocityException e) {
-                    this.logger.debug("Failed to get autocomplete hints for content [{}] at offset [{}]",
-                        new Object[] {content, offset, e});
+                    this.logger.debug("Failed to get autocomplete hints for content [{}] at offset [{}]", new Object[] {
+                    content, offset, e});
                 }
             }
         }
@@ -348,13 +346,5 @@ public class AutoCompletionResource implements XWikiRestComponent
         }
 
         return hints;
-    }
-
-    /**
-     * @return the XWiki Context from which we get the Velocity Context
-     */
-    protected XWikiContext getXWikiContext()
-    {
-        return (XWikiContext) this.execution.getContext().getProperty(DefaultModelContext.XCONTEXT_KEY);
     }
 }

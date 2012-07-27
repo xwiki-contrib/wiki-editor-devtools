@@ -181,21 +181,34 @@ public class AutoCompletionResource implements XWikiRestComponent
         VelocityContext velocityContext) throws InvalidVelocityException
     {
         List<HintData> results = new ArrayList<HintData>();
-        VelocityParserContext context = new VelocityParserContext();
 
-        // Get the property before the first dot
-        StringBuffer propertyBlock = new StringBuffer();
-        int methodPos = this.parser.getMethodOrProperty(chars, dollarPos, propertyBlock, context);
-        String propertyName = propertyBlock.toString().substring(1);
-
-        if (methodPos < blockPos) {
-            // Get methods!
-            if (chars[methodPos] == '.') {
-                results.addAll(getMethods(chars, propertyName, blockPos, methodPos, offset, velocityContext));
+        // Get the property before the first dot.
+        int methodPos = -1;
+        for (int i = dollarPos; i < offset; i++) {
+            if (chars[i] == '.') {
+                methodPos = i;
+                break;
             }
-        } else {
-            String fragment = propertyBlock.toString().substring(1);
-            results.addAll(getVelocityContextKeys(fragment, velocityContext));
+        }
+
+        // Get the variable name without any leading '$', '!' or '{'
+        int endPos = (methodPos == -1) ? offset : methodPos;
+        int variableStartPos = -1;
+        for (int i = dollarPos; i < endPos; i++) {
+            if (chars[i] != '$' && chars[i] != '!' && chars[i] != '{') {
+                variableStartPos = i;
+                break;
+            }
+        }
+        if (variableStartPos > -1) {
+            String variableName = new String(chars, variableStartPos, endPos - variableStartPos);
+
+            if (methodPos > -1) {
+                results.addAll(getMethods(chars, variableName, blockPos, methodPos, offset, velocityContext));
+
+            } else {
+                results.addAll(getVelocityContextKeys(variableName, velocityContext));
+            }
         }
 
         return results;

@@ -138,12 +138,35 @@ public class AutoCompletionResourceTest extends AbstractMockingComponentTestCase
     }
 
     @Test
-    @Ignore("Velocity Parser is buggy ATM and doesn't handle it!")
-    public void getAutoCompletionHintsWhenDollarSignFollowedByBangOrCurlyBracketSymbol() throws Exception
+    public void getAutoCompletionHintsWhenDollarSignFollowedByBangSymbol() throws Exception
     {
         setUpMocks("$!ke", createTestVelocityContext("key", "value", "otherKey", "otherValue"));
 
         String velocity = "{{velocity}}$!ke";
+        Hints hints = this.resource.getAutoCompletionHints(velocity.length(), "xwiki/2.0", velocity);
+
+        Assert.assertEquals(1, hints.getHints().size());
+        assertThat(hints.getHints(), containsInAnyOrder(new HintData("y", "key")));
+    }
+
+    @Test
+    public void getAutoCompletionHintsWhenDollarSignFollowedByCurlyBracketSymbol() throws Exception
+    {
+        setUpMocks("${ke", createTestVelocityContext("key", "value", "otherKey", "otherValue"));
+
+        String velocity = "{{velocity}}${ke";
+        Hints hints = this.resource.getAutoCompletionHints(velocity.length(), "xwiki/2.0", velocity);
+
+        Assert.assertEquals(1, hints.getHints().size());
+        assertThat(hints.getHints(), containsInAnyOrder(new HintData("y", "key")));
+    }
+
+    @Test
+    public void getAutoCompletionHintsWhenDollarSignFollowedByBangAndCurlyBracketSymbol() throws Exception
+    {
+        setUpMocks("$!{ke", createTestVelocityContext("key", "value", "otherKey", "otherValue"));
+
+        String velocity = "{{velocity}}$!{ke";
         Hints hints = this.resource.getAutoCompletionHints(velocity.length(), "xwiki/2.0", velocity);
 
         Assert.assertEquals(1, hints.getHints().size());

@@ -48,7 +48,7 @@ import org.xwiki.velocity.VelocityManager;
  * Unit tests for {@link AutoCompletionResource}.
  * 
  * @version $Id$
- * @since 4.2M1
+ * @since 4.2M2
  */
 @ComponentList({ScriptServicesAutoCompletionMethodFinder.class})
 public class AutoCompletionResourceTest extends AbstractMockingComponentTestCase

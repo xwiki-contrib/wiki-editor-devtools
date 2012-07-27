@@ -31,7 +31,7 @@ import com.xpn.xwiki.plugin.XWikiPluginManager;
  * returned.
  *
  * @version $Id$
- * @since 4.2M1
+ * @since 4.2M2
  */
 @Component
 @Named("xwiki")

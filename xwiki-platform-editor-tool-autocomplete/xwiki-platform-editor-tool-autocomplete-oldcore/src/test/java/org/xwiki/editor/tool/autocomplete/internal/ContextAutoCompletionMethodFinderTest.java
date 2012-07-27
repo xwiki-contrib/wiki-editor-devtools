@@ -40,7 +40,7 @@ import com.xpn.xwiki.XWikiContext;
  * Unit tests for {@link org.xwiki.editor.tool.autocomplete.internal.ContextAutoCompletionMethodFinder}.
  *
  * @version $Id$
- * @since 4.2M1
+ * @since 4.2M2
  */
 public class ContextAutoCompletionMethodFinderTest extends AbstractMockingComponentTestCase
 {

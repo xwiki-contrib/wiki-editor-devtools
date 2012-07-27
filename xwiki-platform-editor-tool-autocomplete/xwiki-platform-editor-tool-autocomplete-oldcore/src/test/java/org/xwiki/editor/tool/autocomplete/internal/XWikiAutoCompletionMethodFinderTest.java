@@ -44,7 +44,7 @@ import static org.junit.Assert.assertThat;
  * Unit tests for {@link XWikiAutoCompletionMethodFinder}.
  *
  * @version $Id$
- * @since 4.2M1
+ * @since 4.2M2
  */
 public class XWikiAutoCompletionMethodFinderTest extends AbstractMockingComponentTestCase
 {

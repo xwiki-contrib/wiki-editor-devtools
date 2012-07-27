@@ -30,7 +30,7 @@ import com.xpn.xwiki.XWikiContext;
  * To be extended by method finders that require getting the XWiki Context.
  *
  * @version $Id$
- * @since 4.2M1
+ * @since 4.2M2
  */
 public abstract class AbstractXWikiContextAutoCompletionMethodFinder extends AbstractAutoCompletionMethodFinder
 {

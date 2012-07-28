@@ -19,7 +19,6 @@
  */
 package org.xwiki.editor.tool.autocomplete.internal;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Vector;
 

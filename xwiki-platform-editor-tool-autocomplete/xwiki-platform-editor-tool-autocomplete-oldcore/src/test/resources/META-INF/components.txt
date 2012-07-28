@@ -1,1 +1,0 @@
-900:org.xwiki.editor.tool.autocomplete.internal.TestableXWikiAutoCompletionMethodFinder

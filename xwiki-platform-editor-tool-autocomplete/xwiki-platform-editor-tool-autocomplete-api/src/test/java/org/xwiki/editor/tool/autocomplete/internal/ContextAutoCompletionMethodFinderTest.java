@@ -19,9 +19,7 @@
  */
 package org.xwiki.editor.tool.autocomplete.internal;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 
 import org.jmock.Expectations;
 import org.jmock.lib.legacy.ClassImposteriser;

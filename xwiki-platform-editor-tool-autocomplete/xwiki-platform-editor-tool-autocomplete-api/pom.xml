@@ -53,7 +53,8 @@
       <artifactId>xwiki-platform-rest-server</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <!-- Needed to get access to the Velocity Manager which in turn gives access to the Velocity Context -->
+    <!-- Needed to get access to the Velocity Manager which in turn gives access to the Velocity Context.
+         Also needed to discover plugins and XWiki Context keys. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-oldcore</artifactId>
@@ -70,6 +71,17 @@
       <groupId>org.xwiki.rendering</groupId>
       <artifactId>xwiki-rendering-syntax-xwiki20</artifactId>
       <version>${rendering.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <!-- Since we're mocking a class, we need this dependency -->
+    <dependency>
+      <groupId>org.jmock</groupId>
+      <artifactId>jmock-legacy</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

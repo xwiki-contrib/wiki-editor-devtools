@@ -36,7 +36,6 @@
   <modules>
     <!-- Sorted Alphabetically -->
     <module>xwiki-platform-editor-tool-autocomplete-api</module>
-    <module>xwiki-platform-editor-tool-autocomplete-oldcore</module>
     <module>xwiki-platform-editor-tool-autocomplete-ui</module>
   </modules>
 </project>

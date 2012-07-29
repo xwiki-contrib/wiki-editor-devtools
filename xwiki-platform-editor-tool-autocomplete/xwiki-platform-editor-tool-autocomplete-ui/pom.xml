@@ -33,4 +33,13 @@
   <name>XWiki Platform - Editor Tools - Auto Complete - UI</name>
   <packaging>xar</packaging>
   <description>XWiki Platform - Editor Tool - Auto Complete - UI</description>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-editor-tool-highlighting</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+      <scope>runtime</scope>
+    </dependency>
+  </dependencies>
 </project>

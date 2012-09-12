@@ -7663,6 +7663,7 @@ var initCodeMirror = function (propertyPattern, objectTitlePattern, codeMirrorMo
   var textareas = $$(propertyPattern);
   for (var i = 0; i&lt;textareas.length; ++i) {
     var textarea = textareas[i];
+    var textareaWidthPercentage = textarea.getWidth() * 100 / textarea.parentNode.getWidth();
     var codeMirror = CodeMirror.fromTextArea(textarea, {
       'mode' : codeMirrorMode,
       'lineNumbers' : true,
@@ -7691,7 +7692,12 @@ var initCodeMirror = function (propertyPattern, objectTitlePattern, codeMirrorMo
       extraKeys: {'Ctrl-Space': 'autocomplete',
                   'Shift-Ctrl-Space': 'autocomplete'}
     });
+    
+    // Initialize active line highlighting.
     var hlLine = codeMirror.setLineClass(0, 'activeline');
+    
+    // Set the width of the codemirror div equal to the one of the wrapped textarea. Value is computed before attaching the codemirror instance, otherwise it will not report it correctly.
+    codeMirror.getWrapperElement().style.width = "" + textareaWidthPercentage + "%";
     
     codeMirrors.push(codeMirror);
   }
@@ -7895,9 +7901,8 @@ var importScript = function(src) {
 
 #template('colorThemeInit.vm')
 
-.CodeMirror-scroll {
+.CodeMirror {
   border: 1px solid $theme.borderColor;
-  width: 90%;
   background-color: $theme.pageContentBackgroundColor;
 }
 

@@ -279,11 +279,17 @@ var initialize = function () {
       var result = getHints(editor);
       if (!result || !result.list.length) return;
       var completions = result.list;
-      function insert(str) {
-        editor.replaceRange(str, result.from, result.to);
+      function insert(completion) {
+        // Simple, string completions.
+        var value = completion;
+        // Support for advanced name/description completions.
+        if (completion.name != null) {
+          value = completion.name;
+        }
+        editor.replaceRange(value, result.from, result.to);
       }
       // When there is only one completion, use it directly.
-      if (completions.length == 1) {insert(completions[0].name); return true;}
+      if (completions.length == 1) {insert(completions[0]); return true;}
   
       // Build the select widget
       var complete = document.createElement("div");
@@ -295,7 +301,13 @@ var initialize = function () {
       if (!window.opera) sel.multiple = true;
       for (var i = 0; i &lt; completions.length; ++i) {
         var opt = sel.appendChild(document.createElement("option"));
-        opt.appendChild(document.createTextNode(completions[i].description));
+        // Simple, string completions.
+        var description = completions[i];
+        // Support for advanced name/description completions.
+        if (description.description != null) {
+          description = description.description;
+        }
+        opt.appendChild(document.createTextNode(description));
       }
       sel.firstChild.selected = true;
       sel.size = Math.min(10, completions.length);
@@ -318,7 +330,7 @@ var initialize = function () {
         complete.parentNode.removeChild(complete);
       }
       function pick() {
-        insert(completions[sel.selectedIndex].name);
+        insert(completions[sel.selectedIndex]);
         close();
         setTimeout(function(){editor.focus();}, 50);
       }
@@ -360,6 +372,161 @@ document.observe('xwiki:dom:loaded', function() {
     </property>
     <property>
       <use>always</use>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <name>Main.WikiEditorAutocomplete</name>
+    <number>2</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>a0e84b4c-bff0-4bf6-bcdf-29f5909156c2</guid>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>#set ($attachmentName = 'codemirror.zip')
+
+(function () {
+var TIMEOUT_VALUE = 150;
+// roughly 10 seconds.
+var timeouts = 7 * 10
+var initialize = function () {
+  if (typeof(CodeMirror) == 'undefined' || typeof(CodeMirror.commands) == 'undefined' || typeof(CodeMirror.commands.autocomplete) == 'undefined') {
+    // The download + loading of the CodeMirror js is done asynchronously, so we need to wait for it to load.
+    setTimeout(initialize, TIMEOUT_VALUE);
+  } else {
+    // Load the javascript hint library
+    importScript("$xwiki.zipexplorer.getFileLink($xwiki.getDocument('Main.SyntaxHighlighting'), $attachmentName, 'lib/util/javascript-hint.js')");
+
+    // Wait for it to load and plug it in.
+    initializeJavascriptHint();
+  }
+}
+
+var initializeJavascriptHint = function() {
+  if (CodeMirror.javascriptHint == null) {
+    // The download + loading of the js hint library is done asynchronously, so we need to wait for it to load.
+    if (timeouts-- &gt; 0) {     
+      setTimeout(arguments.callee, TIMEOUT_VALUE);
+    } else {
+    }
+  } else {
+    // Plug it into the autocompletion mechanism.
+    CodeMirror.commands.autocomplete.javascript = function (args) {
+      // By default, the javascript-hint.js library does not sort the results. We execute the default code and then sort the results before returining it to the simpleHint module.
+      var result = CodeMirror.javascriptHint.apply(this, arguments);
+      result.list.sort(function(x,y){ 
+        var a = String(x).toUpperCase();
+        var b = String(y).toUpperCase();
+        if (a &gt; b)
+		  return 1;
+        if (a &lt; b)
+          return -1;
+        return 0;
+   	  });
+
+      return result;
+    }
+  }
+}
+
+/*
+ * Utility methods.
+ */
+
+/* Inject an extra javascript script tag into the current DOM using the given script location/source. */
+var importScript = function(src) {
+  var script_tag = document.createElement('script');
+  script_tag.type = "text/javascript";
+  script_tag.src = src;
+
+  document.getElementsByTagName('head')[0].appendChild(script_tag);
+}
+
+document.observe('xwiki:dom:loaded', function() {
+  initialize();    
+});
+
+})();</code>
+    </property>
+    <property>
+      <name>JavaScript Autocompletion using the default javascript-hint.js</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>currentPage</use>
     </property>
   </object>
   <object>

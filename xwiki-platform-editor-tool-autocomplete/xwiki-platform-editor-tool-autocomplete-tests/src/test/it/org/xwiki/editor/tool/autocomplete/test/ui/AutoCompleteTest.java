@@ -20,17 +20,17 @@
 package org.xwiki.editor.tool.autocomplete.test.ui;
 
 import org.junit.Test;
-import org.xwiki.test.ui.AbstractTest;
+import org.xwiki.test.ui.AbstractAdminAuthenticatedTest;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
 
 /**
  * Tests autocompletion in the Velocity macro while being in the wiki editor.
- *
+ * 
  * @version $Id$
  * @since 4.2M2
  */
-public class AutoCompleteTest extends AbstractTest
+public class AutoCompleteTest extends AbstractAdminAuthenticatedTest
 {
     @Test
     public void autoComplete() throws Exception

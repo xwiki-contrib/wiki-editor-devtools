@@ -29,6 +29,7 @@ import junit.framework.Assert;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.context.Context;
 import org.jmock.Expectations;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -39,9 +40,9 @@ import org.xwiki.editor.tool.autocomplete.TargetContentLocator;
 import org.xwiki.editor.tool.autocomplete.TargetContentType;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.script.service.ScriptServiceManager;
-import org.xwiki.test.AbstractMockingComponentTestCase;
+import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.ComponentList;
-import org.xwiki.test.annotation.MockingRequirement;
+import org.xwiki.test.jmock.annotation.MockingRequirement;
 import org.xwiki.velocity.VelocityManager;
 
 /**
@@ -50,18 +51,20 @@ import org.xwiki.velocity.VelocityManager;
  * @version $Id$
  * @since 4.2M2
  */
+@MockingRequirement(value = TestableAutoCompletionResource.class, exceptions = {ComponentManager.class})
 @ComponentList({ScriptServicesAutoCompletionMethodFinder.class})
-public class AutoCompletionResourceTest extends AbstractMockingComponentTestCase
+public class AutoCompletionResourceTest extends AbstractMockingComponentTestCase<AutoCompletionResource>
 {
-    @MockingRequirement(exceptions = {ComponentManager.class})
     private TestableAutoCompletionResource resource;
 
-    @Override
+    @Before
     public void configure() throws Exception
     {
         registerMockComponent(ScriptServiceManager.class);
         registerMockComponent(ScriptService.class, "test", "mock1");
         registerMockComponent(ScriptService.class, "othertest", "mock2");
+        
+        this.resource = (TestableAutoCompletionResource) getMockedComponent();
     }
 
     private class AncillaryTestClass

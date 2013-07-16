@@ -29,8 +29,8 @@ import org.junit.Test;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.editor.tool.autocomplete.AutoCompletionMethodFinder;
-import org.xwiki.test.AbstractMockingComponentTestCase;
-import org.xwiki.test.annotation.MockingRequirement;
+import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
+import org.xwiki.test.jmock.annotation.MockingRequirement;
 
 import com.xpn.xwiki.XWikiContext;
 
@@ -40,9 +40,9 @@ import com.xpn.xwiki.XWikiContext;
  * @version $Id$
  * @since 4.2M2
  */
-public class ContextAutoCompletionMethodFinderTest extends AbstractMockingComponentTestCase
+@MockingRequirement(ContextAutoCompletionMethodFinder.class)
+public class ContextAutoCompletionMethodFinderTest extends AbstractMockingComponentTestCase<AutoCompletionMethodFinder>
 {
-    @MockingRequirement
     private ContextAutoCompletionMethodFinder finder;
 
     private class TestClass
@@ -50,9 +50,11 @@ public class ContextAutoCompletionMethodFinderTest extends AbstractMockingCompon
     }
 
     @Before
-    public void setImposteriser()
+    public void setImposteriser() throws Exception
     {
         getMockery().setImposteriser(ClassImposteriser.INSTANCE);
+        
+        this.finder = (ContextAutoCompletionMethodFinder) getMockedComponent();
     }
 
     @Test

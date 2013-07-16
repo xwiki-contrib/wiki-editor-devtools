@@ -23,9 +23,11 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.assertThat;
 import junit.framework.Assert;
 
+import org.junit.Before;
 import org.junit.Test;
-import org.xwiki.test.AbstractMockingComponentTestCase;
-import org.xwiki.test.annotation.MockingRequirement;
+import org.xwiki.editor.tool.autocomplete.AutoCompletionMethodFinder;
+import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
+import org.xwiki.test.jmock.annotation.MockingRequirement;
 
 import com.xpn.xwiki.util.Programming;
 
@@ -35,11 +37,17 @@ import com.xpn.xwiki.util.Programming;
  * @version $Id$
  * @since 4.2M2
  */
-public class DefaultAutoCompletionMethodFinderTest extends AbstractMockingComponentTestCase
+@MockingRequirement(DefaultAutoCompletionMethodFinder.class)
+public class DefaultAutoCompletionMethodFinderTest extends AbstractMockingComponentTestCase<AutoCompletionMethodFinder>
 {
-    @MockingRequirement
     private DefaultAutoCompletionMethodFinder finder;
 
+    @Before
+    public void configure() throws Exception
+    {
+        this.finder = (DefaultAutoCompletionMethodFinder) getMockedComponent();
+    }
+    
     private class AncillaryTestClass
     {
         public void method()

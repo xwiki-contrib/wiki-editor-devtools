@@ -19,20 +19,22 @@
  */
 package org.xwiki.editor.tool.autocomplete.internal;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.editor.tool.autocomplete.TargetContent;
+import org.xwiki.editor.tool.autocomplete.TargetContentLocator;
 import org.xwiki.editor.tool.autocomplete.TargetContentType;
-import org.xwiki.rendering.internal.parser.reference.URLResourceReferenceTypeParser;
+import org.xwiki.rendering.internal.parser.reference.type.URLResourceReferenceTypeParser;
 import org.xwiki.rendering.internal.parser.xwiki20.XWiki20ImageReferenceParser;
 import org.xwiki.rendering.internal.parser.xwiki20.XWiki20LinkReferenceParser;
 import org.xwiki.rendering.internal.parser.xwiki20.XWiki20Parser;
 import org.xwiki.rendering.internal.renderer.plain.PlainTextRendererFactory;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.test.AbstractMockingComponentTestCase;
+import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
 import org.xwiki.test.annotation.ComponentList;
-import org.xwiki.test.annotation.MockingRequirement;
+import org.xwiki.test.jmock.annotation.MockingRequirement;
 
 import junit.framework.Assert;
 
@@ -43,11 +45,17 @@ import junit.framework.Assert;
     URLResourceReferenceTypeParser.class,
     PlainTextRendererFactory.class
 })
-public class DefaultTargetContentLocatorTest extends AbstractMockingComponentTestCase
+@MockingRequirement(value = DefaultTargetContentLocator.class, exceptions = { ComponentManager.class, Parser.class })
+public class DefaultTargetContentLocatorTest extends AbstractMockingComponentTestCase<TargetContentLocator>
 {
-    @MockingRequirement(exceptions = { ComponentManager.class, Parser.class })
     private DefaultTargetContentLocator locator;
 
+    @Before
+    public void configure() throws Exception
+    {
+        this.locator = (DefaultTargetContentLocator) getMockedComponent();
+    }
+    
     @Test
     public void locateVelocityMacroContent() throws Exception
     {

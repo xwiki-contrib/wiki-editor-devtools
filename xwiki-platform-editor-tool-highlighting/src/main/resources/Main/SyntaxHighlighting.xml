@@ -7642,7 +7642,10 @@ var initCodeMirrors = function () {
   initCodeMirror("textarea[id^='XWiki.XWikiSkins_'][id$='.js']",
                  "div[id^='xobject_XWiki.XWikiSkins_'][id$='_title']",
                  'javascript');
-  initCodeMirror("textarea[id='content']", '', 'xwiki');
+  // Don't load the syntax highlighting in WYSIWYG edit mode because it breaks the save action.
+  if (XWiki.editor != 'wysiwyg') {
+    initCodeMirror("textarea[id='content']", '', 'xwiki');
+  }
 }
 
 /* Initialize a CodeMirror instance and add it to the list of instances.

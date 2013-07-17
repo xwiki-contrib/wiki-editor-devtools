@@ -29,7 +29,7 @@ import com.xpn.xwiki.util.Programming;
  * Helper class when writing {@link AutoCompletionMethodFinder}s.
  *
  * @version $Id$
- * @since 4.2M2
+ * @since 5.2M1
  */
 public abstract class AbstractAutoCompletionMethodFinder implements AutoCompletionMethodFinder
 {

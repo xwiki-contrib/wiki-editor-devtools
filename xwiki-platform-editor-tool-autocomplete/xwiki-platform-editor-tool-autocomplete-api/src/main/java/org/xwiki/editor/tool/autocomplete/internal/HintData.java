@@ -30,7 +30,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  * Represents hint data (name of hint and description of hint).
  *
  * @version $Id$
- * @since 4.2M2
+ * @since 5.2M1
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 public class HintData implements Comparable<HintData>

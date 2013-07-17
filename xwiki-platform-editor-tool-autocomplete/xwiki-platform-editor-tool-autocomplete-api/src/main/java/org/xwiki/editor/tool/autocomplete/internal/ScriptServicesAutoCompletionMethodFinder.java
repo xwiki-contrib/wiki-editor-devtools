@@ -36,7 +36,7 @@ import org.xwiki.script.service.ScriptService;
  * {@link ScriptService} bindings that exist.
  * 
  * @version $Id$
- * @since 4.2M2
+ * @since 5.2M1
  */
 @Component
 @Named("services")

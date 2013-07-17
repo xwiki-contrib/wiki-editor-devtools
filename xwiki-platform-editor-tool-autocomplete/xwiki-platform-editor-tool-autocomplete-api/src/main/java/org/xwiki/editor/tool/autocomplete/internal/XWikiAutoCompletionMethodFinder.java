@@ -32,7 +32,7 @@ import com.xpn.xwiki.plugin.XWikiPluginManager;
  * Returns autocompletion hints for the the {@link com.xpn.xwiki.XWiki} class, with special support for plugins.
  * 
  * @version $Id$
- * @since 4.2M2
+ * @since 5.2M1
  */
 @Component
 @Named("xwiki")

@@ -28,7 +28,7 @@ import org.xwiki.component.annotation.Component;
  * Make it possible to easily test {@link AutoCompletionResource} so that we don't have to mock lots of old core stuff.
  *
  * @version $Id$
- * @since 4.2M2
+ * @since 5.2M1
  */
 @Component("org.xwiki.editor.tool.autocomplete.internal.AutoCompletionResource")
 @Path("/autocomplete")

@@ -23,7 +23,7 @@ package org.xwiki.editor.tool.autocomplete;
  * Represents the type of content at the cursor position.
  *
  * @version $Id$
- * @since 4.2M2
+ * @since 5.2M1
  */
 public enum TargetContentType
 {

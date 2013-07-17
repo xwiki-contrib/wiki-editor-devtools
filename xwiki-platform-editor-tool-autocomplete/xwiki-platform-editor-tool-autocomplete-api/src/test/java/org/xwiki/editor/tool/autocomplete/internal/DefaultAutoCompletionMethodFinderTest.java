@@ -35,7 +35,7 @@ import com.xpn.xwiki.util.Programming;
  * Unit tests for {@link DefaultAutoCompletionMethodFinder}.
  * 
  * @version $Id$
- * @since 4.2M2
+ * @since 5.2M1
  */
 @MockingRequirement(DefaultAutoCompletionMethodFinder.class)
 public class DefaultAutoCompletionMethodFinderTest extends AbstractMockingComponentTestCase<AutoCompletionMethodFinder>

@@ -49,7 +49,7 @@ import org.xwiki.velocity.VelocityManager;
  * Unit tests for {@link AutoCompletionResource}.
  * 
  * @version $Id$
- * @since 4.2M2
+ * @since 5.2M1
  */
 @MockingRequirement(value = TestableAutoCompletionResource.class, exceptions = {ComponentManager.class})
 @ComponentList({ScriptServicesAutoCompletionMethodFinder.class})

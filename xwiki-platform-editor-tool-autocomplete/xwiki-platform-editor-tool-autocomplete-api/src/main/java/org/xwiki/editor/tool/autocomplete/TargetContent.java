@@ -28,7 +28,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  * to the content.
  *
  * @version $Id$
- * @since 4.2M2
+ * @since 5.2M1
  */
 public class TargetContent
 {

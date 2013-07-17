@@ -29,7 +29,7 @@ import org.xwiki.editor.tool.autocomplete.internal.Hints;
  * the wiki.
  * 
  * @version $Id$
- * @since 4.2M2
+ * @since 5.2M1
  */
 @Role
 public interface AutoCompletionMethodFinder

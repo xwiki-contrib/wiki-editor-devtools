@@ -32,7 +32,7 @@ import com.xpn.xwiki.XWikiContext;
  * keys.
  * 
  * @version $Id$
- * @since 4.2M2
+ * @since 5.2M1
  */
 @Component(hints = { "context", "xcontext" })
 @Singleton

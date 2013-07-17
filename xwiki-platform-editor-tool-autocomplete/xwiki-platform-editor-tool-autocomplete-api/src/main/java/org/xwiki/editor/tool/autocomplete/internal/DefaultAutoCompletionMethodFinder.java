@@ -30,7 +30,7 @@ import org.xwiki.component.annotation.Component;
  * Returns autocompletion hints by finding all methods using introspection.
  * 
  * @version $Id$
- * @since 4.2M2
+ * @since 5.2M1
  */
 @Component
 @Singleton

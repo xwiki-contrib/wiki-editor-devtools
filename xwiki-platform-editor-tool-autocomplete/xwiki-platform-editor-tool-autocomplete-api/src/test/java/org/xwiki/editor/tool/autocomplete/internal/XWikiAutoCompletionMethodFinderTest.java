@@ -38,7 +38,7 @@ import com.xpn.xwiki.plugin.XWikiPluginManager;
  * Unit tests for {@link XWikiAutoCompletionMethodFinder}.
  * 
  * @version $Id$
- * @since 4.2M2
+ * @since 5.2M1
  */
 @MockingRequirement(TestableXWikiAutoCompletionMethodFinder.class)
 public class XWikiAutoCompletionMethodFinderTest extends AbstractMockingComponentTestCase<AutoCompletionMethodFinder>

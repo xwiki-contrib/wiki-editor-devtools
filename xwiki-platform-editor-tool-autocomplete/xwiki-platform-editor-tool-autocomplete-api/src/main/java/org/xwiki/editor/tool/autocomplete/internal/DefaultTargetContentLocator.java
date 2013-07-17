@@ -43,7 +43,7 @@ import org.xwiki.rendering.parser.Parser;
  * Finds the content and content type at the cursor position.
  * 
  * @version $Id$
- * @since 4.2M2
+ * @since 5.2M1
  */
 @Component
 @Singleton

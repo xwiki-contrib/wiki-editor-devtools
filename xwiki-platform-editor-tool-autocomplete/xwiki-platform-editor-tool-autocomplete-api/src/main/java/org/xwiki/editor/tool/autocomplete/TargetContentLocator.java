@@ -25,7 +25,7 @@ import org.xwiki.component.annotation.Role;
  * Allows discovering the syntax of the content under the current cursor position.
  *
  * @version $Id$
- * @since 4.2M2
+ * @since 5.2M1
  */
 @Role
 public interface TargetContentLocator

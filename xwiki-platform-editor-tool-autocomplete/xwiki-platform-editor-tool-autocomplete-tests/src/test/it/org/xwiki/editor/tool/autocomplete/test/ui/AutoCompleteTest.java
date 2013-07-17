@@ -28,7 +28,7 @@ import org.xwiki.test.ui.po.editor.WikiEditPage;
  * Tests autocompletion in the Velocity macro while being in the wiki editor.
  * 
  * @version $Id$
- * @since 4.2M2
+ * @since 5.2M1
  */
 public class AutoCompleteTest extends AbstractAdminAuthenticatedTest
 {

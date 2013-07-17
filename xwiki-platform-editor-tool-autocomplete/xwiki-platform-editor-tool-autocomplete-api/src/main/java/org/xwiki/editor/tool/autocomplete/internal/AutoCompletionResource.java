@@ -51,7 +51,7 @@ import com.xpn.xwiki.web.Utils;
  * position of the cursor and the syntax in which the content is written in are passed as request parameters.
  * 
  * @version $Id$
- * @since 4.2M2
+ * @since 5.2M1
  */
 @Component("org.xwiki.editor.tool.autocomplete.internal.AutoCompletionResource")
 @Path("/autocomplete")

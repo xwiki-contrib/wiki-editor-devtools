@@ -32,7 +32,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * Represents a list of hints that are returned.
  * 
  * @version $Id$
- * @since 4.2M2
+ * @since 5.2M1
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement(name = "hints")

@@ -11,12 +11,11 @@
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <creationDate>1343123377000</creationDate>
-  <date>1343373624000</date>
-  <contentUpdateDate>1343373624000</contentUpdateDate>
+  <creationDate>1373562597000</creationDate>
+  <date>1374094078000</date>
+  <contentUpdateDate>1374077924000</contentUpdateDate>
   <version>1.1</version>
   <title/>
-  <template/>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
@@ -312,13 +311,13 @@ var initialize = function () {
       sel.firstChild.selected = true;
       sel.size = Math.min(10, completions.length);
       var pos = editor.cursorCoords();
-      complete.style.left = pos.x + "px";
-      complete.style.top = pos.yBot + "px";
+      complete.style.left = pos.left + "px";
+      complete.style.top = pos.bottom + "px";
       document.body.appendChild(complete);
       // If we're at the edge of the screen, then we want the menu to appear on the left of the cursor.
       var winW = window.innerWidth || Math.max(document.body.offsetWidth, document.documentElement.offsetWidth);
-      if(winW - pos.x &lt; sel.clientWidth)
-        complete.style.left = (pos.x - sel.clientWidth) + "px";
+      if(winW - pos.left &lt; sel.clientWidth)
+        complete.style.left = (pos.left - sel.clientWidth) + "px";
       // Hack to hide the scrollbar.
       if (completions.length &lt;= 10)
         complete.style.width = (sel.clientWidth - 1) + "px";
@@ -334,8 +333,8 @@ var initialize = function () {
         close();
         setTimeout(function(){editor.focus();}, 50);
       }
-      CodeMirror.connect(sel, "blur", close);
-      CodeMirror.connect(sel, "keydown", function(event) {
+      CodeMirror.on(sel, "blur", close);
+      CodeMirror.on(sel, "keydown", function(event) {
         var code = event.keyCode;
         // Enter
         if (code == 13) {CodeMirror.e_stop(event); pick();}
@@ -348,7 +347,7 @@ var initialize = function () {
           setTimeout(function(){CodeMirror.simpleHint(editor, getHints);}, 50);
         }
       });
-      CodeMirror.connect(sel, "dblclick", pick);
+      CodeMirror.on(sel, "dblclick", pick);
   
       sel.focus();
       // Opera sometimes ignores focusing a freshly created node
@@ -454,7 +453,7 @@ document.observe('xwiki:dom:loaded', function() {
       <cache>long</cache>
     </property>
     <property>
-      <code>#set ($attachmentName = 'codemirror.zip')
+      <code>#includeMacros('Macros')
 
 (function () {
 var TIMEOUT_VALUE = 150;
@@ -466,7 +465,7 @@ var initialize = function () {
     setTimeout(initialize, TIMEOUT_VALUE);
   } else {
     // Load the javascript hint library
-    importScript("$xwiki.zipexplorer.getFileLink($xwiki.getDocument('Main.SyntaxHighlighting'), $attachmentName, 'lib/util/javascript-hint.js')");
+    importCodeMirrorScript('addon/hint/javascript-hint.js');
 
     // Wait for it to load and plug it in.
     initializeJavascriptHint();
@@ -485,7 +484,7 @@ var initializeJavascriptHint = function() {
     CodeMirror.commands.autocomplete.javascript = function (args) {
       // By default, the javascript-hint.js library does not sort the results. We execute the default code and then sort the results before returining it to the simpleHint module.
       var result = CodeMirror.javascriptHint.apply(this, arguments);
-      result.list.sort(function(x,y){ 
+      result.list.sort(function(x, y) { 
         var a = String(x).toUpperCase();
         var b = String(y).toUpperCase();
         if (a &gt; b)
@@ -498,19 +497,6 @@ var initializeJavascriptHint = function() {
       return result;
     }
   }
-}
-
-/*
- * Utility methods.
- */
-
-/* Inject an extra javascript script tag into the current DOM using the given script location/source. */
-var importScript = function(src) {
-  var script_tag = document.createElement('script');
-  script_tag.type = "text/javascript";
-  script_tag.src = src;
-
-  document.getElementsByTagName('head')[0].appendChild(script_tag);
 }
 
 document.observe('xwiki:dom:loaded', function() {
@@ -526,7 +512,131 @@ document.observe('xwiki:dom:loaded', function() {
       <parse>1</parse>
     </property>
     <property>
-      <use>currentPage</use>
+      <use>always</use>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <name>Main.WikiEditorAutocomplete</name>
+    <number>3</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>c6c480d4-d20d-4d10-ba0a-26f41370ceca</guid>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>(function () {
+var TIMEOUT_VALUE = 150;
+var initialize = function () {
+  if (typeof(CodeMirror) == 'undefined' || typeof(CodeMirror.commands) == 'undefined') {
+    // The download + loading of the CodeMirror js is done asynchronously, so we need to wait for it to load.
+    setTimeout(initialize, TIMEOUT_VALUE);
+  } else {
+    // Add support for simple autocomplete
+    // NOTE: We are using our customized version of the deprecated simple-hint.js inside a JSX found in the Autocomplete page.
+    // TODO: maybe upgrade to show-hint.js which superseeds simpleHint.
+    // importCodeMirrorScript('addon/hint/show-hint.js');
+
+    // Autocomplete hook that allows an extension point for autocomplete implementations for each mode.
+    CodeMirror.commands.autocomplete = function(cm) {
+      var mode = cm.getOption('mode');
+      
+      var autocompleteImplementation = CodeMirror.commands.autocomplete[mode];
+      if (autocompleteImplementation != null) {
+      	CodeMirror.simpleHint(cm, autocompleteImplementation);
+        // TODO: maybe upgrade to show-hint.js which superseeds simpleHint.
+        //CodeMirror.showHint(cm, autocompleteImplementation);
+      }
+    }
+  }
+}
+
+document.observe('xwiki:dom:loaded', function() {
+  initialize();    
+});
+
+})();
+
+</code>
+    </property>
+    <property>
+      <name>Support for autocompletion in the CodeMirror editor</name>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>always</use>
     </property>
   </object>
   <object>
@@ -615,6 +725,113 @@ document.observe('xwiki:dom:loaded', function() {
     </property>
     <property>
       <name>Autocomplete styling</name>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>always</use>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <name>Main.WikiEditorAutocomplete</name>
+    <number>1</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>8a8fe1f3-4973-4529-90a4-6c27fe232d1d</guid>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>.CodeMirror-completions {
+  position: absolute;
+  z-index: 10;
+  overflow: hidden;
+  -webkit-box-shadow: 2px 3px 5px rgba(0,0,0,.2);
+  -moz-box-shadow: 2px 3px 5px rgba(0,0,0,.2);
+  box-shadow: 2px 3px 5px rgba(0,0,0,.2);
+}
+.CodeMirror-completions select {
+  background: #fafafa;
+  outline: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font-family: monospace;
+}</code>
+    </property>
+    <property>
+      <name>simple-hint.css - the original file that was removed in CodeMirror 3.11</name>
     </property>
     <property>
       <parse>0</parse>

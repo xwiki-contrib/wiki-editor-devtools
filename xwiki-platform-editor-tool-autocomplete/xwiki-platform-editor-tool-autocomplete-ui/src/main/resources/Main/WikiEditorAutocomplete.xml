@@ -103,72 +103,71 @@
     </property>
     <property>
       <code>(function () {
-var TIMEOUT_VALUE = 150;
-var initialize = function () {
-  if (typeof(CodeMirror) == 'undefined' || typeof(CodeMirror.commands) == 'undefined' || typeof(CodeMirror.commands.autocomplete) == 'undefined') {
-    // The download + loading of the CodeMirror js is done asynchronously, so we need to wait for it to load.
-    setTimeout(initialize, TIMEOUT_VALUE);
-  } else { 
-    CodeMirror.commands.autocomplete.xwiki = function(editor) {
-      // Extract the cursor and token.
-      var cursor = editor.getCursor();
-      var token = editor.getTokenAt(cursor)
+  var TIMEOUT_VALUE = 150;
+  var initialize = function () {
+    if (typeof(CodeMirror) == 'undefined' || typeof(CodeMirror.commands) == 'undefined' || typeof(CodeMirror.commands.autocomplete) == 'undefined') {
+      // The download + loading of the CodeMirror js is done asynchronously, so we need to wait for it to load.
+      setTimeout(initialize, TIMEOUT_VALUE);
+    } else {
+      CodeMirror.commands.autocomplete.xwiki = function(editor) {
+        // Extract the cursor and token.
+        var cursor = editor.getCursor();
+        var token = editor.getTokenAt(cursor)
 
-      // Extract the information needed for the autocompletion service.
-      var offset = editor.indexFromPos(cursor);
-      var content = editor.getValue();
-      var syntax = XWiki.docsyntax;
+        // Extract the information needed for the autocompletion service.
+        var offset = editor.indexFromPos(cursor);
+        var content = editor.getValue();
+        var syntax = XWiki.docsyntax;
 
-      var hints = [];
-      var startOffset = offset;
+        var hints = [];
+        var startOffset = offset;
 
-      // Synchronous AJAX call to get the suggestions from the server.
-      new Ajax.Request("/${xwiki.webAppPath}rest/autocomplete?media=json&amp;offset=" + offset + "&amp;syntax=" + encodeURIComponent(syntax), {
-        asynchronous : false,
-        method : 'post',
-        contentType : 'text/plain',
-        postBody : content,
-        onSuccess: function(response) {
-          var response = response.responseJSON;
-          var responseHints = response.hints;
-          if (responseHints != null &amp;&amp; responseHints.length &gt; 0) {
-            for (var i = 0; i &lt; responseHints.length; i++) {
-              hints.push(responseHints[i]);
+        // Synchronous AJAX call to get the suggestions from the server.
+        new Ajax.Request("/${xwiki.webAppPath}rest/autocomplete?media=json&amp;offset=" + offset + "&amp;syntax=" + encodeURIComponent(syntax), {
+          asynchronous : false,
+          method : 'post',
+          contentType : 'text/plain',
+          postBody : content,
+          onSuccess: function(response) {
+            var response = response.responseJSON;
+            var responseHints = response.hints;
+            if (responseHints != null &amp;&amp; responseHints.length &gt; 0) {
+              for (var i = 0; i &lt; responseHints.length; i++) {
+                hints.push(responseHints[i]);
+              }
+
+              // If the backend provides the startOffset, use it. Otherwise, assume the selected result needs to be appended and just use the current cursor location.
+              if (response.startOffset != null) {
+                startOffset = response.startOffset;
+              }
             }
-            
-            // If the backend provides the startOffset, use it. Otherwise, assume the selected result needs to be appended and just use the current cursor location.
-            if (response.startOffset != null) {
-              startOffset = response.startOffset;
+          }.bind(this),
+
+          onFailure: function(response) {
+            var failureReason = response.statusText;
+            if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
+              failureReason = 'Server not responding';
             }
+
+            // show the error message at the bottom
+            editor._x_notification.replace(new XWiki.widgets.Notification('Failed to get autocompletion: ' + failureReason, 'error', {timeout : 5}));
+          },
+
+          on0: function (response) {
+            response.request.options.onFailure(response);
           }
-        }.bind(this),
+        });
 
-        onFailure: function(response) {
-          var failureReason = response.statusText;
-          if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
-            failureReason = 'Server not responding';
-          }
-
-		  // show the error message at the bottom
-          editor._x_notification.replace(new XWiki.widgets.Notification('Failed to get autocompletion: ' + failureReason, 'error', {timeout : 5}));
-        },
-        
-        on0: function (response) {
-          response.request.options.onFailure(response);
-        }
-      });
-
-      return {list: hints,
-              from: editor.posFromIndex(startOffset),
-              to: {line: cursor.line, ch: cursor.ch}};
+        return {list: hints,
+                from: editor.posFromIndex(startOffset),
+                to: {line: cursor.line, ch: cursor.ch}};
+      }
     }
   }
-}
 
-document.observe('xwiki:dom:loaded', function() {
-  initialize();    
-});
-
+  document.observe('xwiki:dom:loaded', function() {
+    initialize();
+  });
 })();</code>
     </property>
     <property>
@@ -262,105 +261,104 @@ document.observe('xwiki:dom:loaded', function() {
     </property>
     <property>
       <code>(function() {
-var TIMEOUT_VALUE = 150;
-var initialize = function () {
-  if (typeof(CodeMirror) == 'undefined') {
-    // The download + loading of the CodeMirror js is done asynchronously, so we need to wait for it to load.
-    setTimeout(initialize, TIMEOUT_VALUE);
-  } else { 
-    CodeMirror.simpleHint = function(editor, getHints) {
-      // We want a single cursor position.
-      if (editor.somethingSelected()) return;
-      //don't show completion if the token is empty
-      var tempToken = editor.getTokenAt(editor.getCursor());
-      if(!(/[\S]/gi.test(tempToken.string))) return;
-  
-      var result = getHints(editor);
-      if (!result || !result.list.length) return;
-      var completions = result.list;
-      function insert(completion) {
-        // Simple, string completions.
-        var value = completion;
-        // Support for advanced name/description completions.
-        if (completion.name != null) {
-          value = completion.name;
-        }
-        editor.replaceRange(value, result.from, result.to);
-      }
-      // When there is only one completion, use it directly.
-      if (completions.length == 1) {insert(completions[0]); return true;}
-  
-      // Build the select widget
-      var complete = document.createElement("div");
-      complete.className = "CodeMirror-completions";
-      var sel = complete.appendChild(document.createElement("select"));
-      // Opera doesn't move the selection when pressing up/down in a
-      // multi-select, but it does properly support the size property on
-      // single-selects, so no multi-select is necessary.
-      if (!window.opera) sel.multiple = true;
-      for (var i = 0; i &lt; completions.length; ++i) {
-        var opt = sel.appendChild(document.createElement("option"));
-        // Simple, string completions.
-        var description = completions[i];
-        // Support for advanced name/description completions.
-        if (description.description != null) {
-          description = description.description;
-        }
-        opt.appendChild(document.createTextNode(description));
-      }
-      sel.firstChild.selected = true;
-      sel.size = Math.min(10, completions.length);
-      var pos = editor.cursorCoords();
-      complete.style.left = pos.left + "px";
-      complete.style.top = pos.bottom + "px";
-      document.body.appendChild(complete);
-      // If we're at the edge of the screen, then we want the menu to appear on the left of the cursor.
-      var winW = window.innerWidth || Math.max(document.body.offsetWidth, document.documentElement.offsetWidth);
-      if(winW - pos.left &lt; sel.clientWidth)
-        complete.style.left = (pos.left - sel.clientWidth) + "px";
-      // Hack to hide the scrollbar.
-      if (completions.length &lt;= 10)
-        complete.style.width = (sel.clientWidth - 1) + "px";
-  
-      var done = false;
-      function close() {
-        if (done) return;
-        done = true;
-        complete.parentNode.removeChild(complete);
-      }
-      function pick() {
-        insert(completions[sel.selectedIndex]);
-        close();
-        setTimeout(function(){editor.focus();}, 50);
-      }
-      CodeMirror.on(sel, "blur", close);
-      CodeMirror.on(sel, "keydown", function(event) {
-        var code = event.keyCode;
-        // Enter
-        if (code == 13) {CodeMirror.e_stop(event); pick();}
-        // Escape
-        else if (code == 27) {CodeMirror.e_stop(event); close(); editor.focus();}
-        else if (code != 38 &amp;&amp; code != 40 &amp;&amp; code != 33 &amp;&amp; code != 34) {
-          close(); editor.focus();
-          // Pass the event to the CodeMirror instance so that it can handle things like backspace properly.
-          editor.triggerOnKeyDown(event);
-          setTimeout(function(){CodeMirror.simpleHint(editor, getHints);}, 50);
-        }
-      });
-      CodeMirror.on(sel, "dblclick", pick);
-  
-      sel.focus();
-      // Opera sometimes ignores focusing a freshly created node
-      if (window.opera) setTimeout(function(){if (!done) sel.focus();}, 100);
-      return true;
-    };
-  }
-}
-    
-document.observe('xwiki:dom:loaded', function() {
-  initialize();    
-});
+  var TIMEOUT_VALUE = 150;
+  var initialize = function () {
+    if (typeof(CodeMirror) == 'undefined') {
+      // The download + loading of the CodeMirror js is done asynchronously, so we need to wait for it to load.
+      setTimeout(initialize, TIMEOUT_VALUE);
+    } else {
+      CodeMirror.simpleHint = function(editor, getHints) {
+        // We want a single cursor position.
+        if (editor.somethingSelected()) return;
+        //don't show completion if the token is empty
+        var tempToken = editor.getTokenAt(editor.getCursor());
+        if(!(/[\S]/gi.test(tempToken.string))) return;
 
+        var result = getHints(editor);
+        if (!result || !result.list.length) return;
+        var completions = result.list;
+        function insert(completion) {
+          // Simple, string completions.
+          var value = completion;
+          // Support for advanced name/description completions.
+          if (completion.name != null) {
+            value = completion.name;
+          }
+          editor.replaceRange(value, result.from, result.to);
+        }
+        // When there is only one completion, use it directly.
+        if (completions.length == 1) {insert(completions[0]); return true;}
+
+        // Build the select widget
+        var complete = document.createElement("div");
+        complete.className = "CodeMirror-completions";
+        var sel = complete.appendChild(document.createElement("select"));
+        // Opera doesn't move the selection when pressing up/down in a
+        // multi-select, but it does properly support the size property on
+        // single-selects, so no multi-select is necessary.
+        if (!window.opera) sel.multiple = true;
+        for (var i = 0; i &lt; completions.length; ++i) {
+          var opt = sel.appendChild(document.createElement("option"));
+          // Simple, string completions.
+          var description = completions[i];
+          // Support for advanced name/description completions.
+          if (description.description != null) {
+            description = description.description;
+          }
+          opt.appendChild(document.createTextNode(description));
+        }
+        sel.firstChild.selected = true;
+        sel.size = Math.min(10, completions.length);
+        var pos = editor.cursorCoords();
+        complete.style.left = pos.left + "px";
+        complete.style.top = pos.bottom + "px";
+        document.body.appendChild(complete);
+        // If we're at the edge of the screen, then we want the menu to appear on the left of the cursor.
+        var winW = window.innerWidth || Math.max(document.body.offsetWidth, document.documentElement.offsetWidth);
+        if(winW - pos.left &lt; sel.clientWidth)
+          complete.style.left = (pos.left - sel.clientWidth) + "px";
+        // Hack to hide the scrollbar.
+        if (completions.length &lt;= 10)
+          complete.style.width = (sel.clientWidth - 1) + "px";
+
+        var done = false;
+        function close() {
+          if (done) return;
+          done = true;
+          complete.parentNode.removeChild(complete);
+        }
+        function pick() {
+          insert(completions[sel.selectedIndex]);
+          close();
+          setTimeout(function(){editor.focus();}, 50);
+        }
+        CodeMirror.on(sel, "blur", close);
+        CodeMirror.on(sel, "keydown", function(event) {
+          var code = event.keyCode;
+          // Enter
+          if (code == 13) {CodeMirror.e_stop(event); pick();}
+          // Escape
+          else if (code == 27) {CodeMirror.e_stop(event); close(); editor.focus();}
+          else if (code != 38 &amp;&amp; code != 40 &amp;&amp; code != 33 &amp;&amp; code != 34) {
+            close(); editor.focus();
+            // Pass the event to the CodeMirror instance so that it can handle things like backspace properly.
+            editor.triggerOnKeyDown(event);
+            setTimeout(function(){CodeMirror.simpleHint(editor, getHints);}, 50);
+          }
+        });
+        CodeMirror.on(sel, "dblclick", pick);
+
+        sel.focus();
+        // Opera sometimes ignores focusing a freshly created node
+        if (window.opera) setTimeout(function(){if (!done) sel.focus();}, 100);
+        return true;
+      };
+    }
+  }
+
+  document.observe('xwiki:dom:loaded', function() {
+    initialize();
+  });
 })();</code>
     </property>
     <property>
@@ -456,53 +454,52 @@ document.observe('xwiki:dom:loaded', function() {
       <code>#includeMacros('Macros')
 
 (function () {
-var TIMEOUT_VALUE = 150;
-// roughly 10 seconds.
-var timeouts = 7 * 10
-var initialize = function () {
-  if (typeof(CodeMirror) == 'undefined' || typeof(CodeMirror.commands) == 'undefined' || typeof(CodeMirror.commands.autocomplete) == 'undefined') {
-    // The download + loading of the CodeMirror js is done asynchronously, so we need to wait for it to load.
-    setTimeout(initialize, TIMEOUT_VALUE);
-  } else {
-    // Load the javascript hint library
-    importCodeMirrorScript('addon/hint/javascript-hint.js');
-
-    // Wait for it to load and plug it in.
-    initializeJavascriptHint();
-  }
-}
-
-var initializeJavascriptHint = function() {
-  if (CodeMirror.javascriptHint == null) {
-    // The download + loading of the js hint library is done asynchronously, so we need to wait for it to load.
-    if (timeouts-- &gt; 0) {     
-      setTimeout(arguments.callee, TIMEOUT_VALUE);
+  var TIMEOUT_VALUE = 150;
+  // roughly 10 seconds.
+  var timeouts = 7 * 10
+  var initialize = function () {
+    if (typeof(CodeMirror) == 'undefined' || typeof(CodeMirror.commands) == 'undefined' || typeof(CodeMirror.commands.autocomplete) == 'undefined') {
+      // The download + loading of the CodeMirror js is done asynchronously, so we need to wait for it to load.
+      setTimeout(initialize, TIMEOUT_VALUE);
     } else {
-    }
-  } else {
-    // Plug it into the autocompletion mechanism.
-    CodeMirror.commands.autocomplete.javascript = function (args) {
-      // By default, the javascript-hint.js library does not sort the results. We execute the default code and then sort the results before returining it to the simpleHint module.
-      var result = CodeMirror.javascriptHint.apply(this, arguments);
-      result.list.sort(function(x, y) { 
-        var a = String(x).toUpperCase();
-        var b = String(y).toUpperCase();
-        if (a &gt; b)
-		  return 1;
-        if (a &lt; b)
-          return -1;
-        return 0;
-   	  });
+      // Load the javascript hint library
+      importCodeMirrorScript('addon/hint/javascript-hint.js');
 
-      return result;
+      // Wait for it to load and plug it in.
+      initializeJavascriptHint();
     }
   }
-}
 
-document.observe('xwiki:dom:loaded', function() {
-  initialize();    
-});
+  var initializeJavascriptHint = function() {
+    if (CodeMirror.javascriptHint == null) {
+      // The download + loading of the js hint library is done asynchronously, so we need to wait for it to load.
+      if (timeouts-- &gt; 0) {
+        setTimeout(arguments.callee, TIMEOUT_VALUE);
+      } else {
+      }
+    } else {
+      // Plug it into the autocompletion mechanism.
+      CodeMirror.commands.autocomplete.javascript = function (args) {
+        // By default, the javascript-hint.js library does not sort the results. We execute the default code and then sort the results before returining it to the simpleHint module.
+        var result = CodeMirror.javascriptHint.apply(this, arguments);
+        result.list.sort(function(x, y) {
+          var a = String(x).toUpperCase();
+          var b = String(y).toUpperCase();
+          if (a &gt; b)
+            return 1;
+          if (a &lt; b)
+            return -1;
+          return 0;
+        });
 
+        return result;
+      }
+    }
+  }
+
+  document.observe('xwiki:dom:loaded', function() {
+    initialize();
+  });
 })();</code>
     </property>
     <property>
@@ -596,38 +593,36 @@ document.observe('xwiki:dom:loaded', function() {
     </property>
     <property>
       <code>(function () {
-var TIMEOUT_VALUE = 150;
-var initialize = function () {
-  if (typeof(CodeMirror) == 'undefined' || typeof(CodeMirror.commands) == 'undefined') {
-    // The download + loading of the CodeMirror js is done asynchronously, so we need to wait for it to load.
-    setTimeout(initialize, TIMEOUT_VALUE);
-  } else {
-    // Add support for simple autocomplete
-    // NOTE: We are using our customized version of the deprecated simple-hint.js inside a JSX found in the Autocomplete page.
-    // TODO: maybe upgrade to show-hint.js which superseeds simpleHint.
-    // importCodeMirrorScript('addon/hint/show-hint.js');
+  var TIMEOUT_VALUE = 150;
+  var initialize = function () {
+    if (typeof(CodeMirror) == 'undefined' || typeof(CodeMirror.commands) == 'undefined') {
+      // The download + loading of the CodeMirror js is done asynchronously, so we need to wait for it to load.
+      setTimeout(initialize, TIMEOUT_VALUE);
+    } else {
+      // Add support for simple autocomplete
+      // NOTE: We are using our customized version of the deprecated simple-hint.js inside a JSX found in the Autocomplete page.
+      // TODO: maybe upgrade to show-hint.js which superseeds simpleHint.
+      // importCodeMirrorScript('addon/hint/show-hint.js');
 
-    // Autocomplete hook that allows an extension point for autocomplete implementations for each mode.
-    CodeMirror.commands.autocomplete = function(cm) {
-      var mode = cm.getOption('mode');
-      
-      var autocompleteImplementation = CodeMirror.commands.autocomplete[mode];
-      if (autocompleteImplementation != null) {
-      	CodeMirror.simpleHint(cm, autocompleteImplementation);
-        // TODO: maybe upgrade to show-hint.js which superseeds simpleHint.
-        //CodeMirror.showHint(cm, autocompleteImplementation);
+      // Autocomplete hook that allows an extension point for autocomplete implementations for each mode.
+      CodeMirror.commands.autocomplete = function(cm) {
+        var mode = cm.getOption('mode');
+
+        var autocompleteImplementation = CodeMirror.commands.autocomplete[mode];
+        if (autocompleteImplementation != null) {
+          CodeMirror.simpleHint(cm, autocompleteImplementation);
+          // TODO: maybe upgrade to show-hint.js which superseeds simpleHint.
+          // CodeMirror.showHint(cm, autocompleteImplementation);
+        }
       }
     }
   }
-}
 
-document.observe('xwiki:dom:loaded', function() {
-  initialize();    
-});
+  document.observe('xwiki:dom:loaded', function() {
+    initialize();
+  });
 
-})();
-
-</code>
+})();</code>
     </property>
     <property>
       <name>Support for autocompletion in the CodeMirror editor</name>

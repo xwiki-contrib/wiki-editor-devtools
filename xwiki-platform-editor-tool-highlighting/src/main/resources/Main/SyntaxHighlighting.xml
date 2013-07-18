@@ -13302,12 +13302,11 @@ BgAAAACAAYAB7ZsAAALcCgAAAA==
 var codeMirrors = [];
 const TIMEOUT_VALUE = 150;
 
-// FIXME: Replace with XWiki.isDomLoaded when upgrading to 3.1.1. http://jira.xwiki.org/jira/browse/XWIKI-6754
-if (XWiki.isInitialized) {
+if (XWiki.domIsLoaded) {
   initCodeMirrorInternals();
 } else {
   document.observe('xwiki:dom:loaded', function() {
-    initCodeMirrorInternals();    
+    initCodeMirrorInternals();
   });
 }
 
@@ -13331,7 +13330,7 @@ var initCodeMirrorModules = function() {
     importCodeMirrorScript('mode/javascript/javascript.js');
     // Velocity Mode
     importCodeMirrorScript('mode/velocity/velocity.js');
-    
+
     // XML mode needed by the XWiki Mode below.
     importCodeMirrorScript('mode/xml/xml.js');
     // XWiki Syntax/Macros (xwikitags.js) and XWiki Mode (mixed mode of all the above + XML/HTML = xwiki.js)
@@ -13340,19 +13339,19 @@ var initCodeMirrorModules = function() {
     // Match highlighting
     importCodeMirrorScript('addon/search/match-highlighter.js');
     importCodeMirrorScript('addon/search/searchcursor.js');
-    
+
     // Enable brackets matching
     importCodeMirrorScript('addon/edit/matchbrackets.js');
 
     // Active line highlighting
     importCodeMirrorScript('addon/selection/active-line.js');
-    
+
     // Continue C-like block comments on a new line
     importCodeMirrorScript('addon/edit/continuecomment.js');
-    
+
     // Auto-close brackets and quotes
     importCodeMirrorScript('addon/edit/closebrackets.js');
-    
+
     // Show trailing empty whitespaces
 	importCodeMirrorScript('addon/edit/trailingspace.js');
 
@@ -13388,68 +13387,68 @@ var initCodeMirrors = function () {
 * @param codeMirrorMode : the mode that will be used by this CodeMirror instance ('css', 'javascript', etc.)
 */
 var initCodeMirror = function (propertyPattern, objectTitlePattern, codeMirrorMode) {
-  //console.log('initCodeMirror(' + propertyPattern + ', ' + objectTitlePattern + ', ' + codeMirrorMode + ')');
   if (CodeMirror.modes[codeMirrorMode] == null) {
     // The download + loading of each CodeMirror module js is done asynchronously, so we need to wait for it to load.
     setTimeout(function() {initCodeMirror(propertyPattern, objectTitlePattern, codeMirrorMode)}, TIMEOUT_VALUE);
   } else {
-  //
-  // Attach codeMirrors to all the elements matched with the propertyPattern.
-  //
-  var textareas = $$(propertyPattern);
-  for (var i = 0; i&lt;textareas.length; ++i) {
-    var textarea = textareas[i];
-    var textareaWidthPercentage = textarea.getWidth() * 100 / textarea.parentNode.getWidth();
-    var codeMirror = CodeMirror.fromTextArea(textarea, {
-      'mode' : codeMirrorMode,
-      'lineNumbers' : true,
-      'matchBrackets' : true,
-      // Clear trailing whitespaces on empty lines.
-      'autoClearEmptyLines' : true,
-      // Active line highlighting
-      'styleActiveLine' : true,
-      // Automatically highlight matching words on click.
-      'highlightSelectionMatches': {showToken: /\w+/},
-      // Continue C-like block comments on a new line.
-      'continueComments' : true,
-      // Auto-close brackets and quotes
-      'autoCloseBrackets' : true,
-      // Show trailing empty whitespaces
-      'showTrailingSpace' : true,
-      /* Autocomplete support. */
-      extraKeys : {'Ctrl-Space' : 'autocomplete',
-                   // Mac friendly autocomplete binding
-                   'Shift-Ctrl-Space' : 'autocomplete',
-                   // Use whitespaces instead of tabs
-                   'Tab' : whitespaceIndentation},
-    });
+    //
+    // Attach codeMirrors to all the elements matched with the propertyPattern.
+    //
+    var textareas = $$(propertyPattern);
+    for (var i = 0; i&lt;textareas.length; ++i) {
+      var textarea = textareas[i];
+      var textareaWidthPercentage = textarea.getWidth() * 100 / textarea.parentNode.getWidth();
+      var codeMirror = CodeMirror.fromTextArea(textarea, {
+        'mode' : codeMirrorMode,
+        'lineNumbers' : true,
+        'matchBrackets' : true,
+        // Clear trailing whitespaces on empty lines.
+        // FIXME: Does not seem to be working. Was introduced in CM 2.2 I believe. Removed from CM 3.x?
+        'autoClearEmptyLines' : true,
+        // Active line highlighting
+        'styleActiveLine' : true,
+        // Automatically highlight matching words on click.
+        'highlightSelectionMatches': {showToken: /\w+/},
+        // Continue C-like block comments on a new line.
+        'continueComments' : true,
+        // Auto-close brackets and quotes
+        'autoCloseBrackets' : true,
+        // Show trailing empty whitespaces
+        'showTrailingSpace' : true,
+        /* Autocomplete support. */
+        extraKeys : {'Ctrl-Space' : 'autocomplete',
+                     // Mac friendly autocomplete binding
+                     'Shift-Ctrl-Space' : 'autocomplete',
+                     // Use whitespaces instead of tabs
+                     'Tab' : whitespaceIndentation},
+      });
 
-    /* Full Screen on F11. */
-    codeMirror.on('keydown', function(i, e) {
-      // Hook into F11
-      if (e.keyCode == 122 || e.keyCode == 27) {
-        e.stop();
-        return toggleFullscreenEditing(codeMirror);
-      }
-    });
+      /* Full Screen on F11. */
+      codeMirror.on('keydown', function(i, e) {
+        // Hook into F11
+        if (e.keyCode == 122 || e.keyCode == 27) {
+          e.stop();
+          return toggleFullscreenEditing(codeMirror);
+        }
+      });
 
-    // Set the width of the codemirror div equal to the one of the wrapped textarea. Value is computed before attaching the codemirror instance, otherwise it will not report it correctly since the textarea will be hidden.
-    codeMirror.getWrapperElement().style.width = "" + textareaWidthPercentage + "%";
+      // Set the width of the codemirror div equal to the one of the wrapped textarea. Value is computed before attaching the codemirror instance, otherwise it will not report it correctly since the textarea will be hidden.
+      codeMirror.getWrapperElement().style.width = "" + textareaWidthPercentage + "%";
 
-    // Track this new instance by adding it to the list of instances.
-    codeMirrors.push(codeMirror);
-  }
-  
-  //
-  // Attach listeners for when expanding an object in the object editor.
-  //
-  if (objectTitlePattern != null &amp;&amp; objectTitlePattern != '') {
-    var titleElements = $$(objectTitlePattern);
-    for (var i=0; i&lt;titleElements.length; ++i) {
-      var titleElement = titleElements[i];
-      titleElement.observe('click', expandTitleElement);
+      // Track this new instance by adding it to the list of instances.
+      codeMirrors.push(codeMirror);
     }
-  }
+
+    //
+    // Attach listeners for when expanding an object in the object editor.
+    //
+    if (objectTitlePattern != null &amp;&amp; objectTitlePattern != '') {
+      var titleElements = $$(objectTitlePattern);
+      for (var i=0; i&lt;titleElements.length; ++i) {
+        var titleElement = titleElements[i];
+        titleElement.observe('click', expandTitleElement);
+      }
+    }
 
   // else-end
   }
@@ -13460,8 +13459,7 @@ var whitespaceIndentation = function(cm) {
   if (cm.somethingSelected()) {
     cm.indentSelection("add");
   } else {
-    cm.replaceSelection(cm.getOption("indentWithTabs")? "\t":
-                        Array(cm.getOption("indentUnit") + 1).join(" "), "end", "+input");
+    cm.replaceSelection(cm.getOption("indentWithTabs") ? "\t" : Array(cm.getOption("indentUnit") + 1).join(" "), "end", "+input");
   }
 }
 
@@ -13522,12 +13520,12 @@ document.observe('xwiki:actions:save', function(event){
 /* Full screen editing when pressing the maximize button. */
 document.observe('xwiki:fullscreen:enter', function(event){
   Event.stop(event);
-  
+
   var originalTextArea = event.memo.target;
   var codeMirrorTextArea = originalTextArea.up().down('.CodeMirror textarea');
-  
+
   var codeMirror = getCodeMirrorFromInternalTextArea(codeMirrorTextArea, codeMirrors);
-  
+
   toggleFullscreenEditing(codeMirror);
 });
 
@@ -13551,12 +13549,12 @@ var CODEMIRROR_ZIP_URL_TEMPLATE = "$CODEMIRROR_RESOURCE_URL_TEMPLATE";
  * @param zipPathPart file path from the codeMirror zip file to be retrieved, without the root "codemirror-&lt;version&gt;" directory information.
  * @return The CodeMirror resource requested by the zipPathPart element.
  */
-var getCodeMirrorFile = function(zipPathPart) {
+var getCodeMirrorResource = function(zipPathPart) {
   return CODEMIRROR_ZIP_URL_TEMPLATE.replace('TEMPLATE', zipPathPart);
 }
 
 var importCodeMirrorScript = function(zipPathPart) {
-  importScript(getCodeMirrorFile(zipPathPart))
+  importScript(getCodeMirrorResource(zipPathPart))
 }</code>
     </property>
     <property>

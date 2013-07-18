@@ -13338,6 +13338,7 @@ var initCodeMirrorModules = function() {
 
     // Match highlighting
     importCodeMirrorScript('addon/search/match-highlighter.js');
+    // Depends on...
     importCodeMirrorScript('addon/search/searchcursor.js');
 
     // Enable brackets matching
@@ -13354,6 +13355,11 @@ var initCodeMirrorModules = function() {
 
     // Show trailing empty whitespaces
 	importCodeMirrorScript('addon/edit/trailingspace.js');
+
+    // Search support
+    importCodeMirrorScript('addon/search/search.js');
+    // Better looking search UI
+    importCodeMirrorScript('addon/dialog/dialog.js');
 
     initCodeMirrors();
   }
@@ -13420,7 +13426,8 @@ var initCodeMirror = function (propertyPattern, objectTitlePattern, codeMirrorMo
                      // Mac friendly autocomplete binding
                      'Shift-Ctrl-Space' : 'autocomplete',
                      // Use whitespaces instead of tabs
-                     'Tab' : whitespaceIndentation},
+                     'Tab' : whitespaceIndentation,
+                     'F3' : 'findNext'}
       });
 
       /* Full Screen on F11. */
@@ -13535,6 +13542,11 @@ document.observe('xwiki:fullscreen:enter', function(event){
 
 /* Inject an extra javascript script tag into the current DOM using the given script location/source. */
 var importScript = function(src) {
+  // Stop here if the script is already loaded
+  if ($$("head &gt; script[src='" + src + "']").length != 0) {
+    return;
+  }
+
   var script_tag = document.createElement('script');
   script_tag.type = "text/javascript";
   script_tag.src = src;
@@ -13652,6 +13664,9 @@ var importCodeMirrorScript = function(zipPathPart) {
 ## CodeMirror base style required for basic usage + default Theme
 @import "#getCodeMirrorResource('lib/codemirror.css')";
 
+## Used by the search dialog CSS
+@import "#getCodeMirrorResource('addon/dialog/dialog.css')";
+
 ##
 ## Custom CSS
 ##
@@ -13710,6 +13725,6 @@ var importCodeMirrorScript = function(zipPathPart) {
   <content>[[CodeMirror&gt;&gt;http://codemirror.net/]] based syntax highlighting for:
 * JavaScript
 * CSS
-* Velocity (Experimental, not the official one released after august 2011)
+* Velocity
 * XWiki Macros (Experimental)</content>
 </xwikidoc>

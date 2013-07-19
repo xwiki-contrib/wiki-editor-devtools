@@ -12,8 +12,8 @@
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1373562578000</creationDate>
-  <date>1374093406000</date>
-  <contentUpdateDate>1374002252000</contentUpdateDate>
+  <date>1374267954000</date>
+  <contentUpdateDate>1374140150000</contentUpdateDate>
   <version>1.1</version>
   <title/>
   <defaultTemplate/>
@@ -13403,47 +13403,10 @@ var initCodeMirror = function (propertyPattern, objectTitlePattern, codeMirrorMo
     var textareas = $$(propertyPattern);
     for (var i = 0; i&lt;textareas.length; ++i) {
       var textarea = textareas[i];
-      var textareaWidthPercentage = textarea.getWidth() * 100 / textarea.parentNode.getWidth();
-      var codeMirror = CodeMirror.fromTextArea(textarea, {
-        'mode' : codeMirrorMode,
-        'lineNumbers' : true,
-        'matchBrackets' : true,
-        // Clear trailing whitespaces on empty lines.
-        // FIXME: Does not seem to be working. Was introduced in CM 2.2 I believe. Removed from CM 3.x?
-        'autoClearEmptyLines' : true,
-        // Active line highlighting
-        'styleActiveLine' : true,
-        // Automatically highlight matching words on click.
-        'highlightSelectionMatches': {showToken: /\w+/},
-        // Continue C-like block comments on a new line.
-        'continueComments' : true,
-        // Auto-close brackets and quotes
-        'autoCloseBrackets' : true,
-        // Show trailing empty whitespaces
-        'showTrailingSpace' : true,
-        /* Autocomplete support. */
-        extraKeys : {'Ctrl-Space' : 'autocomplete',
-                     // Mac friendly autocomplete binding
-                     'Shift-Ctrl-Space' : 'autocomplete',
-                     // Use whitespaces instead of tabs
-                     'Tab' : whitespaceIndentation,
-                     'F3' : 'findNext'}
-      });
-
-      /* Full Screen on F11. */
-      codeMirror.on('keydown', function(i, e) {
-        // Hook into F11
-        if (e.keyCode == 122 || e.keyCode == 27) {
-          e.stop();
-          return toggleFullscreenEditing(codeMirror);
-        }
-      });
-
-      // Set the width of the codemirror div equal to the one of the wrapped textarea. Value is computed before attaching the codemirror instance, otherwise it will not report it correctly since the textarea will be hidden.
-      codeMirror.getWrapperElement().style.width = "" + textareaWidthPercentage + "%";
-
-      // Track this new instance by adding it to the list of instances.
-      codeMirrors.push(codeMirror);
+      // If the textarea is not visible, like the object editor's textareas are when they are not expanded, skip initialization
+      if (textarea.offsetWidth &gt; 0 || textarea.offsetHeight &gt; 0) {
+        initSingleCodeMirror(textarea, codeMirrorMode);
+      }
     }
 
     //
@@ -13453,12 +13416,69 @@ var initCodeMirror = function (propertyPattern, objectTitlePattern, codeMirrorMo
       var titleElements = $$(objectTitlePattern);
       for (var i=0; i&lt;titleElements.length; ++i) {
         var titleElement = titleElements[i];
-        titleElement.observe('click', expandTitleElement);
+        titleElement.observe('click', lazyInitObjectEditorCodeMirrors.bindAsEventListener(lazyInitObjectEditorCodeMirrors, titleElement, codeMirrorMode));
       }
     }
 
   // else-end
   }
+}
+
+var initSingleCodeMirror = function (textarea, codeMirrorMode) {
+  var textareaWidthPercentage = textarea.getWidth() * 100 / textarea.parentNode.getWidth();
+  var codeMirror = CodeMirror.fromTextArea(textarea, {
+    'mode' : codeMirrorMode,
+    'lineNumbers' : true,
+    'matchBrackets' : true,
+    // Clear trailing whitespaces on empty lines.
+    // FIXME: Does not seem to be working. Was introduced in CM 2.2 I believe. Removed from CM 3.x?
+    'autoClearEmptyLines' : true,
+    // Active line highlighting
+    'styleActiveLine' : true,
+    // Automatically highlight matching words on click.
+    'highlightSelectionMatches': {showToken: /\w+/},
+    // Continue C-like block comments on a new line.
+    'continueComments' : true,
+    // Auto-close brackets and quotes
+    'autoCloseBrackets' : true,
+    // Show trailing empty whitespaces
+    'showTrailingSpace' : true,
+    /* Autocomplete support. */
+    extraKeys : {
+      'Ctrl-Space' : 'autocomplete',
+      // Mac friendly autocomplete binding
+      'Shift-Ctrl-Space' : 'autocomplete',
+      // Use whitespaces instead of tabs
+      'Tab' : whitespaceIndentation,
+      // Fix for findNext because Ctrl-G is not available
+      'F3' : 'findNext',
+      // Fullscreen on
+      'F11' : function(cm) {
+        var editorDiv = cm.getWrapperElement();
+        if (!editorDiv.hasClassName('CodeMirror-fullscreen')) {
+          var fullScreenActivatorElement = editorDiv.up().select('.fullScreenEditButton', '.fullScreenEditLink')[0];
+          fullScreenActivatorElement.click();
+        }
+      },
+      // Fullscreen off
+      'Esc' : function(cm) {
+        var editorDiv = cm.getWrapperElement();
+        if (editorDiv.hasClassName('CodeMirror-fullscreen')) {
+          var fullScreenDeactivatorElement = $$('.bottombuttons')[0].down('.button');
+          fullScreenDeactivatorElement.click();
+        }
+      }
+    }
+  });
+
+  // Set the width of the codemirror div equal to the one of the wrapped textarea. Value is computed before attaching the codemirror instance, otherwise it will not report it correctly since the textarea will be hidden.
+  codeMirror.getWrapperElement().style.width = "" + textareaWidthPercentage + "%";
+  codeMirror.refresh();
+
+  // Track this new instance by adding it to the list of instances.
+  codeMirrors.push(codeMirror);
+
+  return codeMirror;
 }
 
 /* Uses whitespaces instead of tabs for indentation. */
@@ -13470,41 +13490,86 @@ var whitespaceIndentation = function(cm) {
   }
 }
 
-/* Display the given codeMirror instance in full screen. */
-var toggleFullscreenEditing = function (codeMirror) {
-  var wrapper = codeMirror.getWrapperElement();
-  var editorDiv = wrapper.select('.CodeMirror-scroll')[0];
-  if (!editorDiv.hasClassName('fullscreen')) {
-    toggleFullscreenEditing.beforeFullscreen = { height: editorDiv.clientHeight, width: editorDiv.clientWidth }
-    editorDiv.addClassName('fullscreen');
-    editorDiv.height = '100%';
-    editorDiv.width ='100%';
-    codeMirror.refresh();
-    codeMirror.focus();
-  } else {
-    editorDiv.removeClassName('fullscreen');
-    editorDiv.height = toggleFullscreenEditing.beforeFullscreen.height;
-    editorDiv.width = toggleFullscreenEditing.beforeFullscreen.width;
-    codeMirror.refresh();
+var getNewCodeMirrorHeightInFullscreen = function() {
+  // Should always exist.
+  var bottomButtonsHeight = $$('.bottombuttons')[0].getHeight();
+
+  // May not always exist (like in the object editor)
+  var toolbarElement = $$('.leftmenu2')[0];
+  var toolbarHeight = 0;
+  if (toolbarElement) {
+    toolbarHeight = toolbarElement.getHeight();
   }
+
+  var result = getWindowHeight() - bottomButtonsHeight - toolbarHeight;
+
+  return result;
 }
 
-/* Refresh all registered codeMirrors that are attached to textareas of the expanded XWiki object. */
-var expandTitleElement = function (event) {
-  var element = Event.element(event);
+var getWindowHeight = function() {
+  return window.innerHeight || (document.documentElement || document.body).clientHeight;
+}
 
-  var textareas = element.up('.xobject').select('textarea');
+/*
+ * Listener that initializes CodeMirror instances for all the objects
+ * of a specific classs when they are expanded in the XWiki object editor.
+ */
+var lazyInitObjectEditorCodeMirrors = function (event, observedElement, codeMirrorMode) {
+  // Note: we`re using observedElement (passed from the caller) instead of Event.element(event) because
+  // that gives us the DOM element that was clicked and not the one on which we have registered the listener.
+  var textareas = observedElement.up('.xobject').select('textarea');
   for(var i=0; i&lt;textareas.length; ++i) {
     var textarea = textareas[i];
-    var codeMirror = getCodeMirrorFromInternalTextArea(textarea, codeMirrors);
-    // codeMirror can be null if the current textarea is the original (currently hidden) textarea and not a CodeMirror internal one.
-    if (codeMirror) {
-      codeMirror.refresh();
-    }
+    initSingleCodeMirror(textarea, codeMirrorMode);
   }
 
   /* Remove the listener. */
-  element.stopObserving('click', expandTitleElement);
+  observedElement.stopObserving('click', lazyInitObjectEditorCodeMirrors);
+}
+
+/* Synchronize the original textareas' contents with the codemirrors' contents just before saving the page. */
+document.observe('xwiki:actions:save', function(event){
+  for (var i=0; i &lt; codeMirrors.length; ++i) {
+    codeMirrors[i].save();
+  }
+});
+
+/*
+ * Fullscreen handling
+ */
+
+/* Before going into fullscreen editing, record the element's original dimensions. */
+document.observe('xwiki:fullscreen:enter', function(event) {
+  var codeMirror = getCodeMirrorFromFullScreenEvent(event);
+  var editorDiv = codeMirror.getWrapperElement();
+  // Height as an integer (pixels), Width
+  toggleFullscreenEditing.dimensionsBeforeFullscreen = {
+    // px
+    height: editorDiv.clientHeight,
+    // %
+    width: editorDiv.clientWidth * 100 / editorDiv.parentNode.getWidth()
+  };
+  toggleFullscreenEditing.scrollBeforeFullscreen = document.viewport.getScrollOffsets();
+});
+
+/* Full screen editing when pressing the maximize button/link. */
+document.observe('xwiki:fullscreen:entered', function(event) {
+  var codeMirror = getCodeMirrorFromFullScreenEvent(event);
+  toggleFullscreenEditing(codeMirror, true);
+});
+
+/* Fullscreen left by pressing the bottom button. */
+document.observe('xwiki:fullscreen:exited', function(event) {
+  var codeMirror = getCodeMirrorFromFullScreenEvent(event);
+  toggleFullscreenEditing(codeMirror, false);
+});
+
+var getCodeMirrorFromFullScreenEvent = function(event) {
+  var originalTextArea = event.memo.target;
+  var codeMirrorTextArea = originalTextArea.up().down('.CodeMirror textarea');
+
+  var codeMirror = getCodeMirrorFromInternalTextArea(codeMirrorTextArea, codeMirrors);
+  return codeMirror;
 }
 
 var getCodeMirrorFromInternalTextArea = function(textArea, codeMirrors) {
@@ -13517,23 +13582,46 @@ var getCodeMirrorFromInternalTextArea = function(textArea, codeMirrors) {
   }
 }
 
-/* Synchronize the original textareas' contents with the codemirrors' contents just before saving the page. */
-document.observe('xwiki:actions:save', function(event){
-  for (var i=0; i &lt; codeMirrors.length; ++i) {
-    codeMirrors[i].save();
+/* Display the given codeMirror instance in full screen. */
+var toggleFullscreenEditing = function (codeMirror, enabled) {
+  console.log('toggleFullscreenEditing: ' + enabled);
+  var editorDiv = codeMirror.getWrapperElement();
+  console.log('Old dimensions: ' + editorDiv.style.width + ' / ' + editorDiv.style.height);
+  if (enabled) {
+    editorDiv.addClassName('CodeMirror-fullscreen');
+
+    // Set proper dimensions
+    editorDiv.style.height = getNewCodeMirrorHeightInFullscreen() + 'px';
+    editorDiv.style.width ='100%';
+    console.log('New dimensions: ' + editorDiv.style.width + ' / ' + editorDiv.style.height);
+  } else {
+    editorDiv.removeClassName('CodeMirror-fullscreen');
+
+    // Restore the editor's dimensions
+    editorDiv.style.height = toggleFullscreenEditing.dimensionsBeforeFullscreen.height + 'px';
+    // Set the editor's width in percentage
+    editorDiv.style.width = toggleFullscreenEditing.dimensionsBeforeFullscreen.width + '%';
+    console.log('Restored dimensions: ' + editorDiv.style.width + ' / ' + editorDiv.style.height);
+
+    // Restore the window's scrolling position
+    window.scrollTo(toggleFullscreenEditing.scrollBeforeFullscreen.left, toggleFullscreenEditing.scrollBeforeFullscreen.top);
   }
-});
+  codeMirror.refresh();
+  codeMirror.focus();
+}
 
-/* Full screen editing when pressing the maximize button. */
-document.observe('xwiki:fullscreen:enter', function(event){
-  Event.stop(event);
+/* Fullscreen: Resize the editor while in fullscreen and the window gets resized */
+Event.observe(window, 'resize', function(event) {
+  var editorDiv = $$('.CodeMirror-fullscreen')[0];
 
-  var originalTextArea = event.memo.target;
-  var codeMirrorTextArea = originalTextArea.up().down('.CodeMirror textarea');
+  // If not in fullscreen mode, ignore the resize event.
+  if (!editorDiv) {
+    return;
+  }
 
-  var codeMirror = getCodeMirrorFromInternalTextArea(codeMirrorTextArea, codeMirrors);
-
-  toggleFullscreenEditing(codeMirror);
+  // Recompute and set the height; the width is already set to 100% so we don`t worry about that.
+  editorDiv.style.height = getNewCodeMirrorHeightInFullscreen() + 'px';
+  editorDiv.CodeMirror.refresh();
 });
 
 /*
@@ -13543,7 +13631,7 @@ document.observe('xwiki:fullscreen:enter', function(event){
 /* Inject an extra javascript script tag into the current DOM using the given script location/source. */
 var importScript = function(src) {
   // Stop here if the script is already loaded
-  if ($$("head &gt; script[src='" + src + "']").length != 0) {
+  if ($$("head script[src='" + src + "']").length != 0) {
     return;
   }
 
@@ -13676,20 +13764,6 @@ var importCodeMirrorScript = function(zipPathPart) {
 .CodeMirror {
   border: 1px solid $theme.borderColor;
   background-color: $theme.pageContentBackgroundColor;
-}
-
-.fullscreen {
-  display: block;
-  position: absolute !important;
-  top: 0;
-  left: 0;
-  width: 100% !important;
-  height: 100% !important;
-  z-index: 9999;
-  margin: 0;
-  padding: 0;
-  border: 0px solid $theme.borderColor;
-  opacity: 1;
 }
 
 ## Active line highlighting

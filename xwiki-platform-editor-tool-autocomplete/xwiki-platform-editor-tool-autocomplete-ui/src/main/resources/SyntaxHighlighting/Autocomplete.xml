@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <xwikidoc>
-  <web>Main</web>
-  <name>WikiEditorAutocomplete</name>
+  <web>SyntaxHighlighting</web>
+  <name>Autocomplete</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
@@ -94,7 +94,7 @@
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>Main.WikiEditorAutocomplete</name>
+    <name>SyntaxHighlighting.Autocomplete</name>
     <number>0</number>
     <className>XWiki.JavaScriptExtension</className>
     <guid>dfd04bf9-8fcf-4ff1-a60c-74cb5fa2c3e9</guid>
@@ -252,7 +252,7 @@
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>Main.WikiEditorAutocomplete</name>
+    <name>SyntaxHighlighting.Autocomplete</name>
     <number>1</number>
     <className>XWiki.JavaScriptExtension</className>
     <guid>78698de7-8ae8-4dcb-99a2-ef20db107c1b</guid>
@@ -443,7 +443,7 @@
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>Main.WikiEditorAutocomplete</name>
+    <name>SyntaxHighlighting.Autocomplete</name>
     <number>2</number>
     <className>XWiki.JavaScriptExtension</className>
     <guid>a0e84b4c-bff0-4bf6-bcdf-29f5909156c2</guid>
@@ -584,7 +584,7 @@
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>Main.WikiEditorAutocomplete</name>
+    <name>SyntaxHighlighting.Autocomplete</name>
     <number>3</number>
     <className>XWiki.JavaScriptExtension</className>
     <guid>c6c480d4-d20d-4d10-ba0a-26f41370ceca</guid>
@@ -706,7 +706,7 @@
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>Main.WikiEditorAutocomplete</name>
+    <name>SyntaxHighlighting.Autocomplete</name>
     <number>0</number>
     <className>XWiki.StyleSheetExtension</className>
     <guid>75c05434-81d8-489b-945b-65f4bc9cc1d9</guid>
@@ -800,7 +800,7 @@
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>Main.WikiEditorAutocomplete</name>
+    <name>SyntaxHighlighting.Autocomplete</name>
     <number>1</number>
     <className>XWiki.StyleSheetExtension</className>
     <guid>8a8fe1f3-4973-4529-90a4-6c27fe232d1d</guid>

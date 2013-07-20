@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <xwikidoc>
-  <web>Main</web>
+  <web>SyntaxHighlighting</web>
   <name>SyntaxHighlightingModes</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>Main.SyntaxHighlighting</parent>
+  <parent>SyntaxHighlighting.SyntaxHighlighting</parent>
   <creator>xwiki:XWiki.Admin</creator>
   <author>xwiki:XWiki.Admin</author>
   <customClass/>
@@ -94,7 +94,7 @@
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>Main.SyntaxHighlightingModes</name>
+    <name>SyntaxHighlighting.SyntaxHighlightingModes</name>
     <number>0</number>
     <className>XWiki.JavaScriptExtension</className>
     <guid>b433d205-6095-4ffb-8b3f-82b963fd7c50</guid>
@@ -313,7 +313,7 @@
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>Main.SyntaxHighlightingModes</name>
+    <name>SyntaxHighlighting.SyntaxHighlightingModes</name>
     <number>1</number>
     <className>XWiki.JavaScriptExtension</className>
     <guid>44af9a7b-02dd-42fd-9d87-ad2528d758ce</guid>

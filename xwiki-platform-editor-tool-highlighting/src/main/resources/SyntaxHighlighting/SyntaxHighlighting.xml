@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <xwikidoc>
-  <web>Main</web>
+  <web>SyntaxHighlighting</web>
   <name>SyntaxHighlighting</name>
   <language/>
   <defaultLanguage/>
@@ -13290,7 +13290,7 @@ BgAAAACAAYAB7ZsAAALcCgAAAA==
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>Main.SyntaxHighlighting</name>
+    <name>SyntaxHighlighting.SyntaxHighlighting</name>
     <number>0</number>
     <className>XWiki.JavaScriptExtension</className>
     <guid>e73a28bb-eb17-4ce1-9426-2b2e99f67fae</guid>
@@ -13753,7 +13753,7 @@ var importCodeMirrorScript = function(zipPathPart) {
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>Main.SyntaxHighlighting</name>
+    <name>SyntaxHighlighting.SyntaxHighlighting</name>
     <number>0</number>
     <className>XWiki.StyleSheetExtension</className>
     <guid>0c407226-5399-46de-ba81-edc7a43e64b1</guid>
@@ -13814,5 +13814,7 @@ var importCodeMirrorScript = function(zipPathPart) {
 * JavaScript
 * CSS
 * Velocity
+* Groovy
+* Python
 * XWiki Macros (Experimental)</content>
 </xwikidoc>

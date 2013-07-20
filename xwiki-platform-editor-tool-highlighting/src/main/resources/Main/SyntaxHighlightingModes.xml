@@ -105,27 +105,25 @@
       <code>(function () {
   CodeMirror.defineMode("xwiki", function(config, parserConfig) {
     var xwikitagsMode = CodeMirror.getMode(config, "xwikitags");
-    var htmlMode      = CodeMirror.getMode(config, {name: "xml", htmlMode: true});
-    var jsMode        = CodeMirror.getMode(config, "javascript");
+    var htmlMode      = CodeMirror.getMode(config, "htmlmixed");
     var velocityMode  = CodeMirror.getMode(config, "velocity");
-    var cssMode       = CodeMirror.getMode(config, "css");
+    var groovyMode    = CodeMirror.getMode(config, "groovy");
 
-    function html(stream, state) {
-      var style = xwikitagsMode.token(stream, state.htmlState);
-      if (style == "tag" &amp;&amp; stream.current() == "}}" &amp;&amp; state.htmlState.context) {
-        if (/^script$/i.test(state.htmlState.context.tagName)) {
-          state.token = javascript;
-          state.localState = jsMode.startState(xwikitagsMode.indent(state.htmlState, ""));
-          state.mode = "javascript";
-        }
-        else if (/^style$/i.test(state.htmlState.context.tagName)) {
-          state.token = css;
-          state.localState = cssMode.startState(xwikitagsMode.indent(state.htmlState, ""));
-          state.mode = "css";
-        } else if(/^velocity$/i.test( state.htmlState.context.tagName )){
+    function xwikitags(stream, state) {
+      var style = xwikitagsMode.token(stream, state.xwikitagsState);
+      if (style == "tag" &amp;&amp; stream.current() == "}}" &amp;&amp; state.xwikitagsState.context) {
+        if (/^velocity$/i.test(state.xwikitagsState.context.tagName)){
           state.token = velocity;
           state.localState = velocityMode.startState(xwikitagsMode.indent(true, ""));
           state.mode = "velocity";
+        } else if (/^groovy$/i.test(state.xwikitagsState.context.tagName)) {
+          state.token = groovy;
+          state.localState = groovyMode.startState(xwikitagsMode.indent(state.xwikitagsState, ""));
+          state.mode = "groovy";
+        } else if (/^html$/i.test(state.xwikitagsState.context.tagName)) {
+          state.token = html;
+          state.localState = htmlMode.startState(xwikitagsMode.indent(state.xwikitagsState, ""));
+          state.mode = "htmlmixed";
         }
       }
       return style;
@@ -136,47 +134,46 @@
       if (close &gt; -1) stream.backUp(cur.length - close);
       return style;
     }
+
     function velocity(stream, state) {
       if (stream.match(/^\{\{\/\s*velocity\s*\}\}/i, false)) {
-        state.token = html;
-        state.curState = null;
-        state.mode = "html";
-        return html(stream, state);
+        state.token = xwikitags;
+        state.localState = null;
+        state.mode = "xwikitags";
+        return xwikitags(stream, state);
       }
       return maybeBackup(stream, /\{\{\/\s*velocity\s*\}\}/, velocityMode.token(stream, state.localState));
     }
-    function javascript(stream, state) {
-      if (stream.match(/^&lt;\/\s*script\s*&gt;/i, false)) {
-        state.token = html;
-        state.curState = null;
-        state.mode = "html";
-        return html(stream, state);
-      }
-      return maybeBackup(stream, /&lt;\/\s*script\s*&gt;/,
-                         jsMode.token(stream, state.localState));
-    }
-    function css(stream, state) {
-      if (stream.match(/^&lt;\/\s*style\s*&gt;/i, false)) {
-        state.token = html;
+    function groovy(stream, state) {
+      if (stream.match(/^\{\{\/\s*groovy\s*\}\}/i, false)) {
+        state.token = xwikitags;
         state.localState = null;
-        state.mode = "html";
-        return html(stream, state);
+        state.mode = "xwikitags";
+        return xwikitags(stream, state);
       }
-      return maybeBackup(stream, /&lt;\/\s*style\s*&gt;/,
-                         cssMode.token(stream, state.localState));
+      return maybeBackup(stream, /\{\{\/\s*groovy\s*\}\}/, groovyMode.token(stream, state.localState));
+    }
+    function html(stream, state) {
+      if (stream.match(/^\{\{\/\s*html\s*\}\}/i, false)) {
+        state.token = xwikitags;
+        state.localState = null;
+        state.mode = "xwikitags";
+        return xwikitags(stream, state);
+      }
+      return maybeBackup(stream, /\{\{\/\s*html\s*\}\}/, htmlMode.token(stream, state.localState));
     }
 
     return {
       startState: function() {
         var state = xwikitagsMode.startState();
-        return {token: html, localState: null, mode: "html", htmlState: state};
+        return {token: xwikitags, localState: null, mode: "xwikitags", xwikitagsState: state};
       },
 
       copyState: function(state) {
         if (state.localState)
-          var local = CodeMirror.copyState(state.token == css ? cssMode : jsMode, state.localState);
+          var local = CodeMirror.copyState(state.token == velocity ? velocityMode : (state.token == groovy ? groovyMode : htmlMode), state.localState);
         return {token: state.token, localState: local, mode: state.mode,
-                htmlState: CodeMirror.copyState(htmlMode, state.htmlState)};
+                xwikitagsState: CodeMirror.copyState(xwikitagsMode, state.xwikitagsState)};
       },
 
       token: function(stream, state) {
@@ -184,23 +181,42 @@
       },
 
       indent: function(state, textAfter) {
-        if (state.token == html || /^\s*&lt;\//.test(textAfter))
-          return htmlMode.indent(state.htmlState, textAfter);
-        else if (state.token == javascript)
-          return jsMode.indent(state.localState, textAfter);
-        else
-          return cssMode.indent(state.localState, textAfter);
+        var indentMode = null;
+        var indentState = state.localState;
+
+        if (state.token == xwikitags || /^\s*\{\{\//.test(textAfter)) {
+          indentMode = xwikitagsMode;
+          indentState = state.xwikitagsState;
+        } else if (state.token == velocity) {
+          indentMode = velocityMode;
+        } else if (state.token == groovy) {
+          indentMode = groovyMode;
+        } else if (state.token == html) {
+          indentMode = htmlMode;
+        }
+
+        // If the mode supports indenting, apply it, otherwise pass.
+        if (indentMode &amp;&amp; indentMode.indent) {
+          return indentMode.indent(indentState, textAfter);
+        } else {
+          return CodeMirror.Pass;
+        }
       },
 
-      electricChars: "/{}:"
+      electricChars: "/{}:",
+
+      innerMode: function(state) {
+        // FIXME: Check if state.mode is ok to be returned here or if a mode instance is required instead.
+        return {state: state.localState || state.xwikitagsState, mode: state.mode || xwikitagsMode};
+      }
     }
   });
 
-  CodeMirror.defineMIME("text/html", "htmlmixed");
+  CodeMirror.defineMIME("text/xwikitags", "xwikitags");
 })();</code>
     </property>
     <property>
-      <name>xwiki.js</name>
+      <name>xwiki.js - Mixed mode that uses XWiki/Velocity/Groovy/etc. syntaxes based on context</name>
     </property>
     <property>
       <parse>0</parse>
@@ -503,7 +519,7 @@
 })();</code>
     </property>
     <property>
-      <name>xwikitags.js</name>
+      <name>xwikitags.js - XWiki syntax mode</name>
     </property>
     <property>
       <parse>0</parse>

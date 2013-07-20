@@ -13330,9 +13330,13 @@ var initCodeMirrorModules = function() {
     importCodeMirrorScript('mode/javascript/javascript.js');
     // Velocity Mode
     importCodeMirrorScript('mode/velocity/velocity.js');
-
-    // XML mode needed by the XWiki Mode below.
+    // Groovy Mode
+    importCodeMirrorScript('mode/groovy/groovy.js');
+    // HTML mode provided by the XML mode
     importCodeMirrorScript('mode/xml/xml.js');
+    // HTML mixed mode that allows JavaScript and CSS inside the HTML mode.
+    importCodeMirrorScript('mode/htmlmixed/htmlmixed.js');
+
     // XWiki Syntax/Macros (xwikitags.js) and XWiki Mode (mixed mode of all the above + XML/HTML = xwiki.js)
     importScript("$xwiki.getURL('SyntaxHighlightingModes', 'jsx', 'minify=false')");
 

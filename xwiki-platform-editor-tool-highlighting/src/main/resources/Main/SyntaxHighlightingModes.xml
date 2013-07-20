@@ -108,6 +108,7 @@
     var htmlMode      = CodeMirror.getMode(config, "htmlmixed");
     var velocityMode  = CodeMirror.getMode(config, "velocity");
     var groovyMode    = CodeMirror.getMode(config, "groovy");
+    var pythonMode    = CodeMirror.getMode(config, "python");
 
     function xwikitags(stream, state) {
       var style = xwikitagsMode.token(stream, state.xwikitagsState);
@@ -124,6 +125,10 @@
           state.token = html;
           state.localState = htmlMode.startState(xwikitagsMode.indent(state.xwikitagsState, ""));
           state.mode = "htmlmixed";
+        } else if (/^python$/i.test(state.xwikitagsState.context.tagName)) {
+          state.token = python;
+          state.localState = pythonMode.startState(xwikitagsMode.indent(state.xwikitagsState, ""));
+          state.mode = "python";
         }
       }
       return style;
@@ -162,6 +167,15 @@
       }
       return maybeBackup(stream, /\{\{\/\s*html\s*\}\}/, htmlMode.token(stream, state.localState));
     }
+    function python(stream, state) {
+      if (stream.match(/^\{\{\/\s*python\s*\}\}/i, false)) {
+        state.token = xwikitags;
+        state.localState = null;
+        state.mode = "xwikitags";
+        return xwikitags(stream, state);
+      }
+      return maybeBackup(stream, /\{\{\/\s*python\s*\}\}/, pythonMode.token(stream, state.localState));
+    }
 
     return {
       startState: function() {
@@ -171,7 +185,7 @@
 
       copyState: function(state) {
         if (state.localState)
-          var local = CodeMirror.copyState(state.token == velocity ? velocityMode : (state.token == groovy ? groovyMode : htmlMode), state.localState);
+          var local = CodeMirror.copyState(state.token == velocity ? velocityMode : (state.token == groovy ? groovyMode : (state.token == html ? htmlMode : pythonMode)), state.localState);
         return {token: state.token, localState: local, mode: state.mode,
                 xwikitagsState: CodeMirror.copyState(xwikitagsMode, state.xwikitagsState)};
       },
@@ -193,6 +207,8 @@
           indentMode = groovyMode;
         } else if (state.token == html) {
           indentMode = htmlMode;
+        } else if (state.token == python) {
+          indentMode = pythonMode;
         }
 
         // If the mode supports indenting, apply it, otherwise pass.

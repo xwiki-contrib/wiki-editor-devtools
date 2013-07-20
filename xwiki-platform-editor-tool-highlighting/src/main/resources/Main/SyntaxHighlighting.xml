@@ -13336,6 +13336,8 @@ var initCodeMirrorModules = function() {
     importCodeMirrorScript('mode/xml/xml.js');
     // HTML mixed mode that allows JavaScript and CSS inside the HTML mode.
     importCodeMirrorScript('mode/htmlmixed/htmlmixed.js');
+    // Python Mode
+    importCodeMirrorScript('mode/python/python.js');
 
     // XWiki Syntax/Macros (xwikitags.js) and XWiki Mode (mixed mode of all the above + XML/HTML = xwiki.js)
     importScript("$xwiki.getURL('SyntaxHighlightingModes', 'jsx', 'minify=false')");

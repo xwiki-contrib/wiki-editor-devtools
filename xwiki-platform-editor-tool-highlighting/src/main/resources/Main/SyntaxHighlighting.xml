@@ -13416,7 +13416,15 @@ var initCodeMirror = function (propertyPattern, objectTitlePattern, codeMirrorMo
       var titleElements = $$(objectTitlePattern);
       for (var i=0; i&lt;titleElements.length; ++i) {
         var titleElement = titleElements[i];
-        titleElement.observe('click', lazyInitObjectEditorCodeMirrors.bindAsEventListener(lazyInitObjectEditorCodeMirrors, titleElement, codeMirrorMode));
+
+        // Hack: since we are not using a static listener, but a custom one for each instance (through the bind method by curry-ing parameter values to it),
+        // we`re currying the "this" (first) parameter to a dummy object that is empty at curry time, but which is then made the container of the generated
+        // listener. This way, the listener will be able to have access to itself, in it's curryed form (so that it can unregister itself once it executes);
+        var dummy = {};
+        var listener = lazyInitObjectEditorCodeMirrors.bindAsEventListener(dummy, titleElement, codeMirrorMode);
+        dummy.listener = listener;
+
+        titleElement.observe('click', listener);
       }
     }
 
@@ -13524,7 +13532,7 @@ var lazyInitObjectEditorCodeMirrors = function (event, observedElement, codeMirr
   }
 
   /* Remove the listener. */
-  observedElement.stopObserving('click', lazyInitObjectEditorCodeMirrors);
+  observedElement.stopObserving('click', this.listener);
 }
 
 /* Synchronize the original textareas' contents with the codemirrors' contents just before saving the page. */

@@ -37,7 +37,7 @@
     <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
     <xwiki.extension.features>enygma:syntax-highlighting---autocompletion-module</xwiki.extension.features>
     <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>Syntax Highlighting API</xwiki.extension.name>
+    <xwiki.extension.name>AutoCompletion API</xwiki.extension.name>
   </properties>
   <dependencies>
     <dependency>

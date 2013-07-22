@@ -32,7 +32,7 @@
   <artifactId>editor-tool-autocomplete-api</artifactId>
   <name>Editor Tools - Auto Complete - API</name>
   <packaging>jar</packaging>
-  <description>Editor Tool - Auto Complete - API</description>
+  <description>Autocompletion back-end, providing a REST end-point</description>
   <properties>
     <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
     <xwiki.extension.features>enygma:syntax-highlighting---autocompletion-module</xwiki.extension.features>

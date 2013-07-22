@@ -1,0 +1,572 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ *
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ *
+-->
+
+<xwikidoc>
+  <web>SyntaxHighlighting</web>
+  <name>SyntaxHighlightingModes</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>SyntaxHighlighting.SyntaxHighlighting</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1373998493000</creationDate>
+  <date>1374070016000</date>
+  <contentUpdateDate>1374000791000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Syntax Highlighting Modes</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <object>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <name>SyntaxHighlighting.SyntaxHighlightingModes</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>b433d205-6095-4ffb-8b3f-82b963fd7c50</guid>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>(function () {
+  CodeMirror.defineMode("xwiki", function(config, parserConfig) {
+    var xwikitagsMode = CodeMirror.getMode(config, "xwikitags");
+    var htmlMode      = CodeMirror.getMode(config, "htmlmixed");
+    var velocityMode  = CodeMirror.getMode(config, "velocity");
+    var groovyMode    = CodeMirror.getMode(config, "groovy");
+    var pythonMode    = CodeMirror.getMode(config, "python");
+
+    function xwikitags(stream, state) {
+      var style = xwikitagsMode.token(stream, state.xwikitagsState);
+      if (style == "tag" &amp;&amp; stream.current() == "}}" &amp;&amp; state.xwikitagsState.context) {
+        if (/^velocity$/i.test(state.xwikitagsState.context.tagName)){
+          state.token = velocity;
+          state.localState = velocityMode.startState(xwikitagsMode.indent(true, ""));
+          state.mode = "velocity";
+        } else if (/^groovy$/i.test(state.xwikitagsState.context.tagName)) {
+          state.token = groovy;
+          state.localState = groovyMode.startState(xwikitagsMode.indent(state.xwikitagsState, ""));
+          state.mode = "groovy";
+        } else if (/^html$/i.test(state.xwikitagsState.context.tagName)) {
+          state.token = html;
+          state.localState = htmlMode.startState(xwikitagsMode.indent(state.xwikitagsState, ""));
+          state.mode = "htmlmixed";
+        } else if (/^python$/i.test(state.xwikitagsState.context.tagName)) {
+          state.token = python;
+          state.localState = pythonMode.startState(xwikitagsMode.indent(state.xwikitagsState, ""));
+          state.mode = "python";
+        }
+      }
+      return style;
+    }
+    function maybeBackup(stream, pat, style) {
+      var cur = stream.current();
+      var close = cur.search(pat);
+      if (close &gt; -1) stream.backUp(cur.length - close);
+      return style;
+    }
+
+    function velocity(stream, state) {
+      if (stream.match(/^\{\{\/\s*velocity\s*\}\}/i, false)) {
+        state.token = xwikitags;
+        state.localState = null;
+        state.mode = "xwikitags";
+        return xwikitags(stream, state);
+      }
+      return maybeBackup(stream, /\{\{\/\s*velocity\s*\}\}/, velocityMode.token(stream, state.localState));
+    }
+    function groovy(stream, state) {
+      if (stream.match(/^\{\{\/\s*groovy\s*\}\}/i, false)) {
+        state.token = xwikitags;
+        state.localState = null;
+        state.mode = "xwikitags";
+        return xwikitags(stream, state);
+      }
+      return maybeBackup(stream, /\{\{\/\s*groovy\s*\}\}/, groovyMode.token(stream, state.localState));
+    }
+    function html(stream, state) {
+      if (stream.match(/^\{\{\/\s*html\s*\}\}/i, false)) {
+        state.token = xwikitags;
+        state.localState = null;
+        state.mode = "xwikitags";
+        return xwikitags(stream, state);
+      }
+      return maybeBackup(stream, /\{\{\/\s*html\s*\}\}/, htmlMode.token(stream, state.localState));
+    }
+    function python(stream, state) {
+      if (stream.match(/^\{\{\/\s*python\s*\}\}/i, false)) {
+        state.token = xwikitags;
+        state.localState = null;
+        state.mode = "xwikitags";
+        return xwikitags(stream, state);
+      }
+      return maybeBackup(stream, /\{\{\/\s*python\s*\}\}/, pythonMode.token(stream, state.localState));
+    }
+
+    return {
+      startState: function() {
+        var state = xwikitagsMode.startState();
+        return {token: xwikitags, localState: null, mode: "xwikitags", xwikitagsState: state};
+      },
+
+      copyState: function(state) {
+        if (state.localState)
+          var local = CodeMirror.copyState(state.token == velocity ? velocityMode : (state.token == groovy ? groovyMode : (state.token == html ? htmlMode : pythonMode)), state.localState);
+        return {token: state.token, localState: local, mode: state.mode,
+                xwikitagsState: CodeMirror.copyState(xwikitagsMode, state.xwikitagsState)};
+      },
+
+      token: function(stream, state) {
+        return state.token(stream, state);
+      },
+
+      indent: function(state, textAfter) {
+        var indentMode = null;
+        var indentState = state.localState;
+
+        if (state.token == xwikitags || /^\s*\{\{\//.test(textAfter)) {
+          indentMode = xwikitagsMode;
+          indentState = state.xwikitagsState;
+        } else if (state.token == velocity) {
+          indentMode = velocityMode;
+        } else if (state.token == groovy) {
+          indentMode = groovyMode;
+        } else if (state.token == html) {
+          indentMode = htmlMode;
+        } else if (state.token == python) {
+          indentMode = pythonMode;
+        }
+
+        // If the mode supports indenting, apply it, otherwise pass.
+        if (indentMode &amp;&amp; indentMode.indent) {
+          return indentMode.indent(indentState, textAfter);
+        } else {
+          return CodeMirror.Pass;
+        }
+      },
+
+      electricChars: "/{}:",
+
+      innerMode: function(state) {
+        // FIXME: Check if state.mode is ok to be returned here or if a mode instance is required instead.
+        return {state: state.localState || state.xwikitagsState, mode: state.mode || xwikitagsMode};
+      }
+    }
+  });
+
+  CodeMirror.defineMIME("text/xwikitags", "xwikitags");
+})();</code>
+    </property>
+    <property>
+      <name>xwiki.js - Mixed mode that uses XWiki/Velocity/Groovy/etc. syntaxes based on context</name>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <name>SyntaxHighlighting.SyntaxHighlightingModes</name>
+    <number>1</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>44af9a7b-02dd-42fd-9d87-ad2528d758ce</guid>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>(function () {
+  CodeMirror.defineMode("xwikitags", function(config, parserConfig) {
+    var indentUnit = config.indentUnit;
+    var Kludges = {
+      autoSelfClosers: {},
+      doNotIndent: {"pre": true, "!cdata": true},
+      allowUnquoted: true
+    };
+    var alignCDATA = parserConfig.alignCDATA;
+
+    // Return variables for tokenizers
+    var tagName, type;
+
+    function inText(stream, state) {
+      function chain(parser) {
+        state.tokenize = parser;
+        return parser(stream, state);
+      }
+
+      var ch = stream.next();
+      if (ch == "{" &amp;&amp; stream.peek() == "{") {
+        stream.next();
+        type = stream.eat("/") ? "closeTag" : "openTag";
+        stream.eatSpace();
+        tagName = "";
+        var c;
+        while ((c = stream.eat(/[^\s\u00a0={}\"\'\/?]/))) tagName += c;
+        state.tokenize = inTag;
+        return "tag";
+      }
+      else if (ch == "&amp;") {
+        stream.eatWhile(/[^;]/);
+        stream.eat(";");
+        return "atom";
+      }
+      else {
+        stream.eatWhile(/[^&amp;&lt;]/);
+        return null;
+      }
+    }
+
+    function inTag(stream, state) {
+      var ch = stream.next();
+      if ( (ch == "}" &amp;&amp; stream.peek() == "}") || (ch == "/" &amp;&amp; stream.eat("}") &amp;&amp; stream.peek() == "}") ) {
+        stream.next();
+        state.tokenize = inText;
+        type = ch == "}" ? "endTag" : "selfcloseTag";
+        return "tag";
+      }
+      else if (ch == "=") {
+        type = "equals";
+        return null;
+      }
+      else if (/[\'\"]/.test(ch)) {
+        state.tokenize = inAttribute(ch);
+        return state.tokenize(stream, state);
+      }
+      else {
+        stream.eatWhile(/[^\s\u00a0={}\"\'\/?]/);
+        return "word";
+      }
+    }
+
+    function inAttribute(quote) {
+      return function(stream, state) {
+        while (!stream.eol()) {
+          if (stream.next() == quote) {
+            state.tokenize = inTag;
+            break;
+          }
+        }
+        return "string";
+      };
+    }
+
+    function inBlock(style, terminator) {
+      return function(stream, state) {
+        while (!stream.eol()) {
+          if (stream.match(terminator)) {
+            state.tokenize = inText;
+            break;
+          }
+          stream.next();
+        }
+        return style;
+      };
+    }
+
+    var curState, setStyle;
+    function pass() {
+      for (var i = arguments.length - 1; i &gt;= 0; i--) curState.cc.push(arguments[i]);
+    }
+    function cont() {
+      pass.apply(null, arguments);
+      return true;
+    }
+
+    function pushContext(tagName, startOfLine) {
+      var noIndent = Kludges.doNotIndent.hasOwnProperty(tagName) || (curState.context &amp;&amp; curState.context.noIndent);
+      curState.context = {
+        prev: curState.context,
+        tagName: tagName,
+        indent: curState.indented,
+        startOfLine: startOfLine,
+        noIndent: noIndent
+      };
+    }
+    function popContext() {
+      if (curState.context) curState.context = curState.context.prev;
+    }
+
+    function element(type) {
+      if (type == "openTag") {curState.tagName = tagName; return cont(attributes, endtag(curState.startOfLine));}
+      else if (type == "closeTag") {
+        var err = false;
+        if (curState.context) {
+          err = curState.context.tagName != tagName;
+          popContext();
+        } else {
+          err = true;
+        }
+        if (err) setStyle = "error";
+        return cont(endclosetag(err));
+      }
+      else if (type == "string") {
+        if (!curState.context || curState.context.name != "!cdata") pushContext("!cdata");
+        if (curState.tokenize == inText) popContext();
+        return cont();
+      }
+      else return cont();
+    }
+    function endtag(startOfLine) {
+      return function(type) {
+        if (type == "selfcloseTag" ||
+            (type == "endTag" &amp;&amp; Kludges.autoSelfClosers.hasOwnProperty(curState.tagName.toLowerCase())))
+          return cont();
+        if (type == "endTag") {pushContext(curState.tagName, startOfLine); return cont();}
+        return cont();
+      };
+    }
+    function endclosetag(err) {
+      return function(type) {
+        if (err) setStyle = "error";
+        if (type == "endTag") return cont();
+        return pass();
+      }
+    }
+
+    function attributes(type) {
+      if (type == "word") {setStyle = "attribute"; return cont(attributes);}
+      if (type == "equals") return cont(attvalue, attributes);
+      return pass();
+    }
+    function attvalue(type) {
+      if (type == "word" &amp;&amp; Kludges.allowUnquoted) {setStyle = "string"; return cont();}
+      if (type == "string") return cont(attvaluemaybe);
+      return pass();
+    }
+    function attvaluemaybe(type) {
+      if (type == "string") return cont(attvaluemaybe);
+      else return pass();
+    }
+
+    return {
+      startState: function() {
+        return {tokenize: inText, cc: [], indented: 0, startOfLine: true, tagName: null, context: null};
+      },
+
+      token: function(stream, state) {
+        if (stream.sol()) {
+          state.startOfLine = true;
+          state.indented = stream.indentation();
+        }
+        if (stream.eatSpace()) return null;
+
+        setStyle = type = tagName = null;
+        var style = state.tokenize(stream, state);
+        if ((style || type) &amp;&amp; style != "comment") {
+          curState = state;
+          while (true) {
+            var comb = state.cc.pop() || element;
+            if (comb(type || style)) break;
+          }
+        }
+        state.startOfLine = false;
+        return setStyle || style;
+      },
+
+      indent: function(state, textAfter) {
+        var context = state.context;
+        if (context &amp;&amp; context.noIndent) return 0;
+        if (alignCDATA &amp;&amp; /&lt;!\[CDATA\[/.test(textAfter)) return 0;
+        if (context &amp;&amp; /^&lt;\//.test(textAfter))
+          context = context.prev;
+        while (context &amp;&amp; !context.startOfLine)
+          context = context.prev;
+        if (context) return context.indent + indentUnit;
+        else return 0;
+      },
+
+      compareStates: function(a, b) {
+        if (a.indented != b.indented || a.tagName != b.tagName) return false;
+        for (var ca = a.context, cb = b.context; ; ca = ca.prev, cb = cb.prev) {
+          if (!ca || !cb) return ca == cb;
+          if (ca.tagName != cb.tagName) return false;
+        }
+      },
+
+      electricChars: "/"
+    };
+  });
+})();</code>
+    </property>
+    <property>
+      <name>xwikitags.js - XWiki syntax mode</name>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+  <content>Contains the XWiki specific [[CodeMirror&gt;&gt;http://codemirror.net/]] modes, defined as JavaScriptExtension objects:
+* **xwikitags.js** - XWiki syntax mode
+* **xwiki.js** - Mixed mode that uses XWiki/Velocity/Groovy/etc. syntaxes based on context</content>
+</xwikidoc>

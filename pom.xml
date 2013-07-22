@@ -25,20 +25,53 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
+    <groupId>org.xwiki.commons</groupId>
+    <artifactId>xwiki-commons-pom</artifactId>
     <version>5.1</version>
   </parent>
-  <groupId>org.xwiki.contrib</groupId>
-  <artifactId>xwiki-platform-editor-tools</artifactId>
+  <groupId>org.xwiki.contrib.editortool</groupId>
+  <artifactId>editor-tools</artifactId>
   <packaging>pom</packaging>
-  <name>XWiki Platform - Editor Tools - Parent POM</name>
-  <description>XWiki Platform - Editor Tools - Parent POM</description>
+  <version>2.0-SNAPSHOT</version>
+  <name>Editor Tools - Parent POM</name>
+  <description>Editor Tools - Parent POM</description>
+  <properties>
+    <rendering.version>${commons.version}</rendering.version>
+    <platform.version>${commons.version}</platform.version>
+  </properties>
   <scm>
     <connection>scm:git:git://github.com/xwiki-contrib/wiki-editor-devtools.git</connection>
     <developerConnection>scm:git:git@github.com:xwiki-contrib/wiki-editor-devtools.git</developerConnection>
     <url>https://github.com/xwiki-contrib/wiki-editor-devtools</url>
   </scm>
+  <developers>
+    <developer>
+      <id>vmassol</id>
+      <name>Vincent Massol</name>
+    </developer>
+    <developer>
+      <id>enygma</id>
+      <name>Eduard Moraru</name>
+    </developer>
+  </developers>
+  <build>
+    <!-- Needed to add support for the XAR packaging -->
+    <extensions>
+      <extension>
+        <groupId>org.xwiki.commons</groupId>
+        <artifactId>xwiki-commons-tool-xar-handlers</artifactId>
+        <version>${commons.version}</version>
+      </extension>
+    </extensions>
+    <plugins>
+      <!-- The XAR packaging uses the XAR plugin and thus we need to define what version to use -->
+      <plugin>
+        <groupId>org.xwiki.commons</groupId>
+        <artifactId>xwiki-commons-tool-xar-plugin</artifactId>
+        <version>${commons.version}</version>
+      </plugin>
+    </plugins>
+  </build>
   <distributionManagement>
     <repository>
       <id>xwiki-staging</id>
@@ -47,7 +80,7 @@
     </repository>
   </distributionManagement>
   <modules>
-    <module>xwiki-platform-editor-tool-autocomplete</module>
-    <module>xwiki-platform-editor-tool-highlighting</module>
+    <module>editor-tool-autocomplete</module>
+    <module>editor-tool-highlighting</module>
   </modules>
 </project>

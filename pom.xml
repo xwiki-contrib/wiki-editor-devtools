@@ -29,10 +29,23 @@
     <artifactId>xwiki-platform-core</artifactId>
     <version>5.1</version>
   </parent>
+  <groupId>org.xwiki.contrib</groupId>
   <artifactId>xwiki-platform-editor-tools</artifactId>
-  <name>XWiki Platform - Editor Tools - Parent POM</name>
   <packaging>pom</packaging>
+  <name>XWiki Platform - Editor Tools - Parent POM</name>
   <description>XWiki Platform - Editor Tools - Parent POM</description>
+  <scm>
+    <connection>scm:git:git://github.com/xwiki-contrib/wiki-editor-devtools.git</connection>
+    <developerConnection>scm:git:git@github.com:xwiki-contrib/wiki-editor-devtools.git</developerConnection>
+    <url>https://github.com/xwiki-contrib/wiki-editor-devtools</url>
+  </scm>
+  <distributionManagement>
+    <repository>
+      <id>xwiki-staging</id>
+      <name>XWiki Staging Repository</name>
+      <url>http://nexus.xwiki.org/nexus/service/local/staging/deploy/maven2/</url>
+    </repository>
+  </distributionManagement>
   <modules>
     <module>xwiki-platform-editor-tool-autocomplete</module>
     <module>xwiki-platform-editor-tool-highlighting</module>

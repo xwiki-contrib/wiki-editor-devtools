@@ -25,6 +25,8 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.editor.tool.autocomplete.AutoCompletionMethodFinder;
+import org.xwiki.editor.tool.autocomplete.HintData;
+import org.xwiki.editor.tool.autocomplete.Hints;
 
 import com.xpn.xwiki.plugin.XWikiPluginManager;
 

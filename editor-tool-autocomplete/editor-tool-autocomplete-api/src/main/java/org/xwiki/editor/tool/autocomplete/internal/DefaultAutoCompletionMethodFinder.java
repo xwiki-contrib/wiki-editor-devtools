@@ -25,6 +25,8 @@ import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.editor.tool.autocomplete.HintData;
+import org.xwiki.editor.tool.autocomplete.Hints;
 
 /**
  * Returns autocompletion hints by finding all methods using introspection.

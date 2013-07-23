@@ -29,6 +29,7 @@ import org.junit.Test;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.editor.tool.autocomplete.AutoCompletionMethodFinder;
+import org.xwiki.editor.tool.autocomplete.Hints;
 import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
 import org.xwiki.test.jmock.annotation.MockingRequirement;
 

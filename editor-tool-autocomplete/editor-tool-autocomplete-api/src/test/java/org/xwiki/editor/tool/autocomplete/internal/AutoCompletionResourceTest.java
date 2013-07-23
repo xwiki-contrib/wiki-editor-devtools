@@ -35,6 +35,8 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.editor.tool.autocomplete.AutoCompletionMethodFinder;
+import org.xwiki.editor.tool.autocomplete.HintData;
+import org.xwiki.editor.tool.autocomplete.Hints;
 import org.xwiki.editor.tool.autocomplete.TargetContent;
 import org.xwiki.editor.tool.autocomplete.TargetContentLocator;
 import org.xwiki.editor.tool.autocomplete.TargetContentType;

@@ -20,7 +20,6 @@
 package org.xwiki.editor.tool.autocomplete;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.editor.tool.autocomplete.internal.Hints;
 
 /**
  * Allows contributing special hints. For example for Script Services, instead of returning a hint of {@code get} which

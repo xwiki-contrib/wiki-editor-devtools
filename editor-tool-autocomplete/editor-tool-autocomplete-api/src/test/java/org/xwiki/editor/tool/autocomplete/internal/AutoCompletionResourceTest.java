@@ -19,20 +19,15 @@
  */
 package org.xwiki.editor.tool.autocomplete.internal;
 
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.junit.Assert.assertThat;
-
 import java.util.Arrays;
+import java.util.List;
 
-import junit.framework.Assert;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.context.Context;
-import org.jmock.Expectations;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.slf4j.Logger;
+import org.junit.*;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.editor.tool.autocomplete.AutoCompletionMethodFinder;
 import org.xwiki.editor.tool.autocomplete.HintData;
@@ -40,32 +35,20 @@ import org.xwiki.editor.tool.autocomplete.Hints;
 import org.xwiki.editor.tool.autocomplete.TargetContent;
 import org.xwiki.editor.tool.autocomplete.TargetContentLocator;
 import org.xwiki.editor.tool.autocomplete.TargetContentType;
-import org.xwiki.script.service.ScriptService;
 import org.xwiki.script.service.ScriptServiceManager;
-import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
-import org.xwiki.test.annotation.ComponentList;
-import org.xwiki.test.jmock.annotation.MockingRequirement;
+import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.velocity.VelocityManager;
 
 /**
  * Unit tests for {@link AutoCompletionResource}.
  * 
- * @version $Id$
+ * @version $Id:$
  */
-@MockingRequirement(value = TestableAutoCompletionResource.class, exceptions = {ComponentManager.class})
-@ComponentList({ScriptServicesAutoCompletionMethodFinder.class})
-public class AutoCompletionResourceTest extends AbstractMockingComponentTestCase<AutoCompletionResource>
+public class AutoCompletionResourceTest
 {
-    private TestableAutoCompletionResource resource;
-
-    @Before
-    public void configure() throws Exception
-    {
-        registerMockComponent(ScriptServiceManager.class);
-        registerMockComponent(ScriptService.class, "test", "mock1");
-        registerMockComponent(ScriptService.class, "othertest", "mock2");
-        
-        this.resource = (TestableAutoCompletionResource) getMockedComponent();
-    }
+    @Rule
+    public MockitoComponentMockingRule<AutoCompletionResource> mocker =
+        new MockitoComponentMockingRule<AutoCompletionResource>(AutoCompletionResource.class);
 
     private class AncillaryTestClass
     {
@@ -104,241 +87,263 @@ public class AutoCompletionResourceTest extends AbstractMockingComponentTestCase
     @Test
     public void getAutoCompletionHintsWhenNoDollarSign() throws Exception
     {
-        setUpMocks("whatever", createTestVelocityContext());
-
+        setupMocks("whatever", new VelocityContext());
         String velocity = "{{velocity}}whatever";
-        Hints hints = this.resource.getAutoCompletionHints(velocity.length(), "xwiki/2.0", velocity);
 
-        Assert.assertEquals(0, hints.getHints().size());
+        Hints hints = mocker.getComponentUnderTest().getAutoCompletionHints(velocity.length(), "xwiki/2.0", velocity);
+
+        assertEquals(0, hints.getHints().size());
     }
 
     @Test
     public void getAutoCompletionHintsWhenOnlyDollarSign() throws Exception
     {
+        // Note that we create nested Velocity Context in order to verify that we support that in getAutoCompletionHints
         Context innerContext = new VelocityContext();
         innerContext.put("key1", "value1");
-        final VelocityContext vcontext = new VelocityContext(innerContext);
+        VelocityContext vcontext = new VelocityContext(innerContext);
         vcontext.put("key2", "value2");
-        setUpMocks("$", vcontext);
+        setupMocks("$", vcontext);
 
         String velocity = "{{velocity}}$";
-        Hints hints = this.resource.getAutoCompletionHints(velocity.length(), "xwiki/2.0", velocity);
+
+        Hints hints = mocker.getComponentUnderTest().getAutoCompletionHints(velocity.length(), "xwiki/2.0", velocity);
 
         // Verify we can get keys from the Velocity Context and its inner context too. We test this since our
         // Velocity tools are put in an inner Velocity Context.
-        Assert.assertEquals(2, hints.getHints().size());
+        assertEquals(5, hints.getHints().size());
 
         // Also verifies that hints are sorted
-        Assert
-            .assertEquals(Arrays.asList(new HintData("key1", "key1"), new HintData("key2", "key2")), hints.getHints());
+        List<HintData> expected = Arrays.asList(
+            new HintData("doc", "doc"),
+            new HintData("key1", "key1"),
+            new HintData("key2", "key2"),
+            new HintData("sdoc", "sdoc"),
+            new HintData("tdoc", "tdoc")
+        );
+        assertEquals(expected, hints.getHints());
     }
 
     @Test
     public void getAutoCompletionHintsWhenOnlyDollarAndBangSigns() throws Exception
     {
-        setUpMocks("$!", createTestVelocityContext("key", "value", "otherKey", "otherValue"));
+        setupMocks("$!", createTestVelocityContext("key", "value", "otherKey", "otherValue"));
 
         String velocity = "{{velocity}}$!";
-        Hints hints = this.resource.getAutoCompletionHints(velocity.length(), "xwiki/2.0", velocity);
+        Hints hints = mocker.getComponentUnderTest().getAutoCompletionHints(velocity.length(), "xwiki/2.0", velocity);
 
-        Assert.assertEquals(2, hints.getHints().size());
-        assertThat(hints.getHints(), containsInAnyOrder(
-            new HintData("key", "key"),
-            new HintData("otherKey", "otherKey")));
+        assertEquals(5, hints.getHints().size());
+        assertTrue(hints.getHints().contains(new HintData("key", "key")));
+        assertTrue(hints.getHints().contains(new HintData("otherKey", "otherKey")));
     }
 
     @Test
     public void getAutoCompletionHintsWhenOnlyDollarAndCurlyBracketSigns() throws Exception
     {
-        setUpMocks("${", createTestVelocityContext("key", "value"));
+        setupMocks("${", createTestVelocityContext("key", "value"));
 
         String velocity = "{{velocity}}${";
-        Hints hints = this.resource.getAutoCompletionHints(velocity.length(), "xwiki/2.0", velocity);
+        Hints hints = mocker.getComponentUnderTest().getAutoCompletionHints(velocity.length(), "xwiki/2.0", velocity);
 
-        Assert.assertEquals(1, hints.getHints().size());
-        assertThat(hints.getHints(), containsInAnyOrder(new HintData("key", "key")));
+        assertEquals(4, hints.getHints().size());
+        assertTrue(hints.getHints().contains(new HintData("key", "key")));
     }
 
     @Test
     public void getAutoCompletionHintsWhenOnlyDollarBangAndCurlyBracketSigns() throws Exception
     {
-        setUpMocks("$!{", createTestVelocityContext("key", "value"));
+        setupMocks("$!{", createTestVelocityContext("key", "value"));
 
         String velocity = "{{velocity}}$!{";
-        Hints hints = this.resource.getAutoCompletionHints(velocity.length(), "xwiki/2.0", velocity);
+        Hints hints = mocker.getComponentUnderTest().getAutoCompletionHints(velocity.length(), "xwiki/2.0", velocity);
 
-        Assert.assertEquals(1, hints.getHints().size());
-        assertThat(hints.getHints(), containsInAnyOrder(new HintData("key", "key")));
+        assertEquals(4, hints.getHints().size());
+        assertTrue(hints.getHints().contains(new HintData("key", "key")));
     }
 
     @Test
     public void getAutoCompletionHintsWhenDollarSignFollowedBySomeLetters() throws Exception
     {
-        setUpMocks("$ke", createTestVelocityContext("key", "value", "otherKey", "otherValue"));
+        setupMocks("$ke", createTestVelocityContext("key", "value", "otherKey", "otherValue"));
 
         String velocity = "{{velocity}}$ke";
-        Hints hints = this.resource.getAutoCompletionHints(velocity.length(), "xwiki/2.0", velocity);
+        Hints hints = mocker.getComponentUnderTest().getAutoCompletionHints(velocity.length(), "xwiki/2.0", velocity);
 
-        Assert.assertEquals(1, hints.getHints().size());
-        assertThat(hints.getHints(), containsInAnyOrder(new HintData("key", "key")));
+        assertEquals(1, hints.getHints().size());
+        assertTrue(hints.getHints().contains(new HintData("key", "key")));
     }
 
     @Test
     public void getAutoCompletionHintsWhenDollarSignFollowedByBangSymbol() throws Exception
     {
-        setUpMocks("$!ke", createTestVelocityContext("key", "value", "otherKey", "otherValue"));
+        setupMocks("$!ke", createTestVelocityContext("key", "value", "otherKey", "otherValue"));
 
         String velocity = "{{velocity}}$!ke";
-        Hints hints = this.resource.getAutoCompletionHints(velocity.length(), "xwiki/2.0", velocity);
+        Hints hints = mocker.getComponentUnderTest().getAutoCompletionHints(velocity.length(), "xwiki/2.0", velocity);
 
-        Assert.assertEquals(1, hints.getHints().size());
-        assertThat(hints.getHints(), containsInAnyOrder(new HintData("key", "key")));
+        assertEquals(1, hints.getHints().size());
+        assertTrue(hints.getHints().contains(new HintData("key", "key")));
     }
 
     @Test
     public void getAutoCompletionHintsWhenDollarSignFollowedByCurlyBracketSymbol() throws Exception
     {
-        setUpMocks("${ke", createTestVelocityContext("key", "value", "otherKey", "otherValue"));
+        setupMocks("${ke", createTestVelocityContext("key", "value", "otherKey", "otherValue"));
 
         String velocity = "{{velocity}}${ke";
-        Hints hints = this.resource.getAutoCompletionHints(velocity.length(), "xwiki/2.0", velocity);
+        Hints hints = mocker.getComponentUnderTest().getAutoCompletionHints(velocity.length(), "xwiki/2.0", velocity);
 
-        Assert.assertEquals(1, hints.getHints().size());
-        assertThat(hints.getHints(), containsInAnyOrder(new HintData("key", "key")));
+        assertEquals(1, hints.getHints().size());
+        assertTrue(hints.getHints().contains(new HintData("key", "key")));
     }
 
     @Test
     public void getAutoCompletionHintsWhenDollarSignFollowedByBangAndCurlyBracketSymbol() throws Exception
     {
-        setUpMocks("$!{ke", createTestVelocityContext("key", "value", "otherKey", "otherValue"));
+        setupMocks("$!{ke", createTestVelocityContext("key", "value", "otherKey", "otherValue"));
 
         String velocity = "{{velocity}}$!{ke";
-        Hints hints = this.resource.getAutoCompletionHints(velocity.length(), "xwiki/2.0", velocity);
+        Hints hints = mocker.getComponentUnderTest().getAutoCompletionHints(velocity.length(), "xwiki/2.0", velocity);
 
-        Assert.assertEquals(1, hints.getHints().size());
-        assertThat(hints.getHints(), containsInAnyOrder(new HintData("key", "key")));
+        assertEquals(1, hints.getHints().size());
+        assertTrue(hints.getHints().contains(new HintData("key", "key")));
     }
 
     @Test
     public void getAutoCompletionHintsWhenDollarSignFollowedBySomeNonMatchingLetters() throws Exception
     {
-        setUpMocks("$o", createTestVelocityContext("key", "value"));
+        setupMocks("$o", createTestVelocityContext("key", "value"));
 
         String velocity = "{{velocity}}$o";
-        Hints hints = this.resource.getAutoCompletionHints(velocity.length(), "xwiki/2.0", velocity);
+        Hints hints = mocker.getComponentUnderTest().getAutoCompletionHints(velocity.length(), "xwiki/2.0", velocity);
 
-        Assert.assertEquals(0, hints.getHints().size());
+        assertEquals(0, hints.getHints().size());
     }
 
     @Test
     public void getAutoCompletionHintsWhenInvalidAutoCompletion() throws Exception
     {
-        setUpMocks("$k ", createTestVelocityContext());
+        setupMocks("$k ", createTestVelocityContext());
 
         String velocity = "{{velocity}}$k ";
-        Hints hints = this.resource.getAutoCompletionHints(velocity.length(), "xwiki/2.0", velocity);
+        Hints hints = mocker.getComponentUnderTest().getAutoCompletionHints(velocity.length(), "xwiki/2.0", velocity);
 
-        Assert.assertEquals(0, hints.getHints().size());
+        assertEquals(0, hints.getHints().size());
     }
 
     @Test
     public void getAutoCompletionHintsForMethodWhenJustAfterTheDot() throws Exception
     {
-        setUpMocks("$key.", createTestVelocityContext("key", new TestClass()));
+        setupMocks("$key.", createTestVelocityContext("key", new TestClass()));
 
-        final Hints expectedMethods =
-            new Hints().withHints(new HintData("doWork", "doWork(...) AncillaryTestClass"), new HintData("something",
-                "something String"), new HintData("getSomething", "getSomething(...) String"), new HintData("method1",
-                "method1(...)"), new HintData("method2", "method2(...) String"));
-        setUpMethodFinderMock(expectedMethods, "", TestClass.class);
+        Hints expectedMethods = new Hints().withHints(
+            new HintData("doWork", "doWork(...) AncillaryTestClass"),
+            new HintData("something", "something String"),
+            new HintData("getSomething", "getSomething(...) String"),
+            new HintData("method1", "method1(...)"),
+            new HintData("method2", "method2(...) String")
+        );
+        setupMethodFinderMock(expectedMethods, "", TestClass.class);
 
         String velocity = "{{velocity}}$key.";
-        Hints hints = this.resource.getAutoCompletionHints(velocity.length(), "xwiki/2.0", velocity);
+        Hints hints = mocker.getComponentUnderTest().getAutoCompletionHints(velocity.length(), "xwiki/2.0", velocity);
 
-        Assert.assertEquals(5, hints.getHints().size());
+        assertEquals(5, hints.getHints().size());
 
         // Verify methods are returned sorted
-        Assert.assertEquals(Arrays.asList(new HintData("doWork", "doWork(...) AncillaryTestClass"), new HintData(
-            "getSomething", "getSomething(...) String"), new HintData("method1", "method1(...)"), new HintData(
-            "method2", "method2(...) String"), new HintData("something", "something String")), hints.getHints());
+        assertEquals(Arrays.asList(
+            new HintData("doWork", "doWork(...) AncillaryTestClass"),
+            new HintData("getSomething", "getSomething(...) String"),
+            new HintData("method1", "method1(...)"),
+            new HintData("method2", "method2(...) String"),
+            new HintData("something", "something String")), hints.getHints());
     }
 
     @Test
     public void getAutoCompletionHintsForMethodWhenThereIsContentAfterCursor() throws Exception
     {
-        setUpMocks("$key.do", createTestVelocityContext("key", new TestClass()));
+        setupMocks("$key.do", createTestVelocityContext("key", new TestClass()));
 
-        final Hints expectedMethods = new Hints().withHints(new HintData("doWork", "doWork(...) AncillaryTestClass"));
-        setUpMethodFinderMock(expectedMethods, "do", TestClass.class);
+        Hints expectedMethods = new Hints().withHints(new HintData("doWork", "doWork(...) AncillaryTestClass"));
+        setupMethodFinderMock(expectedMethods, "do", TestClass.class);
 
         String velocity = "{{velocity}}$key.doWork";
-        Hints hints = this.resource.getAutoCompletionHints(velocity.length() - 4, "xwiki/2.0", velocity);
+        Hints hints =
+            mocker.getComponentUnderTest().getAutoCompletionHints(velocity.length() - 4, "xwiki/2.0", velocity);
 
-        Assert.assertEquals(1, hints.getHints().size());
+        assertEquals(1, hints.getHints().size());
 
         // Verify methods are returned sorted
-        Assert.assertEquals(Arrays.asList(new HintData("doWork", "doWork(...) AncillaryTestClass")), hints.getHints());
+        assertEquals(Arrays.asList(new HintData("doWork", "doWork(...) AncillaryTestClass")), hints.getHints());
     }
 
     @Test
     public void getAutoCompletionHintsForMethodWhenThereIsContentAfterCursorWithCapitalLetters() throws Exception
     {
-        setUpMocks("$key.doW", createTestVelocityContext("key", new TestClass()));
+        setupMocks("$key.doW", createTestVelocityContext("key", new TestClass()));
 
-        final Hints expectedMethods = new Hints().withHints(new HintData("doWork", "doWork(...) AncillaryTestClass"));
-        setUpMethodFinderMock(expectedMethods, "doW", TestClass.class);
+        Hints expectedMethods = new Hints().withHints(new HintData("doWork", "doWork(...) AncillaryTestClass"));
+        setupMethodFinderMock(expectedMethods, "doW", TestClass.class);
 
         String velocity = "{{velocity}}$key.doWork";
-        Hints hints = this.resource.getAutoCompletionHints(velocity.length() - 3, "xwiki/2.0", velocity);
+        Hints hints =
+            mocker.getComponentUnderTest().getAutoCompletionHints(velocity.length() - 3, "xwiki/2.0", velocity);
 
-        Assert.assertEquals(1, hints.getHints().size());
+        assertEquals(1, hints.getHints().size());
 
         // Verify methods are returned sorted
-        Assert.assertEquals(Arrays.asList(new HintData("doWork", "doWork(...) AncillaryTestClass")), hints.getHints());
+        assertEquals(Arrays.asList(new HintData("doWork", "doWork(...) AncillaryTestClass")), hints.getHints());
     }
 
     @Test
     public void getAutoCompletionHintsForMethodsWhenGetter() throws Exception
     {
-        setUpMocks("$key.s", createTestVelocityContext("key", new TestClass()));
+        setupMocks("$key.s", createTestVelocityContext("key", new TestClass()));
 
-        final Hints expectedMethods =
-            new Hints().withHints(new HintData("something", "something String"));
-        setUpMethodFinderMock(expectedMethods, "s", TestClass.class);
+        Hints expectedMethods = new Hints().withHints(new HintData("something", "something String"));
+        setupMethodFinderMock(expectedMethods, "s", TestClass.class);
 
         String velocity = "{{velocity}}$key.s";
-        Hints hints = this.resource.getAutoCompletionHints(velocity.length(), "xwiki/2.0", velocity);
+        Hints hints = mocker.getComponentUnderTest().getAutoCompletionHints(velocity.length(), "xwiki/2.0", velocity);
 
-        Assert.assertEquals(1, hints.getHints().size());
+        assertEquals(1, hints.getHints().size());
     }
 
     @Test
     public void getAutoCompletionHintsForMethod() throws Exception
     {
-        setUpMocks("$key.m", createTestVelocityContext("key", new TestClass()));
+        setupMocks("$key.m", createTestVelocityContext("key", new TestClass()));
 
-        final Hints expectedMethods =
-            new Hints().withHints(new HintData("method", "method1(...)"),
-                new HintData("method2", "method2(...) String"));
-        setUpMethodFinderMock(expectedMethods, "m", TestClass.class);
+        Hints expectedMethods = new Hints().withHints(
+            new HintData("method", "method1(...)"),
+            new HintData("method2", "method2(...) String")
+        );
+        setupMethodFinderMock(expectedMethods, "m", TestClass.class);
 
         String velocity = "{{velocity}}$key.m";
-        Hints hints = this.resource.getAutoCompletionHints(velocity.length(), "xwiki/2.0", velocity);
+        Hints hints = mocker.getComponentUnderTest().getAutoCompletionHints(velocity.length(), "xwiki/2.0", velocity);
 
-        Assert.assertEquals(2, hints.getHints().size());
+        assertEquals(2, hints.getHints().size());
     }
 
     @Test
     public void getAutoCompletionHintsForScriptServiceProperty() throws Exception
     {
-        ScriptServiceManager scriptServiceManager = getComponentManager().getInstance(ScriptServiceManager.class);
-        setUpMocks("$services.t", createTestVelocityContext("services", scriptServiceManager));
+        ComponentManager cm = mocker.getInstance(ComponentManager.class);
+        AutoCompletionMethodFinder scriptServiceFinder = mock(AutoCompletionMethodFinder.class);
+        when(cm.hasComponent(AutoCompletionMethodFinder.class, "services")).thenReturn(true);
+        when(cm.getInstance(AutoCompletionMethodFinder.class, "services")).thenReturn(scriptServiceFinder);
+
+        ScriptServiceManager scriptServiceManager = mock(ScriptServiceManager.class);
+        setupMocks("$services.t", createTestVelocityContext("services", scriptServiceManager));
+        when(scriptServiceFinder.findMethods(scriptServiceManager.getClass(), "t")).thenReturn(
+            new Hints().withHints(new HintData("test", "test")));
 
         String velocity = "{{velocity}}$services.t";
-        Hints hints = this.resource.getAutoCompletionHints(velocity.length(), "xwiki/2.0", velocity);
+        Hints hints = mocker.getComponentUnderTest().getAutoCompletionHints(velocity.length(), "xwiki/2.0", velocity);
 
-        Assert.assertEquals(1, hints.getHints().size());
-        assertThat(hints.getHints(), containsInAnyOrder(new HintData("test", "test")));
+        assertEquals(1, hints.getHints().size());
+        assertTrue(hints.getHints().contains(new HintData("test", "test")));
     }
 
     @Test
@@ -346,43 +351,29 @@ public class AutoCompletionResourceTest extends AbstractMockingComponentTestCase
     public void getAutoCompletionHintsWhenSetDoneAbove() throws Exception
     {
         String velocity = "#set ($mydoc = $key.doWork())\n$mydoc.";
-        setUpMocks(velocity, createTestVelocityContext("key", new TestClass()));
+        setupMocks(velocity, createTestVelocityContext("key", new TestClass()));
 
         String content = "{{velocity}}" + velocity;
-        Hints hints = this.resource.getAutoCompletionHints(content.length(), "xwiki/2.0", content);
+        Hints hints = mocker.getComponentUnderTest().getAutoCompletionHints(content.length(), "xwiki/2.0", content);
 
-        Assert.assertEquals(2, hints.getHints().size());
+        assertEquals(2, hints.getHints().size());
     }
 
-    private void setUpMethodFinderMock(final Hints expectedMethodNames, final String fragmentToMatch,
-        final Class methodClass) throws Exception
+    private void setupMocks(String expectedContent, VelocityContext velocityContext) throws Exception
     {
-        final AutoCompletionMethodFinder finder = getComponentManager().getInstance(AutoCompletionMethodFinder.class);
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(finder).findMethods(methodClass, fragmentToMatch);
-                will(returnValue(expectedMethodNames));
-            }
-        });
+        TargetContentLocator locator = mocker.getInstance(TargetContentLocator.class);
+        when(locator.locate(anyString(), eq("xwiki/2.0"), anyInt())).thenReturn(
+            new TargetContent(expectedContent, expectedContent.length(), TargetContentType.VELOCITY));
+
+        VelocityManager velocityManager = mocker.getInstance(VelocityManager.class);
+        when(velocityManager.getVelocityContext()).thenReturn(velocityContext);
     }
 
-    private void setUpMocks(final String expectedContent, final VelocityContext velocityContext) throws Exception
+    private void setupMethodFinderMock(Hints expectedMethodNames, String fragmentToMatch, Class methodClass)
+        throws Exception
     {
-        this.resource.setVelocityContext(velocityContext);
-
-        final TargetContentLocator locator = getComponentManager().getInstance(TargetContentLocator.class);
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(locator).locate(with(any(String.class)), with(equal("xwiki/2.0")), with(any(Integer.class)));
-                will(returnValue(new TargetContent(expectedContent, expectedContent.length(),
-                    TargetContentType.VELOCITY)));
-
-                // Ignore all calls to debug().
-                ignoring(any(Logger.class)).method("debug");
-            }
-        });
+        AutoCompletionMethodFinder methodFinder = mocker.getInstance(AutoCompletionMethodFinder.class);
+        when(methodFinder.findMethods(methodClass, fragmentToMatch)).thenReturn(expectedMethodNames);
     }
 
     private VelocityContext createTestVelocityContext(Object... properties)

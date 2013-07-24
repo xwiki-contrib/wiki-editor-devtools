@@ -13417,15 +13417,12 @@ var initCodeMirrors = function () {
 
 /* Initialize a CodeMirror instance and add it to the list of instances.
 * @param propertyPattern : the CSS selector for the textarea to wrap with a CodeMirror instance.
-* @param objectTitlePattern : the CSS selector for an XWiki object that contains a TextArea field editable
-*    with a CodeMirror instance. Applies for the object editor only. It basically registers a click listener
-*    that will refresh the CodeMirror instance when it becomes visible.
 * @param codeMirrorMode : the mode that will be used by this CodeMirror instance ('css', 'javascript', etc.)
 */
-var initCodeMirror = function (propertyPattern, objectTitlePattern, codeMirrorMode) {
+var initCodeMirror = function (propertyPattern, codeMirrorMode) {
   if (CodeMirror.modes[codeMirrorMode] == null) {
     // The download + loading of each CodeMirror module js is done asynchronously, so we need to wait for it to load.
-    setTimeout(function() {initCodeMirror(propertyPattern, objectTitlePattern, codeMirrorMode)}, TIMEOUT_VALUE);
+    setTimeout(function() {initCodeMirror(propertyPattern, codeMirrorMode)}, TIMEOUT_VALUE);
   } else {
     //
     // Attach codeMirrors to all the elements matched with the propertyPattern.
@@ -13433,33 +13430,35 @@ var initCodeMirror = function (propertyPattern, objectTitlePattern, codeMirrorMo
     var textareas = $$(propertyPattern);
     for (var i = 0; i&lt;textareas.length; ++i) {
       var textarea = textareas[i];
-      // If the textarea is not visible, like the object editor's textareas are when they are not expanded, skip initialization
+      // If the textarea is not visible, like the object editor's textareas are when they are not expanded, delay the initialization
       if (textarea.offsetWidth &gt; 0 || textarea.offsetHeight &gt; 0) {
         initSingleCodeMirror(textarea, codeMirrorMode);
-      }
-    }
-
-    //
-    // Attach listeners for when expanding an object in the object editor.
-    //
-    if (objectTitlePattern != null &amp;&amp; objectTitlePattern != '') {
-      var titleElements = $$(objectTitlePattern);
-      for (var i=0; i&lt;titleElements.length; ++i) {
-        var titleElement = titleElements[i];
+      } else {
+        var objectDiv = textarea.up('.xobject');
 
         // Hack: since we are not using a static listener, but a custom one for each instance (through the bind method by curry-ing parameter values to it),
         // we`re currying the "this" (first) parameter to a dummy object that is empty at curry time, but which is then made the container of the generated
         // listener. This way, the listener will be able to have access to itself, in it's curryed form (so that it can unregister itself once it executes);
         var dummy = {};
-        var listener = lazyInitObjectEditorCodeMirrors.bindAsEventListener(dummy, titleElement, codeMirrorMode);
+        var listener = lazyInitObjectEditorCodeMirrors.bindAsEventListener(dummy, objectDiv, textarea, codeMirrorMode);
         dummy.listener = listener;
 
-        titleElement.observe('click', listener);
+        objectDiv.observe('click', listener);
       }
     }
 
   // else-end
   }
+}
+
+/*
+ * Listener that initializes a CodeMirror instance only once and then unregistes itself.
+ */
+var lazyInitObjectEditorCodeMirrors = function (event, observedElement, textarea, codeMirrorMode) {
+  initSingleCodeMirror(textarea, codeMirrorMode);
+
+  /* Remove the listener so that it is triggered only once */
+  observedElement.stopObserving('click', this.listener);
 }
 
 var initSingleCodeMirror = function (textarea, codeMirrorMode) {
@@ -13546,23 +13545,6 @@ var getNewCodeMirrorHeightInFullscreen = function() {
 
 var getWindowHeight = function() {
   return window.innerHeight || (document.documentElement || document.body).clientHeight;
-}
-
-/*
- * Listener that initializes CodeMirror instances for all the objects
- * of a specific classs when they are expanded in the XWiki object editor.
- */
-var lazyInitObjectEditorCodeMirrors = function (event, observedElement, codeMirrorMode) {
-  // Note: we`re using observedElement (passed from the caller) instead of Event.element(event) because
-  // that gives us the DOM element that was clicked and not the one on which we have registered the listener.
-  var textareas = observedElement.up('.xobject').select('textarea');
-  for(var i=0; i&lt;textareas.length; ++i) {
-    var textarea = textareas[i];
-    initSingleCodeMirror(textarea, codeMirrorMode);
-  }
-
-  /* Remove the listener. */
-  observedElement.stopObserving('click', this.listener);
 }
 
 /* Synchronize the original textareas' contents with the codemirrors' contents just before saving the page. */

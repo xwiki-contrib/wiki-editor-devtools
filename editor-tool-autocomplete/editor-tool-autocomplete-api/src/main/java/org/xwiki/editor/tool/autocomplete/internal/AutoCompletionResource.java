@@ -229,9 +229,6 @@ public class AutoCompletionResource implements XWikiRestComponent
 
             if (methodPos > -1) {
                 results = getMethods(chars, variableName, blockPos, methodPos, offset, velocityContext);
-
-                // Set the temporary start offset as the size of the user's input.
-                results.withStartOffset(blockPos - methodPos - 1);
             } else {
                 results = getVelocityContextKeys(variableName, velocityContext);
 
@@ -291,8 +288,9 @@ public class AutoCompletionResource implements XWikiRestComponent
                 if (newMethodPos + 1 == chars.length && chars[newMethodPos] == '.') {
                     newFragment = "";
                 } else {
-                    newMethodPos = this.parser.getMethodOrProperty(chars, newMethodPos, methodBlock, context);
+                    int newMethodPos2 = this.parser.getMethodOrProperty(chars, newMethodPos, methodBlock, context);
                     newFragment = methodBlock.toString().substring(1);
+                    results.withStartOffset(newMethodPos2 - newMethodPos - 1);
                 }
                 // Find all methods from return types matching the new fragment
                 for (Class<?> returnType : returnTypes) {
@@ -304,6 +302,8 @@ public class AutoCompletionResource implements XWikiRestComponent
         if (autoCompleteMethods) {
             // Find methods using Reflection
             results = getMethods(propertyName, fragment, velocityContext);
+            // Set the temporary start offset as the size of the user's input.
+            results.withStartOffset(blockPos - methodPos - 1);
         }
 
         return results;

@@ -385,6 +385,7 @@ public class AutoCompletionResourceTest
 
         assertEquals(1, hints.getHints().size());
         assertEquals(new HintData("method", "method"), hints.getHints().first());
+        assertEquals(velocity.length() - 1, hints.getStartOffset());
     }
 
     @Test
@@ -405,6 +406,7 @@ public class AutoCompletionResourceTest
 
         assertEquals(1, hints.getHints().size());
         assertEquals(new HintData("method", "method"), hints.getHints().first());
+        assertEquals(velocity.length(), hints.getStartOffset());
     }
 
     private void setupMocks(String expectedContent, VelocityContext velocityContext) throws Exception

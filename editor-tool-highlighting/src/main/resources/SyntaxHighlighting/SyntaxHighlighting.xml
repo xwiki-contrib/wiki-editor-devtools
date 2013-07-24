@@ -13328,7 +13328,9 @@ if (XWiki.domIsLoaded) {
   initCodeMirrorInternals();
 } else {
   document.observe('xwiki:dom:loaded', function() {
-    initCodeMirrorInternals();
+    // Try not to pollute the other XWiki actions with CodeMirror specific code
+    if (XWiki.contextaction == 'edit')
+      initCodeMirrorInternals();
   });
 }
 
@@ -13395,21 +13397,21 @@ var initCodeMirrorModules = function() {
 
 /* Initialize all possible CodeMirror instances. */
 var initCodeMirrors = function () {
-  initCodeMirror("textarea[id^='XWiki.StyleSheetExtension_'][id$='_code']",
-                 "div[id^='xobject_XWiki.StyleSheetExtension_'][id$='_title']",
-                 'css');
-  initCodeMirror("textarea[id^='XWiki.JavaScriptExtension_'][id$='_code']",
-                 "div[id^='xobject_XWiki.JavaScriptExtension_'][id$='_title']",
-                 'javascript');
-  initCodeMirror("textarea[id^='XWiki.XWikiSkins_'][id$='.css']",
-                 "div[id^='xobject_XWiki.XWikiSkins_'][id$='_title']",
-                 'css');
-  initCodeMirror("textarea[id^='XWiki.XWikiSkins_'][id$='.js']",
-                 "div[id^='xobject_XWiki.XWikiSkins_'][id$='_title']",
-                 'javascript');
-  // Don't load the syntax highlighting in WYSIWYG edit mode because it breaks the save action.
-  if (XWiki.editor != 'wysiwyg') {
-    initCodeMirror("textarea[id='content']", '', 'xwiki');
+  if (XWiki.editor == 'object') {
+    // Object editor highlighting support
+
+    initCodeMirror("textarea[id^='XWiki.StyleSheetExtension_'][id$='_code']",
+                   'css');
+    initCodeMirror("textarea[id^='XWiki.JavaScriptExtension_'][id$='_code']",
+                   'javascript');
+    initCodeMirror("textarea[id^='XWiki.XWikiSkins_'][id$='.css']",
+                   'css');
+    initCodeMirror("textarea[id^='XWiki.XWikiSkins_'][id$='.js']",
+                   'javascript');
+  } else if (XWiki.editor == 'wiki') {
+    // Document content editor highlighting support
+
+    initCodeMirror("textarea[id='content']", 'xwiki');
   }
 }
 

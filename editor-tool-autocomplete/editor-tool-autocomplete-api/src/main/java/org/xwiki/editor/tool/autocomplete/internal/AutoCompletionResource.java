@@ -19,7 +19,7 @@
  */
 package org.xwiki.editor.tool.autocomplete.internal;
 
-import java.util.Collections;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.ws.rs.POST;
@@ -169,9 +169,6 @@ public class AutoCompletionResource implements XWikiRestComponent
             }
         }
 
-        // Sort hints
-        Collections.sort(results.getHints());
-
         return results;
     }
 
@@ -271,9 +268,34 @@ public class AutoCompletionResource implements XWikiRestComponent
         } else {
             StringBuffer propertyBlock = new StringBuffer();
             int newMethodPos = this.parser.getMethodOrProperty(chars, methodPos, propertyBlock, context);
+            // Extract the method name without the parameters
+            // Remove the leading dot
+            String methodName = StringUtils.substringBefore(propertyBlock.toString(), "(").substring(1);
             if (newMethodPos == blockPos) {
                 autoCompleteMethods = true;
-                fragment = propertyBlock.toString().substring(1);
+                // Remove the leading dot
+                fragment = methodName;
+            } else {
+                // TODO: Refactor this ugly code below and make it generic so that we can support any nesting level of
+                // methods.
+
+                // There is more! It probably means some chained method call...
+                Object propertyClass = velocityContext.get(propertyName);
+                List<Class<?>> returnTypes = IntrospectionUtil.findReturnTypes(propertyClass.getClass(), methodName);
+                // Find the next method name...
+                StringBuffer methodBlock = new StringBuffer();
+                // Handle the case where the last char is a '.' since our Velocity Parser doesn't support that
+                String newFragment;
+                if (newMethodPos + 1 == chars.length && chars[newMethodPos] == '.') {
+                    newFragment = "";
+                } else {
+                    newMethodPos = this.parser.getMethodOrProperty(chars, newMethodPos, methodBlock, context);
+                    newFragment = methodBlock.toString().substring(1);
+                }
+                // Find all methods from return types matching the new fragment
+                for (Class<?> returnType : returnTypes) {
+                    results.withHints(this.defaultAutoCompletionMethodFinder.findMethods(returnType, newFragment));
+                }
             }
         }
 

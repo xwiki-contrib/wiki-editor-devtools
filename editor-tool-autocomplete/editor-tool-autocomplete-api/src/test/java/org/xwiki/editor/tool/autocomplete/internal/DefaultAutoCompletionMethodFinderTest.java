@@ -19,7 +19,11 @@
  */
 package org.xwiki.editor.tool.autocomplete.internal;
 
+import java.util.SortedSet;
+import java.util.TreeSet;
+
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import junit.framework.Assert;
 
@@ -113,10 +117,10 @@ public class DefaultAutoCompletionMethodFinderTest extends AbstractMockingCompon
     {
         Hints hints = this.finder.findMethods(TestClass.class, "getSo");
 
-        assertThat(
-            hints.getHints(),
-            containsInAnyOrder(new HintData("getSomething", "getSomething() String"), new HintData("getSomething",
-                "getSomething(String) String")));
+        SortedSet<HintData> expected = new TreeSet<HintData>();
+        expected.add(new HintData("getSomething", "getSomething() String"));
+        expected.add(new HintData("getSomething", "getSomething(String) String"));
+        assertEquals(expected, hints.getHints());
     }
 
     @Test

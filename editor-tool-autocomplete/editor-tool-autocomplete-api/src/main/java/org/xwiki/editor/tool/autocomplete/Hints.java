@@ -19,9 +19,9 @@
  */
 package org.xwiki.editor.tool.autocomplete;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -41,7 +41,7 @@ public class Hints
      * @see #getHints()
      */
     @XmlElement(name = "hint")
-    private List<HintData> hints;
+    private SortedSet<HintData> hints;
 
     /**
      * @see #getStartOffset()
@@ -52,10 +52,10 @@ public class Hints
     /**
      * @return the autocompletion hints
      */
-    public List<HintData> getHints()
+    public SortedSet<HintData> getHints()
     {
         if (this.hints == null) {
-            this.hints = new ArrayList<HintData>();
+            this.hints = new TreeSet<HintData>();
         }
         return this.hints;
     }

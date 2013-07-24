@@ -60,7 +60,7 @@ public class ScriptServicesAutoCompletionMethodFinderTest
 
         Hints hints = mocker.getComponentUnderTest().findMethods(null, "q");
         assertEquals(1, hints.getHints().size());
-        assertEquals(new HintData("query", "query"), hints.getHints().get(0));
+        assertEquals(new HintData("query", "query"), hints.getHints().first());
     }
 
     @Test

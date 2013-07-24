@@ -81,7 +81,7 @@ public class XWikiAutoCompletionMethodFinderTest extends AbstractMockingComponen
         Hints hints = this.finder.findMethods(TestClass.class, "t");
 
         Assert.assertEquals(1, hints.getHints().size());
-        Assert.assertEquals("tag", hints.getHints().get(0).getName());
-        Assert.assertEquals("tag " + plugin.getClass().getSimpleName(), hints.getHints().get(0).getDescription());
+        Assert.assertEquals("tag", hints.getHints().first().getName());
+        Assert.assertEquals("tag " + plugin.getClass().getSimpleName(), hints.getHints().first().getDescription());
     }
 }

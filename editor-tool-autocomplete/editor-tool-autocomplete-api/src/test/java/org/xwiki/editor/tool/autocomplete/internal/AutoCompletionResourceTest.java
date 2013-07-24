@@ -21,6 +21,8 @@ package org.xwiki.editor.tool.autocomplete.internal;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -114,13 +116,14 @@ public class AutoCompletionResourceTest
         assertEquals(5, hints.getHints().size());
 
         // Also verifies that hints are sorted
-        List<HintData> expected = Arrays.asList(
+        SortedSet<HintData> expected = new TreeSet<HintData>();
+        expected.addAll(Arrays.asList(
             new HintData("doc", "doc"),
             new HintData("key1", "key1"),
             new HintData("key2", "key2"),
             new HintData("sdoc", "sdoc"),
             new HintData("tdoc", "tdoc")
-        );
+        ));
         assertEquals(expected, hints.getHints());
     }
 
@@ -251,12 +254,13 @@ public class AutoCompletionResourceTest
         assertEquals(5, hints.getHints().size());
 
         // Verify methods are returned sorted
-        assertEquals(Arrays.asList(
-            new HintData("doWork", "doWork(...) AncillaryTestClass"),
-            new HintData("getSomething", "getSomething(...) String"),
-            new HintData("method1", "method1(...)"),
-            new HintData("method2", "method2(...) String"),
-            new HintData("something", "something String")), hints.getHints());
+        SortedSet<HintData> expected = new TreeSet<HintData>();
+        expected.add(new HintData("doWork", "doWork(...) AncillaryTestClass"));
+        expected.add(new HintData("getSomething", "getSomething(...) String"));
+        expected.add(new HintData("method1", "method1(...)"));
+        expected.add(new HintData("method2", "method2(...) String"));
+        expected.add(new HintData("something", "something String"));
+        assertEquals(expected, hints.getHints());
     }
 
     @Test
@@ -274,7 +278,9 @@ public class AutoCompletionResourceTest
         assertEquals(1, hints.getHints().size());
 
         // Verify methods are returned sorted
-        assertEquals(Arrays.asList(new HintData("doWork", "doWork(...) AncillaryTestClass")), hints.getHints());
+        SortedSet<HintData> expected = new TreeSet<HintData>();
+        expected.add(new HintData("doWork", "doWork(...) AncillaryTestClass"));
+        assertEquals(expected, hints.getHints());
     }
 
     @Test
@@ -292,7 +298,9 @@ public class AutoCompletionResourceTest
         assertEquals(1, hints.getHints().size());
 
         // Verify methods are returned sorted
-        assertEquals(Arrays.asList(new HintData("doWork", "doWork(...) AncillaryTestClass")), hints.getHints());
+        SortedSet<HintData> expected = new TreeSet<HintData>();
+        expected.add(new HintData("doWork", "doWork(...) AncillaryTestClass"));
+        assertEquals(expected, hints.getHints());
     }
 
     @Test
@@ -357,6 +365,40 @@ public class AutoCompletionResourceTest
         Hints hints = mocker.getComponentUnderTest().getAutoCompletionHints(content.length(), "xwiki/2.0", content);
 
         assertEquals(2, hints.getHints().size());
+    }
+
+    @Test
+    public void getAutoCompletionHintsForChainedMethod() throws Exception
+    {
+        setupMocks("$key.doWork().m", createTestVelocityContext("key", new TestClass()));
+
+        Hints expectedMethods = new Hints().withHints(
+            new HintData("method", "method")
+        );
+        setupMethodFinderMock(expectedMethods, "m", AncillaryTestClass.class);
+
+        String velocity = "{{velocity}}$key.doWork().";
+        Hints hints = mocker.getComponentUnderTest().getAutoCompletionHints(velocity.length(), "xwiki/2.0", velocity);
+
+        assertEquals(1, hints.getHints().size());
+        assertEquals(new HintData("method", "method"), hints.getHints().first());
+    }
+
+    @Test
+    public void getAutoCompletionHintsForChainedMethodEndingWithDot() throws Exception
+    {
+        setupMocks("$key.doWork().", createTestVelocityContext("key", new TestClass()));
+
+        Hints expectedMethods = new Hints().withHints(
+            new HintData("method", "method")
+        );
+        setupMethodFinderMock(expectedMethods, "", AncillaryTestClass.class);
+
+        String velocity = "{{velocity}}$key.doWork().";
+        Hints hints = mocker.getComponentUnderTest().getAutoCompletionHints(velocity.length(), "xwiki/2.0", velocity);
+
+        assertEquals(1, hints.getHints().size());
+        assertEquals(new HintData("method", "method"), hints.getHints().first());
     }
 
     private void setupMocks(String expectedContent, VelocityContext velocityContext) throws Exception

@@ -20,6 +20,7 @@
 package org.xwiki.editor.tool.autocomplete.internal;
 
 import java.lang.reflect.Method;
+import java.util.List;
 
 import javax.inject.Singleton;
 

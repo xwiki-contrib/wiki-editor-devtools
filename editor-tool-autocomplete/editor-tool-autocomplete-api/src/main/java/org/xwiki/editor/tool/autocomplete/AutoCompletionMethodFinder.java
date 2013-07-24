@@ -19,6 +19,8 @@
  */
 package org.xwiki.editor.tool.autocomplete;
 
+import java.util.List;
+
 import org.xwiki.component.annotation.Role;
 
 /**
@@ -38,4 +40,6 @@ public interface AutoCompletionMethodFinder
      * @return the autocompletion hints
      */
     Hints findMethods(Class variableClass, String fragmentToMatch);
+
+    List<Class> findMethodReturnTypes(Class propertyClass, String methodName);
 }

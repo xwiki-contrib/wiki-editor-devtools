@@ -375,7 +375,10 @@ public class AutoCompletionResourceTest
         Hints expectedMethods = new Hints().withHints(
             new HintData("method", "method")
         );
-        setupMethodFinderMock(expectedMethods, "m", AncillaryTestClass.class);
+        AutoCompletionMethodFinder methodFinder = mocker.getInstance(AutoCompletionMethodFinder.class);
+        when(methodFinder.findMethods(AncillaryTestClass.class, "m")).thenReturn(expectedMethods);
+        when(methodFinder.findMethodReturnTypes(TestClass.class, "doWork")).thenReturn(
+            Arrays.asList((Class) AncillaryTestClass.class));
 
         String velocity = "{{velocity}}$key.doWork().";
         Hints hints = mocker.getComponentUnderTest().getAutoCompletionHints(velocity.length(), "xwiki/2.0", velocity);
@@ -392,7 +395,10 @@ public class AutoCompletionResourceTest
         Hints expectedMethods = new Hints().withHints(
             new HintData("method", "method")
         );
-        setupMethodFinderMock(expectedMethods, "", AncillaryTestClass.class);
+        AutoCompletionMethodFinder methodFinder = mocker.getInstance(AutoCompletionMethodFinder.class);
+        when(methodFinder.findMethods(AncillaryTestClass.class, "")).thenReturn(expectedMethods);
+        when(methodFinder.findMethodReturnTypes(TestClass.class, "doWork")).thenReturn(
+            Arrays.asList((Class) AncillaryTestClass.class));
 
         String velocity = "{{velocity}}$key.doWork().";
         Hints hints = mocker.getComponentUnderTest().getAutoCompletionHints(velocity.length(), "xwiki/2.0", velocity);

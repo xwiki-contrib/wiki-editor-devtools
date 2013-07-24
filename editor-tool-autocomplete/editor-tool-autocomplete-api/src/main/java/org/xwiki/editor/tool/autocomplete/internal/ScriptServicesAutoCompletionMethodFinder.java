@@ -20,6 +20,7 @@
 package org.xwiki.editor.tool.autocomplete.internal;
 
 import java.lang.reflect.Type;
+import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -28,6 +29,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.descriptor.ComponentDescriptor;
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.editor.tool.autocomplete.HintData;
 import org.xwiki.editor.tool.autocomplete.Hints;
@@ -66,5 +68,22 @@ public class ScriptServicesAutoCompletionMethodFinder extends AbstractAutoComple
         }
 
         return results;
+    }
+
+    @Override
+    public List<Class> findMethodReturnTypes(Class propertyClass, String serviceHint)
+    {
+        List<Class> returnTypes;
+
+        // Find the SS with hint = serviceHint
+        try {
+            ScriptService scriptService = this.componentManager.getInstance(ScriptService.class, serviceHint);
+            returnTypes = Collections.<Class>singletonList(scriptService.getClass());
+        } catch (ComponentLookupException e) {
+            // Hint doesn't correspond to an existing ScriptService, ignore it!
+            returnTypes = Collections.EMPTY_LIST;
+        }
+
+        return returnTypes;
     }
 }

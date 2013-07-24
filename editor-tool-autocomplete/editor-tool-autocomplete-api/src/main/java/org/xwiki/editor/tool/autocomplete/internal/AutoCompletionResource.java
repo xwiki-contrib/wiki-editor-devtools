@@ -280,8 +280,10 @@ public class AutoCompletionResource implements XWikiRestComponent
                 // methods.
 
                 // There is more! It probably means some chained method call...
+                AutoCompletionMethodFinder methodFinder = getMethodFinder(propertyName);
                 Object propertyClass = velocityContext.get(propertyName);
-                List<Class<?>> returnTypes = IntrospectionUtil.findReturnTypes(propertyClass.getClass(), methodName);
+                List<Class> returnTypes = methodFinder.findMethodReturnTypes(propertyClass.getClass(), methodName);
+
                 // Find the next method name...
                 StringBuffer methodBlock = new StringBuffer();
                 // Handle the case where the last char is a '.' since our Velocity Parser doesn't support that
@@ -373,6 +375,26 @@ public class AutoCompletionResource implements XWikiRestComponent
         }
 
         return hints;
+    }
+
+    private AutoCompletionMethodFinder getMethodFinder(String hint)
+    {
+        AutoCompletionMethodFinder finder = null;
+
+        // Allow special handling for classes that have registered a custom introspection handler
+        if (this.componentManager.hasComponent(AutoCompletionMethodFinder.class, hint)) {
+            try {
+                finder = this.componentManager.getInstance(AutoCompletionMethodFinder.class, hint);
+            } catch (ComponentLookupException e) {
+                // Component not found, continue with default finder...
+            }
+        }
+
+        if (finder == null) {
+            finder = this.defaultAutoCompletionMethodFinder;
+        }
+
+        return  finder;
     }
 
     /**

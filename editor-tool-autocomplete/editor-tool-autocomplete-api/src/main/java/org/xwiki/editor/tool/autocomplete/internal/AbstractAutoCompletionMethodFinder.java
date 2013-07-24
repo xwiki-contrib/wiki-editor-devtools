@@ -20,6 +20,7 @@
 package org.xwiki.editor.tool.autocomplete.internal;
 
 import java.lang.reflect.Method;
+import java.util.List;
 
 import org.xwiki.editor.tool.autocomplete.AutoCompletionMethodFinder;
 
@@ -140,5 +141,11 @@ public abstract class AbstractAutoCompletionMethodFinder implements AutoCompleti
         }
 
         return builder;
+    }
+
+    @Override
+    public List<Class> findMethodReturnTypes(Class propertyClass, String methodName)
+    {
+        return IntrospectionUtil.findReturnTypes(propertyClass.getClass(), methodName);
     }
 }

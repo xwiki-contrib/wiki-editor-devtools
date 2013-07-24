@@ -41,9 +41,9 @@ public class IntrospectionUtil
         return methods;
     }
 
-    public static List<Class<?>> findReturnTypes(Class propertyClass, String methodName)
+    public static List<Class> findReturnTypes(Class propertyClass, String methodName)
     {
-        List<Class<?>> returnTypes = new ArrayList<Class<?>>();
+        List<Class> returnTypes = new ArrayList<Class>();
         List<Method> methods = findMethods(propertyClass, methodName);
         for (Method method : methods) {
             returnTypes.add(method.getReturnType());

@@ -28,8 +28,21 @@ import java.util.List;
  *
  * @version $Id$
  */
-public class IntrospectionUtil
+public final class IntrospectionUtil
 {
+    /**
+     * Private constructor since this is a utility class not meant to be instantiated.
+     */
+    private IntrospectionUtil()
+    {
+        // Empty voluntarily.
+    }
+
+    /**
+     * @param propertyClass the class in which to look for methods
+     * @param methodName the name of the method to find
+     * @return all methods (ie all signatures) named with {@code methodName} in class {@code propertyClass}
+     */
     public static List<Method> findMethods(Class propertyClass, String methodName)
     {
         List<Method> methods = new ArrayList<Method>();
@@ -41,6 +54,12 @@ public class IntrospectionUtil
         return methods;
     }
 
+    /**
+     * @param propertyClass the class from which to find the method signatures
+     * @param methodName the method signature to look for
+     * @return the classes returned by the method signatures matching the passed {@code methodName} for class
+     *         {@code propertyClass}
+     */
     public static List<Class> findReturnTypes(Class propertyClass, String methodName)
     {
         List<Class> returnTypes = new ArrayList<Class>();

@@ -41,5 +41,11 @@ public interface AutoCompletionMethodFinder
      */
     Hints findMethods(Class variableClass, String fragmentToMatch);
 
-    List<Class> findMethodReturnTypes(Class propertyClass, String methodName);
+    /**
+     * @param propertyClass the class for which to find the return type for the passed "method name"
+     * @param methodReferenceName the name pointing to a method (e.g. the method name or a hint for a Script Service,
+     *        etc)
+     * @return the return type of the method represented by {@code methodReferenceName} applied on {@code propertyClass}
+     */
+    List<Class> findMethodReturnTypes(Class propertyClass, String methodReferenceName);
 }

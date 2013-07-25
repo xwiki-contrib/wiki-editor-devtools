@@ -377,6 +377,10 @@ public class AutoCompletionResource implements XWikiRestComponent
         return hints;
     }
 
+    /**
+     * @param hint the hint of the finder to return. If no such component exist return the default finder
+     * @return the {@link AutoCompletionMethodFinder} to use depending on the passed hint
+     */
     private AutoCompletionMethodFinder getMethodFinder(String hint)
     {
         AutoCompletionMethodFinder finder = null;

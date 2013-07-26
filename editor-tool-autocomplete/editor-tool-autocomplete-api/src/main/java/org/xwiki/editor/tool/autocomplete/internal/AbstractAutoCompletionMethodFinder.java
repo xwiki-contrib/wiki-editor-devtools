@@ -146,6 +146,6 @@ public abstract class AbstractAutoCompletionMethodFinder implements AutoCompleti
     @Override
     public List<Class> findMethodReturnTypes(Class propertyClass, String methodName)
     {
-        return IntrospectionUtil.findReturnTypes(propertyClass.getClass(), methodName);
+        return IntrospectionUtil.findReturnTypes(propertyClass, methodName);
     }
 }

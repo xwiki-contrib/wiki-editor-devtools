@@ -359,6 +359,29 @@ public class AutoCompletionResourceTest
     }
 
     @Test
+    public void getAutoCompletionHintsForScriptServicePropertyWhenNestedCalls() throws Exception
+    {
+        ComponentManager cm = mocker.getInstance(ComponentManager.class);
+        AutoCompletionMethodFinder scriptServiceFinder = mock(AutoCompletionMethodFinder.class);
+        when(cm.hasComponent(AutoCompletionMethodFinder.class, "services")).thenReturn(true);
+        when(cm.getInstance(AutoCompletionMethodFinder.class, "services")).thenReturn(scriptServiceFinder);
+
+        ScriptServiceManager scriptServiceManager = mock(ScriptServiceManager.class);
+        setupMocks("$services.query.m", createTestVelocityContext("services", scriptServiceManager));
+        when(scriptServiceFinder.findMethodReturnTypes(scriptServiceManager.getClass(), "query")).thenReturn(
+            Arrays.asList((Class) TestClass.class));
+        AutoCompletionMethodFinder defaultMethodFinder = mocker.getInstance(AutoCompletionMethodFinder.class);
+        when(defaultMethodFinder.findMethods(TestClass.class, "m")).thenReturn(
+            new Hints().withHints(new HintData("method", "method")));
+
+        String velocity = "{{velocity}}$services.query.m";
+        Hints hints = mocker.getComponentUnderTest().getAutoCompletionHints(velocity.length(), "xwiki/2.0", velocity);
+
+        assertEquals(1, hints.getHints().size());
+        assertTrue(hints.getHints().contains(new HintData("method", "method")));
+    }
+
+    @Test
     @Ignore("Not working yet")
     public void getAutoCompletionHintsWhenSetDoneAbove() throws Exception
     {

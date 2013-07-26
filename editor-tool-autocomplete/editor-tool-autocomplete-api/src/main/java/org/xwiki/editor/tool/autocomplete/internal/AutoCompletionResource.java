@@ -243,6 +243,9 @@ public class AutoCompletionResource implements XWikiRestComponent
                     returnTypes.addAll(methodFinder.findMethodReturnTypes(methodClass, methodName));
                 }
                 methodClasses = returnTypes;
+
+                // Reset the method finder since we use a specialized finder only for the first autocompletion method
+                methodFinder = this.defaultAutoCompletionMethodFinder;
             }
         } while (true);
 

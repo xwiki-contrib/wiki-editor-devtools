@@ -19,6 +19,8 @@
  */
 package org.xwiki.editor.tool.autocomplete.internal;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -124,6 +126,8 @@ public class AutoCompletionResource implements XWikiRestComponent
     }
 
     /**
+     * Parses the passed content and return the autocompletion hints for the passed cursor position.
+     *
      * @param content the Velocity content to autocomplete
      * @param offset the position of the cursor relative to the Velocity content
      * @return the list of autocompletion hints
@@ -131,43 +135,116 @@ public class AutoCompletionResource implements XWikiRestComponent
     private Hints getHints(String content, int offset)
     {
         Hints results = new Hints();
-        char[] chars = content.toCharArray();
-        VelocityContext velocityContext = getVelocityContext();
+
+        // General algorithm:
+        // - We start parsing at the first dollar before the cursor
+        // - We get the full reference (a reference in VTL can be a variable, a property or a method call, see
+        //   http://velocity.apache.org/engine/devel/user-guide.html#References)
+        // - We split the reference on "." and handle first the case of a variable. If there's no "." then it means
+        //   we're autocompleting a variable and we find all matching Velocity context variables and return them.
+        // - If there's at least one "." then we parse the whole chain of method calls till the last dot to find the
+        //   return type of the last method call. This allows us to know the full list of methods for autocompletion.
 
         // Find the dollar sign before the current position
+        char[] chars = content.toCharArray();
+        VelocityContext velocityContext = getVelocityContext();
         int dollarPos = StringUtils.lastIndexOf(content, '$', offset);
-        if (dollarPos > -1) {
-            // Special case for when there's no variable after the dollar position since the Velocity Parser doesn't
-            // support parsing this case.
-            if (isCursorDirectlyAfterDollar(chars, dollarPos, offset)) {
-                // Find all objects bound to the Velocity Context. We need to also look in the chained context since
-                // this is where we store Velocity Tools
-                results = getVelocityContextKeys("", velocityContext);
-            } else {
-                StringBuffer velocityBlock = new StringBuffer();
+
+        if (dollarPos == -1) {
+            return results;
+        }
+
+        // Special case for when there's no variable after the dollar position since the Velocity Parser doesn't
+        // support parsing this case.
+        if (isCursorDirectlyAfterDollar(chars, dollarPos, offset)) {
+            // Find all objects bound to the Velocity Context. We need to also look in the chained context since
+            // this is where we store Velocity Tools
+            results = getVelocityContextKeys("", velocityContext);
+        } else {
+            // The cursor is not directly after the dollar sign.
+            try {
+                // Get all the references after the dollar sign. For example if the input is "$a.b().ccc" then
+                // we get "a.b().ccc".
                 VelocityParserContext context = new VelocityParserContext();
-                try {
-                    // Get the block after the dollar
-                    int blockPos = this.parser.getVar(chars, dollarPos, velocityBlock, context);
-                    // if newPos matches the current position then it means we have a valid block for autocompletion
+                StringBuffer reference = new StringBuffer();
+                StringBuffer identifier = new StringBuffer();
+                int endPos = this.parser.getVar(chars, dollarPos, identifier, reference, context);
 
-                    // Note: we need to handle the special case where the cursor is just after the dot since getVar
-                    // will not return it!
-                    if (blockPos + 1 == offset && chars[blockPos] == '.') {
-                        blockPos++;
-                        velocityBlock.append('.');
-                    }
-
-                    if (blockPos == offset) {
-                        results = getMethodsOrVariableHints(chars, dollarPos, blockPos, offset, velocityContext);
-                    }
-
-                } catch (InvalidVelocityException e) {
-                    this.logger.debug("Failed to get autocomplete hints for content [{}] at offset [{}]", 
-                        new Object[] {content, offset, e});
+                // If endPos matches the current cursor position then it means we have a valid token for
+                // autocompletion. Otherwise we don't autocomplete (for example there could be spaces between the
+                // reference and the cursor position).
+                // Note: We need to handle the special when the cursor is just after the '.' char.
+                if (endPos + 1 == offset && chars[endPos] == '.') {
+                    endPos++;
+                    reference.append('.');
                 }
+                if (endPos == offset) {
+                    // Find out if we're autocompleting a variable. In this case there's no "." in the reference
+                    int methodPos = reference.indexOf(".");
+                    if (methodPos > -1) {
+                        // Autocomplete a method!
+                        results = getHintsForMethodCall(chars, methodPos, identifier.toString());
+                    } else {
+                        // Autocomplete a variable! Find all matching variables.
+                        results = getVelocityContextKeys(identifier.toString(), velocityContext);
+                    }
+                }
+            } catch (InvalidVelocityException e) {
+                this.logger.debug("Failed to get autocomplete hints for content [{}] at offset [{}]",
+                    new Object[] {content, offset, e});
             }
         }
+
+        return results;
+    }
+
+    /**
+     * Find hints for the passed content assuming thay it's representing method calls.
+     *
+     * @param chars the content to parse
+     * @param currentPos the current position at which method calls are starting
+     * @param variableName the name of the variable on which the first method is called
+     * @return the list of autocompletion hints
+     * @throws InvalidVelocityException if a parsing error occurs
+     */
+    private Hints getHintsForMethodCall(char[] chars, int currentPos, String variableName)
+        throws InvalidVelocityException
+    {
+        Hints results = new Hints();
+        VelocityParserContext context = new VelocityParserContext();
+
+        // Find the next method after the currentPos.
+        int pos = currentPos;
+        AutoCompletionMethodFinder methodFinder = getMethodFinder(variableName);
+        List<Class> methodClasses = Arrays.asList((Class) getVelocityContext().get(variableName).getClass());
+        do {
+            // Handle the special case when the cursor is after the dot ('.')
+            String methodName;
+            if (pos == chars.length - 1) {
+                methodName = "";
+                pos++;
+            } else {
+                StringBuffer method = new StringBuffer();
+                pos = this.parser.getMethodOrProperty(chars, pos, method, context);
+                methodName = StringUtils.substringBefore(method.toString(), "(").substring(1);
+            }
+
+            if (pos == chars.length) {
+                // Find all methods matching methodName in methodClasses
+                for (Class methodClass : methodClasses) {
+                    results.withHints(methodFinder.findMethods(methodClass, methodName));
+                }
+                results = results.withStartOffset(methodName.length());
+                break;
+            } else {
+                // Find the returned type for method "methodName".
+                List<Class> returnTypes = new ArrayList<Class>();
+                for (Class methodClass : methodClasses) {
+                    returnTypes.addAll(methodFinder.findMethodReturnTypes(methodClass, methodName));
+                }
+                methodClasses = returnTypes;
+            }
+        } while (true);
 
         return results;
     }
@@ -190,123 +267,6 @@ public class AutoCompletionResource implements XWikiRestComponent
         }
 
         return result;
-    }
-
-    /**
-     * @param chars the content to parse
-     * @param dollarPos the position of the dollar symbol
-     * @param blockPos the position in the content after the whole fragment starting with the dollar symbol
-     * @param offset the position in the whole content of the cursor
-     * @param velocityContext the velocity context used to get the variables bound in the Velocity Context
-     * @return the list of hints
-     * @throws InvalidVelocityException when the code to parse is not what's expected
-     */
-    private Hints getMethodsOrVariableHints(char[] chars, int dollarPos, int blockPos, int offset,
-        VelocityContext velocityContext) throws InvalidVelocityException
-    {
-        Hints results = new Hints();
-
-        // Get the property before the first dot.
-        int methodPos = -1;
-        for (int i = dollarPos; i < offset; i++) {
-            if (chars[i] == '.') {
-                methodPos = i;
-                break;
-            }
-        }
-
-        // Get the variable name without any leading '$', '!' or '{'
-        int endPos = (methodPos == -1) ? offset : methodPos;
-        int variableStartPos = -1;
-        for (int i = dollarPos; i < endPos; i++) {
-            if (chars[i] != '$' && chars[i] != '!' && chars[i] != '{') {
-                variableStartPos = i;
-                break;
-            }
-        }
-        if (variableStartPos > -1) {
-            String variableName = new String(chars, variableStartPos, endPos - variableStartPos);
-
-            if (methodPos > -1) {
-                results = getMethods(chars, variableName, blockPos, methodPos, offset, velocityContext);
-            } else {
-                results = getVelocityContextKeys(variableName, velocityContext);
-
-                // Set the temporary start offset as the size of the user's input.
-                results.withStartOffset(variableName.length());
-            }
-        }
-
-        return results;
-    }
-
-    /**
-     * @param chars the content to parse
-     * @param propertyName the name of the property on which we want to find methods
-     * @param blockPos the position in the content after the whole fragment starting with the dollar symbol
-     * @param methodPos the position in the content after the whole fragment starting with the dollar symbol
-     * @param offset the position in the whole content of the cursor
-     * @param velocityContext the velocity context used to get the variables bound in the Velocity Context
-     * @return the list of hints
-     * @throws InvalidVelocityException when the code to parse is not what's expected
-     */
-    private Hints getMethods(char[] chars, String propertyName, int blockPos, int methodPos, int offset,
-        VelocityContext velocityContext) throws InvalidVelocityException
-    {
-        Hints results = new Hints();
-        VelocityParserContext context = new VelocityParserContext();
-
-        String fragment = "";
-        boolean autoCompleteMethods = false;
-
-        // Handle the case where the cursor is just after the dot
-        if (methodPos + 1 == offset) {
-            autoCompleteMethods = true;
-        } else {
-            StringBuffer propertyBlock = new StringBuffer();
-            int newMethodPos = this.parser.getMethodOrProperty(chars, methodPos, propertyBlock, context);
-            // Extract the method name without the parameters
-            // Remove the leading dot
-            String methodName = StringUtils.substringBefore(propertyBlock.toString(), "(").substring(1);
-            if (newMethodPos == blockPos) {
-                autoCompleteMethods = true;
-                // Remove the leading dot
-                fragment = methodName;
-            } else {
-                // TODO: Refactor this ugly code below and make it generic so that we can support any nesting level of
-                // methods.
-
-                // There is more! It probably means some chained method call...
-                AutoCompletionMethodFinder methodFinder = getMethodFinder(propertyName);
-                Object propertyClass = velocityContext.get(propertyName);
-                List<Class> returnTypes = methodFinder.findMethodReturnTypes(propertyClass.getClass(), methodName);
-
-                // Find the next method name...
-                StringBuffer methodBlock = new StringBuffer();
-                // Handle the case where the last char is a '.' since our Velocity Parser doesn't support that
-                String newFragment;
-                if (newMethodPos + 1 == chars.length && chars[newMethodPos] == '.') {
-                    newFragment = "";
-                } else {
-                    int newMethodPos2 = this.parser.getMethodOrProperty(chars, newMethodPos, methodBlock, context);
-                    newFragment = methodBlock.toString().substring(1);
-                    results.withStartOffset(newMethodPos2 - newMethodPos - 1);
-                }
-                // Find all methods from return types matching the new fragment
-                for (Class<?> returnType : returnTypes) {
-                    results.withHints(this.defaultAutoCompletionMethodFinder.findMethods(returnType, newFragment));
-                }
-            }
-        }
-
-        if (autoCompleteMethods) {
-            // Find methods using Reflection
-            results = getMethods(propertyName, fragment, velocityContext);
-            // Set the temporary start offset as the size of the user's input.
-            results.withStartOffset(blockPos - methodPos - 1);
-        }
-
-        return results;
     }
 
     /**
@@ -343,38 +303,6 @@ public class AutoCompletionResource implements XWikiRestComponent
                 results.withHints(new HintData((String) key, (String) key));
             }
         }
-    }
-
-    /**
-     * @param variableName the variable name corresponding to the class for which to find the methods
-     * @param fragmentToMatch the filter to only return methods matching the passed string
-     * @param velocityContext the Velocity Context from which to get the Class corresponding to the variable name
-     * @return the method names found in the Class pointed to by the passed variableName name
-     */
-    private Hints getMethods(String variableName, String fragmentToMatch, VelocityContext velocityContext)
-    {
-        Hints hints = new Hints();
-        Object propertyClass = velocityContext.get(variableName);
-
-        if (propertyClass != null) {
-            // Allow special handling for classes that have registered a custom introspection handler
-            if (this.componentManager.hasComponent(AutoCompletionMethodFinder.class, variableName)) {
-                try {
-                    AutoCompletionMethodFinder finder =
-                        this.componentManager.getInstance(AutoCompletionMethodFinder.class, variableName);
-                    hints.withHints(finder.findMethods(propertyClass.getClass(), fragmentToMatch));
-                } catch (ComponentLookupException e) {
-                    // Component not found, continue with default finder...
-                }
-            }
-
-            if (hints.isEmpty()) {
-                hints.withHints(this.defaultAutoCompletionMethodFinder.findMethods(propertyClass.getClass(),
-                    fragmentToMatch));
-            }
-        }
-
-        return hints;
     }
 
     /**

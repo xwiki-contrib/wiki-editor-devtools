@@ -20,7 +20,6 @@
 package org.xwiki.editor.tool.autocomplete.internal;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -54,7 +53,12 @@ public class AutoCompletionResourceTest
 
     private class AncillaryTestClass
     {
-        public void method()
+        public String method1()
+        {
+            return "";
+        }
+
+        public void method2()
         {
         }
     }
@@ -373,7 +377,8 @@ public class AutoCompletionResourceTest
         setupMocks("$key.doWork().m", createTestVelocityContext("key", new TestClass()));
 
         Hints expectedMethods = new Hints().withHints(
-            new HintData("method", "method")
+            new HintData("method1", "method1"),
+            new HintData("method2", "method2")
         );
         AutoCompletionMethodFinder methodFinder = mocker.getInstance(AutoCompletionMethodFinder.class);
         when(methodFinder.findMethods(AncillaryTestClass.class, "m")).thenReturn(expectedMethods);
@@ -383,9 +388,10 @@ public class AutoCompletionResourceTest
         String velocity = "{{velocity}}$key.doWork().";
         Hints hints = mocker.getComponentUnderTest().getAutoCompletionHints(velocity.length(), "xwiki/2.0", velocity);
 
-        assertEquals(1, hints.getHints().size());
-        assertEquals(new HintData("method", "method"), hints.getHints().first());
-        assertEquals(velocity.length() - 1, hints.getStartOffset());
+        assertEquals(2, hints.getHints().size());
+        assertEquals(new HintData("method1", "method1"), hints.getHints().first());
+        assertEquals(new HintData("method2", "method2"), hints.getHints().last());
+        assertEquals(velocity.length() - "m".length(), hints.getStartOffset());
     }
 
     @Test
@@ -394,7 +400,8 @@ public class AutoCompletionResourceTest
         setupMocks("$key.doWork().", createTestVelocityContext("key", new TestClass()));
 
         Hints expectedMethods = new Hints().withHints(
-            new HintData("method", "method")
+            new HintData("method1", "method1"),
+            new HintData("method2", "method2")
         );
         AutoCompletionMethodFinder methodFinder = mocker.getInstance(AutoCompletionMethodFinder.class);
         when(methodFinder.findMethods(AncillaryTestClass.class, "")).thenReturn(expectedMethods);
@@ -404,9 +411,33 @@ public class AutoCompletionResourceTest
         String velocity = "{{velocity}}$key.doWork().";
         Hints hints = mocker.getComponentUnderTest().getAutoCompletionHints(velocity.length(), "xwiki/2.0", velocity);
 
-        assertEquals(1, hints.getHints().size());
-        assertEquals(new HintData("method", "method"), hints.getHints().first());
+        assertEquals(2, hints.getHints().size());
+        assertEquals(new HintData("method1", "method1"), hints.getHints().first());
+        assertEquals(new HintData("method2", "method2"), hints.getHints().last());
         assertEquals(velocity.length(), hints.getStartOffset());
+    }
+
+    @Test
+    public void getAutoCompletionHintsForDeepChainedMethod() throws Exception
+    {
+        setupMocks("$key.doWork().method1().spl", createTestVelocityContext("key", new TestClass()));
+
+        Hints expectedMethods = new Hints().withHints(
+            new HintData("split", "split")
+        );
+        AutoCompletionMethodFinder methodFinder = mocker.getInstance(AutoCompletionMethodFinder.class);
+        when(methodFinder.findMethodReturnTypes(TestClass.class, "doWork")).thenReturn(
+            Arrays.asList((Class) AncillaryTestClass.class));
+        when(methodFinder.findMethodReturnTypes(AncillaryTestClass.class, "method1")).thenReturn(
+            Arrays.asList((Class) String.class));
+        when(methodFinder.findMethods(String.class, "spl")).thenReturn(expectedMethods);
+
+        String velocity = "{{velocity}}$key.doWork().method1().";
+        Hints hints = mocker.getComponentUnderTest().getAutoCompletionHints(velocity.length(), "xwiki/2.0", velocity);
+
+        assertEquals(1, hints.getHints().size());
+        assertEquals(new HintData("split", "split"), hints.getHints().first());
+        assertEquals(velocity.length() - "spl".length(), hints.getStartOffset());
     }
 
     private void setupMocks(String expectedContent, VelocityContext velocityContext) throws Exception

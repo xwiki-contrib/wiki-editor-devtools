@@ -183,7 +183,7 @@ public class AutoCompletionResource implements XWikiRestComponent
                     int methodPos = reference.indexOf(".");
                     if (methodPos > -1) {
                         // Autocomplete a method!
-                        results = getHintsForMethodCall(chars, methodPos, identifier.toString());
+                        results = getHintsForMethodCall(chars, dollarPos + methodPos, identifier.toString());
                     } else {
                         // Autocomplete a variable! Find all matching variables.
                         results = getVelocityContextKeys(identifier.toString(), velocityContext);

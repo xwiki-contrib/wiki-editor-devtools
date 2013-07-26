@@ -440,6 +440,23 @@ public class AutoCompletionResourceTest
         assertEquals(velocity.length() - "spl".length(), hints.getStartOffset());
     }
 
+    @Test
+    public void getAutoCompletionHintsWhenSeveralDollar() throws Exception
+    {
+        setupMocks("$var\n$key.", createTestVelocityContext("key", new TestClass()));
+
+        Hints expectedMethods = new Hints().withHints(
+            new HintData("method1", "method1")
+        );
+        setupMethodFinderMock(expectedMethods, "", TestClass.class);
+
+        String velocity = "{{velocity}}$var\n$key.";
+        Hints hints = mocker.getComponentUnderTest().getAutoCompletionHints(velocity.length(), "xwiki/2.0", velocity);
+
+        assertEquals(1, hints.getHints().size());
+        assertEquals(new HintData("method1", "method1"), hints.getHints().first());
+    }
+
     private void setupMocks(String expectedContent, VelocityContext velocityContext) throws Exception
     {
         TargetContentLocator locator = mocker.getInstance(TargetContentLocator.class);

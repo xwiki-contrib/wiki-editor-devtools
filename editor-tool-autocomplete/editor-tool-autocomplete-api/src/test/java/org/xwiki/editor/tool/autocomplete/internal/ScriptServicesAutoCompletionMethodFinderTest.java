@@ -25,8 +25,10 @@ import java.util.Collections;
 import java.util.List;
 
 import org.junit.*;
+import static org.mockito.Mockito.*;
 import org.xwiki.component.descriptor.ComponentDescriptor;
 import org.xwiki.component.descriptor.DefaultComponentDescriptor;
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.editor.tool.autocomplete.HintData;
 import org.xwiki.editor.tool.autocomplete.Hints;
@@ -85,5 +87,27 @@ public class ScriptServicesAutoCompletionMethodFinderTest
 
         Hints hints = mocker.getComponentUnderTest().findMethods(null, "");
         assertEquals(0, hints.getHints().size());
+    }
+
+    @Test
+    public void findMethodReturnTypesWhenExists() throws Exception
+    {
+        ComponentManager componentManager = mocker.getInstance(ComponentManager.class);
+        ScriptService scriptService = mock(ScriptService.class);
+        when(componentManager.getInstance(ScriptService.class, "query")).thenReturn(scriptService);
+
+        List<Class> types = mocker.getComponentUnderTest().findMethodReturnTypes(null, "query");
+        assertEquals(1, types.size());
+        assertEquals(scriptService.getClass(), types.get(0));
+    }
+    @Test
+    public void findMethodReturnTypesWhenDoesntExists() throws Exception
+    {
+        ComponentManager componentManager = mocker.getInstance(ComponentManager.class);
+        when(componentManager.getInstance(ScriptService.class, "unknown")).thenThrow(
+            new ComponentLookupException("unknown hint"));
+
+        List<Class> types = mocker.getComponentUnderTest().findMethodReturnTypes(null, "unknown");
+        assertEquals(0, types.size());
     }
 }

@@ -19,6 +19,7 @@
  */
 package org.xwiki.editor.tool.autocomplete.internal;
 
+import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -27,13 +28,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import junit.framework.Assert;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.xwiki.editor.tool.autocomplete.AutoCompletionMethodFinder;
+import org.junit.*;
 import org.xwiki.editor.tool.autocomplete.HintData;
 import org.xwiki.editor.tool.autocomplete.Hints;
-import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
-import org.xwiki.test.jmock.annotation.MockingRequirement;
+import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import com.xpn.xwiki.util.Programming;
 
@@ -42,15 +40,18 @@ import com.xpn.xwiki.util.Programming;
  * 
  * @version $Id$
  */
-@MockingRequirement(DefaultAutoCompletionMethodFinder.class)
-public class DefaultAutoCompletionMethodFinderTest extends AbstractMockingComponentTestCase<AutoCompletionMethodFinder>
+public class DefaultAutoCompletionMethodFinderTest
 {
+    @Rule
+    public MockitoComponentMockingRule<DefaultAutoCompletionMethodFinder> mocker =
+        new MockitoComponentMockingRule<DefaultAutoCompletionMethodFinder>(DefaultAutoCompletionMethodFinder.class);
+
     private DefaultAutoCompletionMethodFinder finder;
 
     @Before
     public void configure() throws Exception
     {
-        this.finder = (DefaultAutoCompletionMethodFinder) getMockedComponent();
+        this.finder = mocker.getComponentUnderTest();
     }
     
     private class AncillaryTestClass
@@ -128,7 +129,14 @@ public class DefaultAutoCompletionMethodFinderTest extends AbstractMockingCompon
     {
         Hints hints = this.finder.findMethods(TestClass.class, "a");
 
-        Assert.assertEquals(0, hints.getHints().size());
+        assertEquals(0, hints.getHints().size());
     }
 
+    @Test
+    public void findMethodReturnTypes()
+    {
+        List<Class> types = this.finder.findMethodReturnTypes(TestClass.class, "doWork");
+        assertEquals(1, types.size());
+        assertEquals(AncillaryTestClass.class, types.get(0));
+    }
 }

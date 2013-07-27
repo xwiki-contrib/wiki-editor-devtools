@@ -20,6 +20,7 @@
 package org.xwiki.editor.tool.autocomplete.internal;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.xwiki.editor.tool.autocomplete.AutoCompletionMethodFinder;
@@ -146,6 +147,38 @@ public abstract class AbstractAutoCompletionMethodFinder implements AutoCompleti
     @Override
     public List<Class> findMethodReturnTypes(Class propertyClass, String methodName)
     {
-        return IntrospectionUtil.findReturnTypes(propertyClass, methodName);
+        return findMatchingReturnTypes(propertyClass, methodName);
+    }
+
+    /**
+     * @param propertyClass the class in which to look for methods
+     * @param methodName the name of the method to find
+     * @return all methods (ie all signatures) named with {@code methodName} in class {@code propertyClass}
+     */
+    private List<Method> findMatchingMethods(Class propertyClass, String methodName)
+    {
+        List<Method> methods = new ArrayList<Method>();
+        for (Method method : propertyClass.getMethods()) {
+            if (method.getName().equals(methodName)) {
+                methods.add(method);
+            }
+        }
+        return methods;
+    }
+
+    /**
+     * @param propertyClass the class from which to find the method signatures
+     * @param methodName the method signature to look for
+     * @return the classes returned by the method signatures matching the passed {@code methodName} for class
+     *         {@code propertyClass}
+     */
+    private List<Class> findMatchingReturnTypes(Class propertyClass, String methodName)
+    {
+        List<Class> returnTypes = new ArrayList<Class>();
+        List<Method> methods = findMatchingMethods(propertyClass, methodName);
+        for (Method method : methods) {
+            returnTypes.add(method.getReturnType());
+        }
+        return returnTypes;
     }
 }

@@ -49,7 +49,7 @@ public class DefaultAutoCompletionMethodFinderTest
     private DefaultAutoCompletionMethodFinder finder;
 
     @Before
-    public void configure() throws Exception
+    public void setUp() throws Exception
     {
         this.finder = mocker.getComponentUnderTest();
     }

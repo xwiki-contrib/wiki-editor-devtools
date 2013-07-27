@@ -22,66 +22,70 @@ package org.xwiki.editor.tool.autocomplete.internal;
 import java.util.Arrays;
 import java.util.Vector;
 
-import org.jmock.Expectations;
-import org.jmock.lib.legacy.ClassImposteriser;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.editor.tool.autocomplete.AutoCompletionMethodFinder;
+import org.xwiki.editor.tool.autocomplete.HintData;
 import org.xwiki.editor.tool.autocomplete.Hints;
-import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
-import org.xwiki.test.jmock.annotation.MockingRequirement;
+import org.xwiki.model.internal.DefaultModelContext;
+import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
 import com.xpn.xwiki.plugin.XWikiPluginManager;
+
+import static org.mockito.Mockito.*;
+import static org.junit.Assert.*;
 
 /**
  * Unit tests for {@link XWikiAutoCompletionMethodFinder}.
  * 
  * @version $Id$
  */
-@MockingRequirement(TestableXWikiAutoCompletionMethodFinder.class)
-public class XWikiAutoCompletionMethodFinderTest extends AbstractMockingComponentTestCase<AutoCompletionMethodFinder>
+public class XWikiAutoCompletionMethodFinderTest
 {
-    private TestableXWikiAutoCompletionMethodFinder finder;
+    @Rule
+    public MockitoComponentMockingRule<XWikiAutoCompletionMethodFinder> mocker =
+        new MockitoComponentMockingRule<XWikiAutoCompletionMethodFinder>(
+            XWikiAutoCompletionMethodFinder.class);
+
+    private XWikiAutoCompletionMethodFinder finder;
 
     private class TestClass
     {
     }
 
     @Before
-    public void setImposteriser() throws Exception
+    public void setUp() throws Exception
     {
-        getMockery().setImposteriser(ClassImposteriser.INSTANCE);
-        
-        this.finder = (TestableXWikiAutoCompletionMethodFinder) getMockedComponent();
+        this.finder = mocker.getComponentUnderTest();
     }
 
     @Test
     public void findMethodsWhenMatching() throws Exception
     {
-        final AutoCompletionMethodFinder defaultMethodFinder =
-            getComponentManager().getInstance(AutoCompletionMethodFinder.class);
-        final XWikiPluginManager pluginManager = getMockery().mock(XWikiPluginManager.class);
-        this.finder.setXWikiPluginManager(pluginManager);
+        Execution execution = mocker.getInstance(Execution.class);
+        ExecutionContext executionContext = mock(ExecutionContext.class);
+        when(execution.getContext()).thenReturn(executionContext);
+        XWikiContext xwikiContext = mock(XWikiContext.class);
+        when(executionContext.getProperty(DefaultModelContext.XCONTEXT_KEY)).thenReturn(xwikiContext);
+        XWiki xwiki = mock(XWiki.class);
+        when(xwikiContext.getWiki()).thenReturn(xwiki);
+        XWikiPluginManager xwikiPluginManager = mock(XWikiPluginManager.class);
+        when(xwiki.getPluginManager()).thenReturn(xwikiPluginManager);
+        when(xwikiPluginManager.getPlugins()).thenReturn(new Vector<String>(Arrays.asList("tag", "query")));
+        XWikiPluginInterface tagPlugin = mock(XWikiPluginInterface.class);
+        when(xwikiPluginManager.getPlugin("tag")).thenReturn(tagPlugin);
 
-        final XWikiPluginInterface plugin = getMockery().mock(XWikiPluginInterface.class);
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(defaultMethodFinder).findMethods(TestClass.class, "t");
-                will(returnValue(new Hints()));
-                oneOf(pluginManager).getPlugins();
-                will(returnValue(new Vector<String>(Arrays.asList("tag", "query"))));
-                oneOf(pluginManager).getPlugin("tag");
-                will(returnValue(plugin));
-            }
-        });
+        AutoCompletionMethodFinder defaultMethodFinder = mocker.getInstance(AutoCompletionMethodFinder.class);
+        when(defaultMethodFinder.findMethods(TestClass.class, "t")).thenReturn(
+            new Hints().withHints(new HintData("tag", "tag")));
 
         Hints hints = this.finder.findMethods(TestClass.class, "t");
 
-        Assert.assertEquals(1, hints.getHints().size());
-        Assert.assertEquals("tag", hints.getHints().first().getName());
-        Assert.assertEquals("tag " + plugin.getClass().getSimpleName(), hints.getHints().first().getDescription());
+        assertEquals(1, hints.getHints().size());
+        assertEquals(new HintData("tag", "tag"), hints.getHints().first());
     }
 }

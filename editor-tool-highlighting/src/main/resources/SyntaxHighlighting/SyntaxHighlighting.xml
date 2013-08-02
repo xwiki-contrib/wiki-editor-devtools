@@ -13618,16 +13618,13 @@ var getCodeMirrorFromInternalTextArea = function(textArea, codeMirrors) {
 
 /* Display the given codeMirror instance in full screen. */
 var toggleFullscreenEditing = function (codeMirror, enabled) {
-  console.log('toggleFullscreenEditing: ' + enabled);
   var editorDiv = codeMirror.getWrapperElement();
-  console.log('Old dimensions: ' + editorDiv.style.width + ' / ' + editorDiv.style.height);
   if (enabled) {
     editorDiv.addClassName('CodeMirror-fullscreen');
 
     // Set proper dimensions
     editorDiv.style.height = getNewCodeMirrorHeightInFullscreen() + 'px';
     editorDiv.style.width ='100%';
-    console.log('New dimensions: ' + editorDiv.style.width + ' / ' + editorDiv.style.height);
   } else {
     editorDiv.removeClassName('CodeMirror-fullscreen');
 
@@ -13635,7 +13632,6 @@ var toggleFullscreenEditing = function (codeMirror, enabled) {
     editorDiv.style.height = toggleFullscreenEditing.dimensionsBeforeFullscreen.height + 'px';
     // Set the editor's width in percentage
     editorDiv.style.width = toggleFullscreenEditing.dimensionsBeforeFullscreen.width + '%';
-    console.log('Restored dimensions: ' + editorDiv.style.width + ' / ' + editorDiv.style.height);
 
     // Restore the window's scrolling position
     window.scrollTo(toggleFullscreenEditing.scrollBeforeFullscreen.left, toggleFullscreenEditing.scrollBeforeFullscreen.top);
@@ -13810,7 +13806,7 @@ var importCodeMirrorScript = function(zipPathPart) {
 
 #set ($strongerHighlightColor = '#FFFF44')
 .CodeMirror-focused .cm-matchhighlight {
-    background: none repeat scroll 0 0 $strongerHighlightColor;
+  background: none repeat scroll 0 0 $strongerHighlightColor;
 }
 
 ## Trailing empty whitespaces

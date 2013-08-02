@@ -13340,6 +13340,18 @@ var initCodeMirrorInternals = function() {
   importCodeMirrorScript('lib/codemirror.js');
 
   initCodeMirrorModules();
+
+  // Override the insertTags method for the wiki syntax editor so that we can intercept commands from
+  // the attached toolbar and execute them on the CodeMirror instance instead of the simple textarea
+  if (XWiki.editor == 'wiki' &amp;&amp; insertTags) {
+    insertTags = function(tagOpen, tagClose, sampleText) {
+      var codeMirror = codeMirrors[0];
+      if (!codeMirror) {
+        return;
+      }
+      codeMirror.replaceSelection(tagOpen + (codeMirror.doc.getSelection() || sampleText) + tagClose, 'end');
+    }
+  }
 }
 
 /* Initialize extra CodeMirror modules and then attach them to the compatible controls. */

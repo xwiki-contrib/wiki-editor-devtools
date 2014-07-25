@@ -19,16 +19,9 @@
  */
 package org.xwiki.editor.tool.autocomplete.internal;
 
-import java.lang.reflect.Type;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import org.junit.*;
-import static org.mockito.Mockito.*;
-import org.xwiki.component.descriptor.ComponentDescriptor;
-import org.xwiki.component.descriptor.DefaultComponentDescriptor;
-import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.editor.tool.autocomplete.HintData;
 import org.xwiki.editor.tool.autocomplete.Hints;
@@ -36,7 +29,6 @@ import org.xwiki.script.service.ScriptService;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link ScriptServicesAutoCompletionMethodFinder}.
@@ -53,12 +45,8 @@ public class ScriptServicesAutoCompletionMethodFinderTest
     @Test
     public void findMethodsWhenMatchingService() throws Exception
     {
-        ComponentManager componentManager = mocker.getInstance(ComponentManager.class);
-        DefaultComponentDescriptor<?> descriptor = new DefaultComponentDescriptor<ScriptService>();
-        descriptor.setRoleHint("query");
-        List<ComponentDescriptor<Object>> descriptors =
-            Arrays.asList((ComponentDescriptor<Object>) descriptor);
-        when(componentManager.getComponentDescriptorList((Type) ScriptService.class)).thenReturn(descriptors);
+        MockitoComponentMockingRule cm = mocker.getInstance(ComponentManager.class);
+        cm.registerMockComponent(ScriptService.class, "query");
 
         Hints hints = mocker.getComponentUnderTest().findMethods(null, "q");
         assertEquals(1, hints.getHints().size());
@@ -68,11 +56,8 @@ public class ScriptServicesAutoCompletionMethodFinderTest
     @Test
     public void findMethodsWhenNotMatchingService() throws Exception
     {
-        ComponentManager componentManager = mocker.getInstance(ComponentManager.class);
-        DefaultComponentDescriptor<?> descriptor = new DefaultComponentDescriptor<ScriptService>();
-        List<ComponentDescriptor<Object>> descriptors =
-            Arrays.asList((ComponentDescriptor<Object>) descriptor);
-        when(componentManager.getComponentDescriptorList((Type) ScriptService.class)).thenReturn(descriptors);
+        MockitoComponentMockingRule cm = mocker.getInstance(ComponentManager.class);
+        cm.registerMockComponent(ScriptService.class);
 
         Hints hints = mocker.getComponentUnderTest().findMethods(null, "q");
         assertEquals(0, hints.getHints().size());
@@ -81,10 +66,6 @@ public class ScriptServicesAutoCompletionMethodFinderTest
     @Test
     public void findMethodsWhenNoScriptService() throws Exception
     {
-        ComponentManager componentManager = mocker.getInstance(ComponentManager.class);
-        when(componentManager.getComponentDescriptorList((Type) ScriptService.class)).thenReturn(
-            Collections.EMPTY_LIST);
-
         Hints hints = mocker.getComponentUnderTest().findMethods(null, "");
         assertEquals(0, hints.getHints().size());
     }
@@ -92,21 +73,19 @@ public class ScriptServicesAutoCompletionMethodFinderTest
     @Test
     public void findMethodReturnTypesWhenExists() throws Exception
     {
-        ComponentManager componentManager = mocker.getInstance(ComponentManager.class);
-        ScriptService scriptService = mock(ScriptService.class);
-        when(componentManager.getInstance(ScriptService.class, "query")).thenReturn(scriptService);
+        MockitoComponentMockingRule cm = mocker.getInstance(ComponentManager.class);
+        ScriptService scriptService = cm.registerMockComponent(ScriptService.class, "query");
 
         List<Class> types = mocker.getComponentUnderTest().findMethodReturnTypes(null, "query");
         assertEquals(1, types.size());
         assertEquals(scriptService.getClass(), types.get(0));
     }
+
     @Test
     public void findMethodReturnTypesWhenDoesntExists() throws Exception
     {
-        ComponentManager componentManager = mocker.getInstance(ComponentManager.class);
-        when(componentManager.getInstance(ScriptService.class, "unknown")).thenThrow(
-            new ComponentLookupException("unknown hint"));
-
+        // "unknown" is supposed to be a hint for a ScriptService that doesn't exist. We verify we don't throw any
+        // exception and return an empty result.
         List<Class> types = mocker.getComponentUnderTest().findMethodReturnTypes(null, "unknown");
         assertEquals(0, types.size());
     }

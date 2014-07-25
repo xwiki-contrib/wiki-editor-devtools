@@ -48,8 +48,8 @@ import org.xwiki.velocity.VelocityManager;
 public class AutoCompletionResourceTest
 {
     @Rule
-    public MockitoComponentMockingRule<AutoCompletionResource> mocker =
-        new MockitoComponentMockingRule<AutoCompletionResource>(AutoCompletionResource.class);
+    public MockitoComponentMockingRule<TestableAutoCompletionResource> mocker =
+        new MockitoComponentMockingRule<>(TestableAutoCompletionResource.class);
 
     private class AncillaryTestClass
     {
@@ -341,10 +341,9 @@ public class AutoCompletionResourceTest
     @Test
     public void getAutoCompletionHintsForScriptServiceProperty() throws Exception
     {
-        ComponentManager cm = mocker.getInstance(ComponentManager.class);
-        AutoCompletionMethodFinder scriptServiceFinder = mock(AutoCompletionMethodFinder.class);
-        when(cm.hasComponent(AutoCompletionMethodFinder.class, "services")).thenReturn(true);
-        when(cm.getInstance(AutoCompletionMethodFinder.class, "services")).thenReturn(scriptServiceFinder);
+        MockitoComponentMockingRule cm = mocker.getInstance(ComponentManager.class);
+        AutoCompletionMethodFinder scriptServiceFinder =
+            cm.registerMockComponent(AutoCompletionMethodFinder.class, "services");
 
         ScriptServiceManager scriptServiceManager = mock(ScriptServiceManager.class);
         setupMocks("$services.t", createTestVelocityContext("services", scriptServiceManager));
@@ -361,10 +360,9 @@ public class AutoCompletionResourceTest
     @Test
     public void getAutoCompletionHintsForScriptServicePropertyWhenNestedCalls() throws Exception
     {
-        ComponentManager cm = mocker.getInstance(ComponentManager.class);
-        AutoCompletionMethodFinder scriptServiceFinder = mock(AutoCompletionMethodFinder.class);
-        when(cm.hasComponent(AutoCompletionMethodFinder.class, "services")).thenReturn(true);
-        when(cm.getInstance(AutoCompletionMethodFinder.class, "services")).thenReturn(scriptServiceFinder);
+        MockitoComponentMockingRule cm = mocker.getInstance(ComponentManager.class);
+        AutoCompletionMethodFinder scriptServiceFinder =
+            cm.registerMockComponent(AutoCompletionMethodFinder.class, "services");
 
         ScriptServiceManager scriptServiceManager = mock(ScriptServiceManager.class);
         setupMocks("$services.query.m", createTestVelocityContext("services", scriptServiceManager));
@@ -375,7 +373,8 @@ public class AutoCompletionResourceTest
             new Hints().withHints(new HintData("method", "method")));
 
         String velocity = "{{velocity}}$services.query.m";
-        Hints hints = mocker.getComponentUnderTest().getAutoCompletionHints(velocity.length(), "xwiki/2.0", velocity);
+        Hints hints =
+            this.mocker.getComponentUnderTest().getAutoCompletionHints(velocity.length(), "xwiki/2.0", velocity);
 
         assertEquals(1, hints.getHints().size());
         assertTrue(hints.getHints().contains(new HintData("method", "method")));

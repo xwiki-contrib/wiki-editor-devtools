@@ -13405,7 +13405,7 @@ var initCodeMirrorModules = function() {
 
 /* Initialize all possible CodeMirror instances. */
 var initCodeMirrors = function () {
-  if (XWiki.editor == 'object') {
+  if (XWiki.editor == 'object' || XWiki.editor == 'inline') {
     // Object editor highlighting support
 
     initCodeMirror("textarea[id^='XWiki.StyleSheetExtension_'][id$='_code']",

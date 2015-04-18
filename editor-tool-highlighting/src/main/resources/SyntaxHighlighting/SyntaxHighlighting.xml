@@ -154,6 +154,7 @@
       initCodeMirror("textarea[id^='XWiki.XWikiSkins_'][id$='.css']", 'css');
       initCodeMirror("textarea[id^='XWiki.XWikiSkins_'][id$='.js']", 'javascript');
       initCodeMirror("textarea[id^='XWiki.XWikiSkins_'][id$='.vm']", 'velocity');
+      initCodeMirror("textarea[id^='XWiki.WikiMacroClass_'][id$='_code']", XWiki.docsyntax);
     } else if (XWiki.editor == 'wiki') {
       // Document content editor highlighting support using the document's syntax.
       initCodeMirror("textarea[id='content']", XWiki.docsyntax);

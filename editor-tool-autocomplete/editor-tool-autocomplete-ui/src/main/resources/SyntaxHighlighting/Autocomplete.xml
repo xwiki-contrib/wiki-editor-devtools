@@ -18,29 +18,32 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
-<xwikidoc>
+
+<xwikidoc version="1.1">
   <web>SyntaxHighlighting</web>
   <name>Autocomplete</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>SyntaxHighlighting.SyntaxHighlighting</parent>
   <creator>xwiki:XWiki.Admin</creator>
+  <parent>SyntaxHighlighting.SyntaxHighlighting</parent>
   <author>xwiki:XWiki.Admin</author>
-  <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1373562597000</creationDate>
   <date>1374094078000</date>
   <contentUpdateDate>1374077924000</contentUpdateDate>
   <version>1.1</version>
   <title/>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
+  <content/>
   <object>
+    <name>SyntaxHighlighting.Autocomplete</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>dfd04bf9-8fcf-4ff1-a60c-74cb5fa2c3e9</guid>
     <class>
       <name>XWiki.JavaScriptExtension</name>
       <customClass/>
@@ -60,7 +63,7 @@
         <prettyName>Caching policy</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>long|short|default|forbid</values>
@@ -105,17 +108,13 @@
         <prettyName>Use this extension</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <values>currentPage|onDemand|always</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>SyntaxHighlighting.Autocomplete</name>
-    <number>0</number>
-    <className>XWiki.JavaScriptExtension</className>
-    <guid>dfd04bf9-8fcf-4ff1-a60c-74cb5fa2c3e9</guid>
     <property>
       <cache>long</cache>
     </property>
@@ -199,6 +198,10 @@
     </property>
   </object>
   <object>
+    <name>SyntaxHighlighting.Autocomplete</name>
+    <number>1</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>78698de7-8ae8-4dcb-99a2-ef20db107c1b</guid>
     <class>
       <name>XWiki.JavaScriptExtension</name>
       <customClass/>
@@ -218,7 +221,7 @@
         <prettyName>Caching policy</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>long|short|default|forbid</values>
@@ -263,17 +266,13 @@
         <prettyName>Use this extension</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <values>currentPage|onDemand|always</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>SyntaxHighlighting.Autocomplete</name>
-    <number>1</number>
-    <className>XWiki.JavaScriptExtension</className>
-    <guid>78698de7-8ae8-4dcb-99a2-ef20db107c1b</guid>
     <property>
       <cache>long</cache>
     </property>
@@ -390,6 +389,10 @@
     </property>
   </object>
   <object>
+    <name>SyntaxHighlighting.Autocomplete</name>
+    <number>2</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>a0e84b4c-bff0-4bf6-bcdf-29f5909156c2</guid>
     <class>
       <name>XWiki.JavaScriptExtension</name>
       <customClass/>
@@ -409,7 +412,7 @@
         <prettyName>Caching policy</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>long|short|default|forbid</values>
@@ -454,17 +457,13 @@
         <prettyName>Use this extension</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <values>currentPage|onDemand|always</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>SyntaxHighlighting.Autocomplete</name>
-    <number>2</number>
-    <className>XWiki.JavaScriptExtension</className>
-    <guid>a0e84b4c-bff0-4bf6-bcdf-29f5909156c2</guid>
     <property>
       <cache>long</cache>
     </property>
@@ -531,6 +530,10 @@
     </property>
   </object>
   <object>
+    <name>SyntaxHighlighting.Autocomplete</name>
+    <number>3</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>c6c480d4-d20d-4d10-ba0a-26f41370ceca</guid>
     <class>
       <name>XWiki.JavaScriptExtension</name>
       <customClass/>
@@ -550,7 +553,7 @@
         <prettyName>Caching policy</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>long|short|default|forbid</values>
@@ -595,17 +598,13 @@
         <prettyName>Use this extension</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <values>currentPage|onDemand|always</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>SyntaxHighlighting.Autocomplete</name>
-    <number>3</number>
-    <className>XWiki.JavaScriptExtension</className>
-    <guid>c6c480d4-d20d-4d10-ba0a-26f41370ceca</guid>
     <property>
       <cache>long</cache>
     </property>
@@ -653,6 +652,10 @@
     </property>
   </object>
   <object>
+    <name>SyntaxHighlighting.Autocomplete</name>
+    <number>4</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>563d6aa6-adb4-4485-bbff-9d2a3cca74b0</guid>
     <class>
       <name>XWiki.JavaScriptExtension</name>
       <customClass/>
@@ -672,7 +675,7 @@
         <prettyName>Caching policy</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>long|short|default|forbid</values>
@@ -717,17 +720,13 @@
         <prettyName>Use this extension</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <values>currentPage|onDemand|always</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>SyntaxHighlighting.Autocomplete</name>
-    <number>4</number>
-    <className>XWiki.JavaScriptExtension</className>
-    <guid>563d6aa6-adb4-4485-bbff-9d2a3cca74b0</guid>
     <property>
       <cache>long</cache>
     </property>
@@ -811,6 +810,10 @@
     </property>
   </object>
   <object>
+    <name>SyntaxHighlighting.Autocomplete</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>75c05434-81d8-489b-945b-65f4bc9cc1d9</guid>
     <class>
       <name>XWiki.StyleSheetExtension</name>
       <customClass/>
@@ -830,7 +833,7 @@
         <prettyName>Caching policy</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>long|short|default|forbid</values>
@@ -846,6 +849,22 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
       <name>
         <disabled>0</disabled>
         <name>name</name>
@@ -875,17 +894,13 @@
         <prettyName>Use this extension</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <values>currentPage|onDemand|always</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>SyntaxHighlighting.Autocomplete</name>
-    <number>0</number>
-    <className>XWiki.StyleSheetExtension</className>
-    <guid>75c05434-81d8-489b-945b-65f4bc9cc1d9</guid>
     <property>
       <cache>long</cache>
     </property>
@@ -893,6 +908,9 @@
       <code>.CodeMirror-completions select option:nth-child(2n) {
     background: none repeat scroll 0 0 #F3F3F3;
 }</code>
+    </property>
+    <property>
+      <contentType>CSS</contentType>
     </property>
     <property>
       <name>Autocomplete styling</name>
@@ -905,6 +923,10 @@
     </property>
   </object>
   <object>
+    <name>SyntaxHighlighting.Autocomplete</name>
+    <number>1</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>8a8fe1f3-4973-4529-90a4-6c27fe232d1d</guid>
     <class>
       <name>XWiki.StyleSheetExtension</name>
       <customClass/>
@@ -924,7 +946,7 @@
         <prettyName>Caching policy</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>long|short|default|forbid</values>
@@ -940,6 +962,22 @@
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
       <name>
         <disabled>0</disabled>
         <name>name</name>
@@ -969,17 +1007,13 @@
         <prettyName>Use this extension</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
-        <values>currentPage=Always on this page|onDemand=On demand|always=Always on this wiki</values>
+        <values>currentPage|onDemand|always</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>SyntaxHighlighting.Autocomplete</name>
-    <number>1</number>
-    <className>XWiki.StyleSheetExtension</className>
-    <guid>8a8fe1f3-4973-4529-90a4-6c27fe232d1d</guid>
     <property>
       <cache>long</cache>
     </property>
@@ -1011,5 +1045,4 @@
       <use>always</use>
     </property>
   </object>
-  <content/>
 </xwikidoc>

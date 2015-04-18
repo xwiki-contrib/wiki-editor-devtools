@@ -418,6 +418,10 @@
   /* Before going into fullscreen editing, record the element's original dimensions. */
   document.observe('xwiki:fullscreen:enter', function(event) {
     var codeMirror = getCodeMirrorFromFullScreenEvent(event);
+    if (!codeMirror) {
+      // Something else is entering fullscreen.
+      return;
+    }
     var editorDiv = codeMirror.getWrapperElement();
     // Height as an integer (pixels), Width as percent string
     toggleFullscreenEditing.dimensionsBeforeFullscreen = {
@@ -432,12 +436,20 @@
   /* Full screen editing when pressing the maximize button/link. */
   document.observe('xwiki:fullscreen:entered', function(event) {
     var codeMirror = getCodeMirrorFromFullScreenEvent(event);
+    if (!codeMirror) {
+      // Something else entered fullscreen.
+      return;
+    }
     toggleFullscreenEditing(codeMirror, true);
   });
 
   /* Fullscreen left by pressing the bottom button. */
   document.observe('xwiki:fullscreen:exited', function(event) {
     var codeMirror = getCodeMirrorFromFullScreenEvent(event);
+    if (!codeMirror) {
+      // Something else exited fullscreen.
+      return;
+    }
     toggleFullscreenEditing(codeMirror, false);
   });
 

@@ -227,6 +227,21 @@ public class AutoCompletionResourceTest
         assertEquals(0, hints.getHints().size());
     }
 
+    /**
+     * See http://jira.xwiki.org/browse/WIKIEDITOR-18
+     * @throws Exception
+     */
+    @Test
+    public void getAutoCompletionHintsWhenDollarSignFollowedBySomeNonMatchingLettersThenDot() throws Exception
+    {
+        setupMocks("$o.", createTestVelocityContext("key", "value"));
+
+        String velocity = "{{velocity}}$o";
+        Hints hints = mocker.getComponentUnderTest().getAutoCompletionHints(velocity.length(), "xwiki/2.0", velocity);
+
+        assertEquals(0, hints.getHints().size());
+    }
+
     @Test
     public void getAutoCompletionHintsWhenInvalidAutoCompletion() throws Exception
     {

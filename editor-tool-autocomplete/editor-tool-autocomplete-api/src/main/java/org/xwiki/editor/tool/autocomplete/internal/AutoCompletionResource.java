@@ -215,8 +215,17 @@ public class AutoCompletionResource implements XWikiRestComponent
 
         // Find the next method after the currentPos.
         int pos = currentPos;
+
+        // Handle the case when the variable of the first method call does not exist, also avoiding a NPE here.
+        // See http://jira.xwiki.org/browse/WIKIEDITOR-18
+        Object contextVariable = getVelocityContext().get(variableName);
+        if (contextVariable == null) {
+            return results;
+        }
+
         AutoCompletionMethodFinder methodFinder = getMethodFinder(variableName);
-        List<Class> methodClasses = Arrays.asList((Class) getVelocityContext().get(variableName).getClass());
+        List<Class> methodClasses = Arrays.asList((Class) contextVariable.getClass());
+
         do {
             // Handle the special case when the cursor is after the dot ('.')
             String methodName;

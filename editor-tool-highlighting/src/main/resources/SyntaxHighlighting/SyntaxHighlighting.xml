@@ -301,6 +301,13 @@
         }
       });
 
+      // Trigger autocomplete while typing, without having to press Ctrl+Space
+      codeMirror.on('keyup', function(editor , event) {
+        if (event.key == '.' || event.key == '$') {
+          editor.execCommand('autocomplete');
+        }
+      }),
+
       // Set the width of the codemirror editor equal to the one of the wrapped textarea. Value is computed before
       // attaching the codemirror instance, otherwise it will not report it correctly since the textarea will be hidden.
       codeMirror.setSize(textareaWidthPercentage + "%", textareaHeight);

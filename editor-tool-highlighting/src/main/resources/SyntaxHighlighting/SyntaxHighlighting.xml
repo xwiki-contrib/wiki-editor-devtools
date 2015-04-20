@@ -231,7 +231,9 @@
             // Show trailing empty whitespaces
             'SyntaxHighlighting_cm/addon/edit/trailingspace',
             // Search support
-            'SyntaxHighlighting_cm/addon/search/search'
+            'SyntaxHighlighting_cm/addon/search/search',
+            // Displays search result locations on the scrollbar
+            'SyntaxHighlighting_cm/addon/search/matchesonscrollbar'
             ], function (CodeMirror) {
       // console.log('Initializing CodeMirror instance...');
 
@@ -669,6 +671,9 @@
 
 ## Used by the search dialog CSS
 @import "$services.webjars.url('codemirror', 'addon/dialog/dialog.css')";
+
+## Used by search to display matches on the scrollbar
+@import "$services.webjars.url('codemirror', 'addon/search/matchesonscrollbar.css')";
 
 ##
 ## Custom CSS

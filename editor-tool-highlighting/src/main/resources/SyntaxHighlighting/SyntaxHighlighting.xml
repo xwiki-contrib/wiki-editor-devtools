@@ -371,7 +371,9 @@
 
     // Set the configured paths.
     require.config({
-      paths: pathsConfig
+      paths: pathsConfig,
+      // At least until http://jira.xwiki.org/browse/WIKIEDITOR-21 is fixed, a greater wait time should avoid timeouts.
+      waitSeconds: 60
     });
 
     return modeDependency;

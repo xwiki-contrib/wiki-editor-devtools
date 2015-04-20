@@ -53,7 +53,7 @@ import com.xpn.xwiki.web.Utils;
 /**
  * REST Resource for returning autocompletion hints. The content to autocomplete is passed in the request body, the
  * position of the cursor and the syntax in which the content is written in are passed as request parameters.
- * 
+ *
  * @version $Id$
  */
 @Component("org.xwiki.editor.tool.autocomplete.internal.AutoCompletionResource")
@@ -69,7 +69,7 @@ public class AutoCompletionResource implements XWikiRestComponent
 
     /**
      * Used to dynamically find Autocompletion Method finder to handle specific cases.
-     * 
+     *
      * @see AutoCompletionMethodFinder
      */
     @Inject
@@ -100,7 +100,7 @@ public class AutoCompletionResource implements XWikiRestComponent
 
     /**
      * Main REST entry point for getting Autocompletion hints.
-     * 
+     *
      * @param offset the position of the cursor in the full content
      * @param syntaxId the syntax in which the content is written in
      * @param content the full wiki content
@@ -139,11 +139,11 @@ public class AutoCompletionResource implements XWikiRestComponent
         // General algorithm:
         // - We start parsing at the first dollar before the cursor
         // - We get the full reference (a reference in VTL can be a variable, a property or a method call, see
-        //   http://velocity.apache.org/engine/devel/user-guide.html#References)
+        // http://velocity.apache.org/engine/devel/user-guide.html#References)
         // - We split the reference on "." and handle first the case of a variable. If there's no "." then it means
-        //   we're autocompleting a variable and we find all matching Velocity context variables and return them.
+        // we're autocompleting a variable and we find all matching Velocity context variables and return them.
         // - If there's at least one "." then we parse the whole chain of method calls till the last dot to find the
-        //   return type of the last method call. This allows us to know the full list of methods for autocompletion.
+        // return type of the last method call. This allows us to know the full list of methods for autocompletion.
 
         // Find the dollar sign before the current position
         char[] chars = content.toCharArray();
@@ -190,8 +190,8 @@ public class AutoCompletionResource implements XWikiRestComponent
                     }
                 }
             } catch (InvalidVelocityException e) {
-                this.logger.debug("Failed to get autocomplete hints for content [{}] at offset [{}]",
-                    new Object[] {content, offset, e});
+                this.logger.debug("Failed to get autocomplete hints for content [{}] at offset [{}]", new Object[] {
+                    content, offset, e});
             }
         }
 
@@ -199,7 +199,7 @@ public class AutoCompletionResource implements XWikiRestComponent
     }
 
     /**
-     * Find hints for the passed content assuming thay it's representing method calls.
+     * Find hints for the passed content assuming that it's representing method calls.
      *
      * @param chars the content to parse
      * @param currentPos the current position at which method calls are starting
@@ -283,7 +283,7 @@ public class AutoCompletionResource implements XWikiRestComponent
 
     /**
      * Find out all Velocity variable names bound in the Velocity Context.
-     * 
+     *
      * @param fragmentToMatch the prefix to filter with in order to return only variable whose names start with the
      *            passed string
      * @param velocityContext the Velocity Context from which to get the bound variables
@@ -303,7 +303,7 @@ public class AutoCompletionResource implements XWikiRestComponent
 
     /**
      * Add variables to the passed results list.
-     * 
+     *
      * @param results the list of variable names
      * @param keys the keys containing the variables to add
      * @param fragmentToMatch the filter in order to only add variable whose names start with the passed string
@@ -338,7 +338,7 @@ public class AutoCompletionResource implements XWikiRestComponent
             finder = this.defaultAutoCompletionMethodFinder;
         }
 
-        return  finder;
+        return finder;
     }
 
     /**

@@ -243,7 +243,10 @@ public class AutoCompletionResource implements XWikiRestComponent
                 for (Class methodClass : methodClasses) {
                     results.withHints(methodFinder.findMethods(methodClass, methodName));
                 }
+
+                // Set the hints offset to be able to determine where the completion should be inserted.
                 results = results.withStartOffset(methodName.length());
+
                 break;
             } else {
                 // Find the returned type for method "methodName".
@@ -297,6 +300,9 @@ public class AutoCompletionResource implements XWikiRestComponent
         if (velocityContext.getChainedContext() != null) {
             addVelocityKeys(hints, velocityContext.getChainedContext().getKeys(), fragmentToMatch);
         }
+
+        // Set the hints offset to be able to determine where the completion should be inserted.
+        hints = hints.withStartOffset(fragmentToMatch.length());
 
         return hints;
     }

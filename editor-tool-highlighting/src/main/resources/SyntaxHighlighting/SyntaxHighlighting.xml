@@ -208,7 +208,7 @@
     if (!theme) theme = 'default';
     if (theme != 'default') {
       #set ($themeCSS = "theme/${configuration.theme}.css")
-      var themeURL = "$services.webjars.url('codemirror', $themeCSS)";
+      var themeURL = "${codeMirrorBaseURL}${themeCSS}";
       loadCSS(themeURL);
     }
 
@@ -334,10 +334,7 @@
    * @returns the configured mode dependency path to use wih requirejs to load the specified codeMirror mode
    */
   var configureRequireJsPaths = function(codeMirrorMode) {
-    // TODO: Replace this workaround with http://jira.xwiki.org/browse/XWIKI-10881, when that issue is implemented.
-    // Note: Until then, we can not use the js API to get the document URL because it never sets the view action in the URL
-    //       and that causes the workaround to not work anymore (i.e. trailing /-es cause problems in the /bin/ handler)
-    var codeMirrorWebjarHome = "$xwiki.getURL('SyntaxHighlighting.RequireJSRequestRouter')/codemirror";
+    var codeMirrorWebjarHome = "$codeMirrorBaseURL";
 
     // The general path to be used in our modules.
     var pathsConfig = {
@@ -364,7 +361,7 @@
     // Basically, the XWiki mode is defined in the fallback location (wiki page) so no need to look in the codemirror directory.
     if (codeMirrorMode != 'xwiki/2.1') {
       // Any other mode has to go through a fallback mechanism.
-      var codeMirrorModeDependency = "$xwiki.getURL('SyntaxHighlighting.RequireJSRequestRouter')" + '/codemirror/mode/' + codeMirrorMode + '/' + codeMirrorMode;
+      var codeMirrorModeDependency = codeMirrorWebjarHome + 'mode/' + codeMirrorMode + '/' + codeMirrorMode;
       // We have already added the fallback, now we are prepeding the list of lookup locations with the codeMirror directory, since it should be checked first.
       pathsConfig[modeDependency].unshift(codeMirrorModeDependency);
     }
@@ -669,13 +666,13 @@
 #if ($configuration.getValue('enabled') == 1)
 
 ## CodeMirror base style required for basic usage + default Theme
-@import "$services.webjars.url('codemirror', 'lib/codemirror.css')";
+@import "${codeMirrorBaseURL}lib/codemirror.css";
 
 ## Used by the search dialog CSS
-@import "$services.webjars.url('codemirror', 'addon/dialog/dialog.css')";
+@import "${codeMirrorBaseURL}addon/dialog/dialog.css";
 
 ## Used by search to display matches on the scrollbar
-@import "$services.webjars.url('codemirror', 'addon/search/matchesonscrollbar.css')";
+@import "${codeMirrorBaseURL}addon/search/matchesonscrollbar.css";
 
 ##
 ## Custom CSS

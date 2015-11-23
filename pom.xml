@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.commons</groupId>
     <artifactId>xwiki-commons-pom</artifactId>
-    <version>7.0</version>
+    <version>6.0</version>
   </parent>
   <groupId>org.xwiki.contrib.editortool</groupId>
   <artifactId>editor-tools</artifactId>

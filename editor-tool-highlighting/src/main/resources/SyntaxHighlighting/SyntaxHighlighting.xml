@@ -32,8 +32,8 @@
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1450093299000</creationDate>
-  <date>1450107390000</date>
-  <contentUpdateDate>1450093299000</contentUpdateDate>
+  <date>1450108239000</date>
+  <contentUpdateDate>1450108212000</contentUpdateDate>
   <version>1.1</version>
   <title>SyntaxHighlighting</title>
   <defaultTemplate/>
@@ -301,9 +301,19 @@ define([], function () {
               var fullScreenDeactivatorElement = $$('.bottombuttons')[0].down('.button');
               fullScreenDeactivatorElement.click();
             }
-          }
+          },
+          // Enable persistent search
+          'Alt-F': 'findPersistent',
         }
       });
+
+      if(Object.keys(shortcut.all_shortcuts).indexOf('ctrl+g') &gt; 0) {
+        var callback = shortcut.all_shortcuts['ctrl+g'].callback;
+        shortcut.remove('ctrl+g');
+        shortcut.add('ctrl+g', callback, {
+          'disable_in_input' : true
+        });
+      }
 
       // Trigger autocomplete while typing, without having to press Ctrl+Space
       codeMirror.on('keyup', function(editor , event) {

@@ -20,31 +20,29 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
+<xwikidoc reference="SyntaxHighlighting.SyntaxHighlighting" locale="">
   <web>SyntaxHighlighting</web>
   <name>SyntaxHighlighting</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
+  <parent>SyntaxHighlighting.EnableSyntaxHighlighting</parent>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1373562578000</creationDate>
-  <parent>SyntaxHighlighting.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
+  <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1429307054000</date>
-  <contentUpdateDate>1429291731000</contentUpdateDate>
+  <creationDate>1450093299000</creationDate>
+  <date>1450188859000</date>
+  <contentUpdateDate>1450108212000</contentUpdateDate>
   <version>1.1</version>
-  <title>Syntax Highlighting Code</title>
+  <title>SyntaxHighlighting</title>
+  <defaultTemplate/>
+  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content/>
   <object>
-    <name>SyntaxHighlighting.SyntaxHighlighting</name>
-    <number>0</number>
-    <className>XWiki.JavaScriptExtension</className>
-    <guid>e73a28bb-eb17-4ce1-9426-2b2e99f67fae</guid>
     <class>
       <name>XWiki.JavaScriptExtension</name>
       <customClass/>
@@ -116,8 +114,12 @@
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
+    <name>SyntaxHighlighting.SyntaxHighlighting</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>ae324f77-9a39-4a22-b789-fb02e302d54f</guid>
     <property>
-      <cache>long</cache>
+      <cache>default</cache>
     </property>
     <property>
       <code>#includeMacros('Macros')
@@ -125,7 +127,7 @@
 ## Only do work if the extension is enabled.
 #if ($configuration.getValue('enabled') == 1)
 
-(function () {
+define(['jquery'], function ($) {
   var codeMirrors = [];
 
   /* Initialize the CodeMirror library and then start registering the extra modules. */
@@ -170,12 +172,18 @@
     //
     // Attach codeMirrors to all the elements matched with the propertyPattern.
     //
+    var codeMirrorState = window.localStorage['XWiki.extension.SyntaxHighlighting.disable'] || 0;
     var textareas = $$(propertyPattern);
     for (var i = 0; i&lt;textareas.length; ++i) {
       var textarea = textareas[i];
       // If the textarea is not visible, like the object editor's textareas are when they are not expanded, delay the initialization
       if (textarea.offsetWidth &gt; 0 || textarea.offsetHeight &gt; 0) {
-        initSingleCodeMirror(textarea, codeMirrorMode);
+        if(codeMirrorState === '1') {
+          displayEnableCheckbox(textarea, codeMirrorMode);
+        }
+        else {
+          initSingleCodeMirror(textarea, codeMirrorMode);
+        }
       } else {
         var objectDiv = textarea.up('.xobject');
         if (!objectDiv) {
@@ -193,6 +201,16 @@
         objectDiv.observe('click', listener);
       }
     }
+  }
+
+  // Add a checkbox to enable CodeMirror for the user
+  var displayEnableCheckbox = function (textarea, codeMirrorMode) {
+    var openInstances = $('.enableCodeMirror').length;
+    $('&lt;div class="meta-versionSummary enableCodeMirror"&gt;&lt;input type="checkbox" class="SHcheckbox" id="enableCodeMirror'+openInstances+'"/&gt; &lt;label for="enableCodeMirror'+openInstances+'"&gt;Allow Syntax Highlighting&lt;/label&gt;&lt;/div&gt;').insertAfter(textarea).on('click',function() {
+      initSingleCodeMirror(textarea, codeMirrorMode);
+      $(this).remove();
+      window.localStorage['XWiki.extension.SyntaxHighlighting.disable'] = 0;
+    });
   }
 
   var initSingleCodeMirror = function (textarea, codeMirrorMode) {
@@ -299,9 +317,19 @@
               var fullScreenDeactivatorElement = $$('.bottombuttons')[0].down('.button');
               fullScreenDeactivatorElement.click();
             }
-          }
+          },
+          // Enable persistent search
+          'Alt-F': 'findPersistent',
         }
       });
+
+      if(Object.keys(shortcut.all_shortcuts).indexOf('ctrl+g') &gt; 0) {
+        var callback = shortcut.all_shortcuts['ctrl+g'].callback;
+        shortcut.remove('ctrl+g');
+        shortcut.add('ctrl+g', callback, {
+          'disable_in_input' : true
+        });
+      }
 
       // Trigger autocomplete while typing, without having to press Ctrl+Space
       codeMirror.on('keyup', function(editor , event) {
@@ -315,6 +343,16 @@
       codeMirror.setSize(textareaWidthPercentage + "%", textareaHeight);
 
       // console.log('CodeMirror instance initialized for mode: ' + codeMirrorMode);
+
+      // Add a checkbox to disable CodeMirror for the user
+      var openInstances = jQuery('.disableCodeMirror').length;
+      var codeMirrorDiv = jQuery(textarea).siblings('.CodeMirror');
+jQuery('&lt;div class="meta-versionSummary disableCodeMirror"&gt;&lt;input type="checkbox" checked="checked" class="SHcheckbox" id="disableCodeMirror'+openInstances+'"/&gt; &lt;label for="disableCodeMirror'+openInstances+'" &gt;Allow Syntax Highlighting&lt;/label&gt;&lt;/div&gt;').insertAfter(codeMirrorDiv).on('click',function() {
+        codeMirror.toTextArea();
+        displayEnableCheckbox(textarea, codeMirrorMode);
+        $(this).remove();
+        window.localStorage['XWiki.extension.SyntaxHighlighting.disable'] = 1;
+      });
 
       // Track this new instance by adding it to the list of instances.
       codeMirrors.push(codeMirror);
@@ -537,180 +575,23 @@
     editorDiv.CodeMirror.refresh();
   });
 
-  /**
-   * Entry point.
-   */
-  if (XWiki.domIsLoaded &amp;&amp; XWiki.contextaction == 'edit') {
-    initCodeMirrorInternals();
-  } else {
-    document.observe('xwiki:dom:loaded', function() {
-      // Try not to pollute the other XWiki actions with CodeMirror specific code
-      if (XWiki.contextaction == 'edit')
-        initCodeMirrorInternals();
-    });
+  return {
+    initCodeMirrorInternals : initCodeMirrorInternals,
+    initCodeMirror : initCodeMirror
   }
-
-})();
+});
 
 #end ## enabled check</code>
     </property>
     <property>
-      <name>Enable CodeMirror</name>
+      <name>CodeMirror API</name>
     </property>
     <property>
       <parse>1</parse>
     </property>
     <property>
-      <use>always</use>
+      <use>currentPage</use>
     </property>
   </object>
-  <object>
-    <name>SyntaxHighlighting.SyntaxHighlighting</name>
-    <number>0</number>
-    <className>XWiki.StyleSheetExtension</className>
-    <guid>0c407226-5399-46de-ba81-edc7a43e64b1</guid>
-    <class>
-      <name>XWiki.StyleSheetExtension</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <cache>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>cache</name>
-        <number>5</number>
-        <prettyName>Caching policy</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>long|short|default|forbid</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </cache>
-      <code>
-        <disabled>0</disabled>
-        <name>code</name>
-        <number>2</number>
-        <prettyName>Code</prettyName>
-        <rows>20</rows>
-        <size>50</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-      </code>
-      <contentType>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>contentType</name>
-        <number>6</number>
-        <prettyName>Content Type</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>CSS|LESS</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </contentType>
-      <name>
-        <disabled>0</disabled>
-        <name>name</name>
-        <number>1</number>
-        <prettyName>Name</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </name>
-      <parse>
-        <disabled>0</disabled>
-        <displayFormType>select</displayFormType>
-        <displayType>yesno</displayType>
-        <name>parse</name>
-        <number>4</number>
-        <prettyName>Parse content</prettyName>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-      </parse>
-      <use>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>use</name>
-        <number>3</number>
-        <prettyName>Use this extension</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>currentPage|onDemand|always</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </use>
-    </class>
-    <property>
-      <cache>long</cache>
-    </property>
-    <property>
-      <code>#includeMacros('Macros')
-
-## Only do work if the extension is enabled.
-#if ($configuration.getValue('enabled') == 1)
-
-## CodeMirror base style required for basic usage + default Theme
-@import "${codeMirrorBaseURL}lib/codemirror.css";
-
-## Used by the search dialog CSS
-@import "${codeMirrorBaseURL}addon/dialog/dialog.css";
-
-## Used by search to display matches on the scrollbar
-@import "${codeMirrorBaseURL}addon/search/matchesonscrollbar.css";
-
-##
-## Custom CSS
-##
-
-#template('colorThemeInit.vm')
-
-.CodeMirror {
-  border: 1px solid $theme.borderColor;
-}
-
-## Match highlighter
-
-#set ($highlightColor = "$!{configuration.highlightColor}")
-.CodeMirror-focused .cm-matchhighlight {
-  background-color: $highlightColor;
-}
-
-## Trailing empty whitespaces
-.cm-trailingspace {
-  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAACCAYAAAB/qH1jAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3QUXCToH00Y1UgAAACFJREFUCNdjPMDBUc/AwNDAAAFMTAwMDA0OP34wQgX/AQBYgwYEx4f9lQAAAABJRU5ErkJggg==);
-  background-position: bottom left;
-  background-repeat: repeat-x;
-}
-
-#end ## enabled check</code>
-    </property>
-    <property>
-      <contentType>CSS</contentType>
-    </property>
-    <property>
-      <name>CodeMirror styling</name>
-    </property>
-    <property>
-      <parse>1</parse>
-    </property>
-    <property>
-      <use>always</use>
-    </property>
-  </object>
+  <content/>
 </xwikidoc>

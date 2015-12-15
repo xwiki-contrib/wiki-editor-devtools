@@ -117,17 +117,14 @@
     <name>SyntaxHighlighting.SyntaxHighlighting</name>
     <number>0</number>
     <className>XWiki.JavaScriptExtension</className>
-    <guid>e73a28bb-eb17-4ce1-9426-2b2e99f67fae</guid>
+    <guid>ae324f77-9a39-4a22-b789-fb02e302d54f</guid>
     <property>
       <cache>long</cache>
     </property>
     <property>
       <code>#includeMacros('Macros')
 
-## Only do work if the extension is enabled.
-#if ($configuration.getValue('enabled') == 1)
-
-(function () {
+define(['jquery'], function ($) {
   var codeMirrors = [];
 
   /* Initialize the CodeMirror library and then start registering the extra modules. */
@@ -539,31 +536,20 @@
     editorDiv.CodeMirror.refresh();
   });
 
-  /**
-   * Entry point.
-   */
-  if (XWiki.domIsLoaded &amp;&amp; XWiki.contextaction == 'edit') {
-    initCodeMirrorInternals();
-  } else {
-    document.observe('xwiki:dom:loaded', function() {
-      // Try not to pollute the other XWiki actions with CodeMirror specific code
-      if (XWiki.contextaction == 'edit')
-        initCodeMirrorInternals();
-    });
+  return {
+    initCodeMirrorInternals : initCodeMirrorInternals,
+    initCodeMirror : initCodeMirror
   }
-
-})();
-
-#end ## enabled check</code>
+});</code>
     </property>
     <property>
-      <name>Enable CodeMirror</name>
+      <name>CodeMirror API</name>
     </property>
     <property>
       <parse>1</parse>
     </property>
     <property>
-      <use>always</use>
+      <use>currentPage</use>
     </property>
   </object>
   <object>
@@ -657,15 +643,12 @@
     <name>SyntaxHighlighting.SyntaxHighlighting</name>
     <number>0</number>
     <className>XWiki.StyleSheetExtension</className>
-    <guid>0c407226-5399-46de-ba81-edc7a43e64b1</guid>
+    <guid>9334660a-c618-45ea-a091-bb6464c08962</guid>
     <property>
       <cache>long</cache>
     </property>
     <property>
       <code>#includeMacros('Macros')
-
-## Only do work if the extension is enabled.
-#if ($configuration.getValue('enabled') == 1)
 
 ## CodeMirror base style required for basic usage + default Theme
 @import "${codeMirrorBaseURL}lib/codemirror.css";
@@ -698,9 +681,7 @@
   background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAACCAYAAAB/qH1jAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3QUXCToH00Y1UgAAACFJREFUCNdjPMDBUc/AwNDAAAFMTAwMDA0OP34wQgX/AQBYgwYEx4f9lQAAAABJRU5ErkJggg==);
   background-position: bottom left;
   background-repeat: repeat-x;
-}
-
-#end ## enabled check</code>
+}</code>
     </property>
     <property>
       <contentType>CSS</contentType>
@@ -712,7 +693,7 @@
       <parse>1</parse>
     </property>
     <property>
-      <use>always</use>
+      <use>currentPage</use>
     </property>
   </object>
   <content/>

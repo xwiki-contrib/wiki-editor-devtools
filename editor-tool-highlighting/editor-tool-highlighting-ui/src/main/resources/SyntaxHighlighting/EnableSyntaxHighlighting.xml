@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc reference="SyntaxHighlighting.EnableSyntaxHighlighting" locale="">
+  <web>SyntaxHighlighting</web>
+  <name>EnableSyntaxHighlighting</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <parent>SyntaxHighlighting.WebHome</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <customClass/>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <creationDate>1373562578000</creationDate>
+  <date>1450263905000</date>
+  <contentUpdateDate>1448966542000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Syntax Highlighting Code</title>
+  <defaultTemplate/>
+  <validationScript/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <object>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <name>SyntaxHighlighting.EnableSyntaxHighlighting</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>56c97c33-0347-474b-99b9-7b257b82a80c</guid>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>#includeMacros('GetConfiguration')
+
+## Only do work if the extension is enabled.
+#if ($configuration.getValue('enabled') == 1)
+
+require(['jquery', '$xwiki.getURL('SyntaxHighlighting.SyntaxHighlighting', 'jsx')', 'xwiki-events-bridge'], function($, SH) {
+  /* Initialize the CodeMirror library and then start registering the extra modules. */
+  var initCodeMirrorInternals = function() {
+    initCodeMirrors();
+
+    // Override the insertTags method for the wiki syntax editor so that we can intercept commands from
+    // the attached toolbar and execute them on the CodeMirror instance instead of the simple textarea
+    if (XWiki.editor == 'wiki' &amp;&amp; insertTags) {
+      insertTags = function(tagOpen, tagClose, sampleText) {
+        var codeMirror = SH.codeMirrors[0];
+        if (!codeMirror) {
+          return;
+        }
+        codeMirror.replaceSelection(tagOpen + (codeMirror.doc.getSelection() || sampleText) + tagClose, 'end');
+      }
+    }
+  }
+
+  /* Initialize all possible CodeMirror instances. */
+  var initCodeMirrors = function () {
+    // Use the theme chosen in the wiki's administration
+    var theme = '$!{configuration.getValue('theme')}';
+    if(!theme) theme = 'default';
+    SH.setTheme(theme);
+
+    if (XWiki.editor == 'object' || XWiki.editor == 'inline') {
+      // Object editor highlighting support
+      SH.initCodeMirror("textarea[id^='XWiki.StyleSheetExtension_'][id$='_code']", 'css');
+      SH.initCodeMirror("textarea[id^='XWiki.JavaScriptExtension_'][id$='_code']", 'javascript');
+      SH.initCodeMirror("textarea[id^='XWiki.XWikiSkins_'][id$='.css']", 'css');
+      SH.initCodeMirror("textarea[id^='XWiki.XWikiSkins_'][id$='.js']", 'javascript');
+      SH.initCodeMirror("textarea[id^='XWiki.XWikiSkins_'][id$='.vm']", 'velocity');
+      SH.initCodeMirror("textarea[id^='XWiki.WikiMacroClass_'][id$='_code']", XWiki.docsyntax);
+    } else if (XWiki.editor == 'wiki') {
+      // Document content editor highlighting support using the document's syntax.
+      SH.initCodeMirror("textarea[id='content']", XWiki.docsyntax);
+    }
+  }
+  /**
+   * Entry point.
+   */
+  if (XWiki.domIsLoaded &amp;&amp; XWiki.contextaction == 'edit') {
+    initCodeMirrorInternals();
+  } else {
+    $(document).on('xwiki:dom:loaded', function() {
+      // Try not to pollute the other XWiki actions with CodeMirror specific code
+      if (XWiki.contextaction == 'edit')
+        initCodeMirrorInternals();
+    });
+  }
+});
+
+#end ## enabled check</code>
+    </property>
+    <property>
+      <name>Enable CodeMirror</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>always</use>
+    </property>
+  </object>
+  <object>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>6</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <disabled>0</disabled>
+        <name>code</name>
+        <number>3</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>1</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>2</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>5</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>4</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <name>SyntaxHighlighting.EnableSyntaxHighlighting</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>827fba8a-807d-49b4-a73f-1058f5b4de80</guid>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>#includeMacros('GetConfiguration')
+
+## Only do work if the extension is enabled.
+#if ($configuration.getValue('enabled') == 1)
+
+#set($themeCSS = $escapetool.url($!{configuration.highlightColor}))
+@import "$xwiki.getURL('SyntaxHighlighting.SyntaxHighlighting', 'ssx', "highlightColor=$themeCSS")";
+
+#end ## enabled check</code>
+    </property>
+    <property>
+      <contentType>CSS</contentType>
+    </property>
+    <property>
+      <name>Enable CodeMirror styling</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>always</use>
+    </property>
+  </object>
+  <content/>
+</xwikidoc>

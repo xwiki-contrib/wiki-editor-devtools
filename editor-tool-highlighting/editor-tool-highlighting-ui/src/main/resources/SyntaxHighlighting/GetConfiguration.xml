@@ -20,9 +20,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc reference="SyntaxHighlighting.Macros" locale="">
+<xwikidoc reference="SyntaxHighlighting.GetConfiguration" locale="">
   <web>SyntaxHighlighting</web>
-  <name>Macros</name>
+  <name>GetConfiguration</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
@@ -32,10 +32,10 @@
   <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1374054190000</creationDate>
-  <date>1429292381000</date>
-  <contentUpdateDate>1429292228000</contentUpdateDate>
+  <date>1450262950000</date>
+  <contentUpdateDate>1450262950000</contentUpdateDate>
   <version>1.1</version>
-  <title>Macros</title>
+  <title>GetConfiguration</title>
   <defaultTemplate/>
   <validationScript/>
   <comment/>
@@ -43,11 +43,8 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity output="false"}}
-## Always ending in '/', remember not to add it twice.
-#set ($codeMirrorBaseURL = $services.webjars.url('codemirror', ''))
-#if ($codeMirrorBaseURL.contains('?'))
-  ## Workaround for XWiki versions pre 7.1M1 that do not have http://jira.xwiki.org/browse/XWIKI-10881 fixed so that syntax highlighting works on older versions as well.
-  #set ($codeMirrorBaseURL = "${xwiki.getURL('SyntaxHighlighting.RequireJSRequestRouter')}/codemirror/")
-#end
+#set ($configurationClass = 'SyntaxHighlighting.ConfigurationClass')
+#set ($configurationDocument = $xwiki.getDocument('SyntaxHighlighting.Configuration'))
+#set ($configuration = $configurationDocument.getObject($configurationClass))
 {{/velocity}}</content>
 </xwikidoc>

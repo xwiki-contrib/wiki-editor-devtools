@@ -117,58 +117,23 @@
     <name>SyntaxHighlighting.SyntaxHighlighting</name>
     <number>0</number>
     <className>XWiki.JavaScriptExtension</className>
-    <guid>e73a28bb-eb17-4ce1-9426-2b2e99f67fae</guid>
+    <guid>ae324f77-9a39-4a22-b789-fb02e302d54f</guid>
     <property>
       <cache>long</cache>
     </property>
     <property>
       <code>#includeMacros('Macros')
 
-## Only do work if the extension is enabled.
-#if ($configuration.getValue('enabled') == 1)
-
-(function () {
+define(['jquery'], function ($) {
   var codeMirrors = [];
-
-  /* Initialize the CodeMirror library and then start registering the extra modules. */
-  var initCodeMirrorInternals = function() {
-    initCodeMirrors();
-
-    // Override the insertTags method for the wiki syntax editor so that we can intercept commands from
-    // the attached toolbar and execute them on the CodeMirror instance instead of the simple textarea
-    if (XWiki.editor == 'wiki' &amp;&amp; insertTags) {
-      insertTags = function(tagOpen, tagClose, sampleText) {
-        var codeMirror = codeMirrors[0];
-        if (!codeMirror) {
-          return;
-        }
-        codeMirror.replaceSelection(tagOpen + (codeMirror.doc.getSelection() || sampleText) + tagClose, 'end');
-      }
-    }
-  }
-
-  /* Initialize all possible CodeMirror instances. */
-  var initCodeMirrors = function () {
-    if (XWiki.editor == 'object' || XWiki.editor == 'inline') {
-      // Object editor highlighting support
-      initCodeMirror("textarea[id^='XWiki.StyleSheetExtension_'][id$='_code']", 'css');
-      initCodeMirror("textarea[id^='XWiki.JavaScriptExtension_'][id$='_code']", 'javascript');
-      initCodeMirror("textarea[id^='XWiki.XWikiSkins_'][id$='.css']", 'css');
-      initCodeMirror("textarea[id^='XWiki.XWikiSkins_'][id$='.js']", 'javascript');
-      initCodeMirror("textarea[id^='XWiki.XWikiSkins_'][id$='.vm']", 'velocity');
-      initCodeMirror("textarea[id^='XWiki.WikiMacroClass_'][id$='_code']", XWiki.docsyntax);
-    } else if (XWiki.editor == 'wiki') {
-      // Document content editor highlighting support using the document's syntax.
-      initCodeMirror("textarea[id='content']", XWiki.docsyntax);
-    }
-  }
+  var theme = 'default';
 
   /**
    * Initialize a CodeMirror instance and add it to the list of instances.
    * @param propertyPattern : the CSS selector for the textarea to wrap with a CodeMirror instance.
    * @param codeMirrorMode : the mode that will be used by this CodeMirror instance ('css', 'javascript', etc.)
    */
-  var initCodeMirror = function (propertyPattern, codeMirrorMode) {
+  var initCodeMirror = function (propertyPattern, codeMirrorMode, parameters) {
     //
     // Attach codeMirrors to all the elements matched with the propertyPattern.
     //
@@ -177,7 +142,7 @@
       var textarea = textareas[i];
       // If the textarea is not visible, like the object editor's textareas are when they are not expanded, delay the initialization
       if (textarea.offsetWidth &gt; 0 || textarea.offsetHeight &gt; 0) {
-        initSingleCodeMirror(textarea, codeMirrorMode);
+        initSingleCodeMirror(textarea, codeMirrorMode, parameters);
       } else {
         var objectDiv = textarea.up('.xobject');
         if (!objectDiv) {
@@ -197,7 +162,7 @@
     }
   }
 
-  var initSingleCodeMirror = function (textarea, codeMirrorMode) {
+  var initSingleCodeMirror = function (textarea, codeMirrorMode, extraAddons) {
     // FIXME: Until a better way comes up, we`ll just reuse the xwiki 2.1 syntax mode for 2.0 as well.
     if (codeMirrorMode == 'xwiki/2.0') {
       codeMirrorMode = 'xwiki/2.1';
@@ -206,17 +171,21 @@
     var modeDependency = configureRequireJsPaths(codeMirrorMode);
 
     // Load any configured theme.
-    var theme = "$!{configuration.getValue('theme')}";
-    if (!theme) theme = 'default';
-    if (theme != 'default') {
-      #set ($themeCSS = "theme/${configuration.theme}.css")
-      var themeURL = "${codeMirrorBaseURL}${themeCSS}";
+    if (theme !== 'default') {
+      var themeCSS = "theme/"+theme+".css";
+      var themeURL = "${codeMirrorBaseURL}"+themeCSS;
       loadCSS(themeURL);
+    }
+
+    var requirePaths = [], extraParameters = {};
+    if(extraAddons) {
+      requirePaths = extraAddons[0];
+      extraParameters = extraAddons[1];
     }
 
     // TODO: Make all these addons requirements configurable and read the global or user configuration when
     // including them in the list of dependencies. i.e. if the user/admin does not need them, do not require them.
-    require(['SyntaxHighlighting_cm/lib/codemirror',
+    require($.merge(['SyntaxHighlighting_cm/lib/codemirror',
             /** Modes **/
             modeDependency,
             /** Addons **/
@@ -236,7 +205,7 @@
             'SyntaxHighlighting_cm/addon/search/search',
             // Displays search result locations on the scrollbar
             'SyntaxHighlighting_cm/addon/search/matchesonscrollbar'
-            ], function (CodeMirror) {
+            ], requirePaths), function (CodeMirror) {
       // console.log('Initializing CodeMirror instance...');
 
       // Enable optional autocomplete support.
@@ -262,7 +231,7 @@
       var textareaHeight = textarea.getHeight();
 
       // Initialize the CodeMirror instance.
-      var codeMirror = CodeMirror.fromTextArea(textarea, {
+      var codeMirror = CodeMirror.fromTextArea(textarea, $.extend(true, {
         'mode' : codeMirrorMode,
         'theme' : theme,
         'lineNumbers' : true,
@@ -303,7 +272,7 @@
             }
           }
         }
-      });
+      }, extraParameters));
 
       // Trigger autocomplete while typing, without having to press Ctrl+Space
       codeMirror.on('keyup', function(editor , event) {
@@ -539,31 +508,26 @@
     editorDiv.CodeMirror.refresh();
   });
 
-  /**
-   * Entry point.
-   */
-  if (XWiki.domIsLoaded &amp;&amp; XWiki.contextaction == 'edit') {
-    initCodeMirrorInternals();
-  } else {
-    document.observe('xwiki:dom:loaded', function() {
-      // Try not to pollute the other XWiki actions with CodeMirror specific code
-      if (XWiki.contextaction == 'edit')
-        initCodeMirrorInternals();
-    });
+  /* Change the theme used by CodeMirror */
+  var setTheme = function(newTheme) {
+    theme = newTheme;
   }
 
-})();
-
-#end ## enabled check</code>
+  return {
+    codeMirrors : codeMirrors,
+    setTheme : setTheme,
+    initCodeMirror : initCodeMirror
+  }
+});</code>
     </property>
     <property>
-      <name>Enable CodeMirror</name>
+      <name>CodeMirror API</name>
     </property>
     <property>
       <parse>1</parse>
     </property>
     <property>
-      <use>always</use>
+      <use>currentPage</use>
     </property>
   </object>
   <object>
@@ -657,15 +621,12 @@
     <name>SyntaxHighlighting.SyntaxHighlighting</name>
     <number>0</number>
     <className>XWiki.StyleSheetExtension</className>
-    <guid>0c407226-5399-46de-ba81-edc7a43e64b1</guid>
+    <guid>9334660a-c618-45ea-a091-bb6464c08962</guid>
     <property>
       <cache>long</cache>
     </property>
     <property>
       <code>#includeMacros('Macros')
-
-## Only do work if the extension is enabled.
-#if ($configuration.getValue('enabled') == 1)
 
 ## CodeMirror base style required for basic usage + default Theme
 @import "${codeMirrorBaseURL}lib/codemirror.css";
@@ -688,7 +649,7 @@
 
 ## Match highlighter
 
-#set ($highlightColor = "$!{configuration.highlightColor}")
+#set ($highlightColor = "$!{request.highlightColor}")
 .CodeMirror-focused .cm-matchhighlight {
   background-color: $highlightColor;
 }
@@ -698,9 +659,7 @@
   background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAACCAYAAAB/qH1jAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3QUXCToH00Y1UgAAACFJREFUCNdjPMDBUc/AwNDAAAFMTAwMDA0OP34wQgX/AQBYgwYEx4f9lQAAAABJRU5ErkJggg==);
   background-position: bottom left;
   background-repeat: repeat-x;
-}
-
-#end ## enabled check</code>
+}</code>
     </property>
     <property>
       <contentType>CSS</contentType>
@@ -712,7 +671,7 @@
       <parse>1</parse>
     </property>
     <property>
-      <use>always</use>
+      <use>currentPage</use>
     </property>
   </object>
   <content/>

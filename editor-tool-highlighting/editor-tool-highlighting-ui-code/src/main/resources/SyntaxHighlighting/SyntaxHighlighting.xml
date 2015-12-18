@@ -270,9 +270,20 @@ define(['jquery'], function ($) {
               var fullScreenDeactivatorElement = $$('.bottombuttons')[0].down('.button');
               fullScreenDeactivatorElement.click();
             }
-          }
+          },
+          // Enable persistent search
+          'Alt-F': 'findPersistent'
         }
       }, extraParameters));
+
+      // Disable the XWiki "Ctrl+G" shortcut in input fields so that it can be used in the search box to find the next result
+      if(Object.keys(shortcut.all_shortcuts).indexOf('ctrl+g') > 0) {
+        var callback = shortcut.all_shortcuts['ctrl+g'].callback;
+        shortcut.remove('ctrl+g');
+        shortcut.add('ctrl+g', callback, {
+          'disable_in_input' : true
+        });
+      }
 
       // Trigger autocomplete while typing, without having to press Ctrl+Space
       codeMirror.on('keyup', function(editor , event) {

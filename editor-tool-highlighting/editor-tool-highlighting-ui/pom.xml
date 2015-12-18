@@ -26,15 +26,28 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.contrib.editortool</groupId>
-    <artifactId>editor-tools</artifactId>
+    <artifactId>editor-tools-highlighting</artifactId>
     <version>3.2-SNAPSHOT</version>
   </parent>
-  <artifactId>editor-tool-highlighting</artifactId>
-  <name>Editor Tools - Highlighting - Parent POM</name>
-  <packaging>pom</packaging>
+  <artifactId>editor-tool-highlighting-ui</artifactId>
+  <name>Editor Tools - Highlighting UI</name>
+  <packaging>xar</packaging>
   <description>Provides Syntax Highlighting</description>
-  <modules>
-    <module>editor-tool-highlighting-ui-code</module>
-    <module>editor-tool-highlighting-ui</module>
-  </modules>
+  <properties>
+    <!-- Don't run CLIRR here since there's no Java code. -->
+    <xwiki.clirr.skip>true</xwiki.clirr.skip>
+    <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
+    <xwiki.extension.features>enygma:syntax-highlighting-application,org.xwiki.contrib.editortool:editor-tools-highlighting</xwiki.extension.features>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Syntax Highlighting Application</xwiki.extension.name>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.contrib.editortool</groupId>
+      <artifactId>editor-tool-highlighting-ui-code</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+      <scope>runtime</scope>
+    </dependency>
+  </dependencies>
 </project>

@@ -26,15 +26,35 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.contrib.editortool</groupId>
-    <artifactId>editor-tools</artifactId>
+    <artifactId>editor-tool-highlighting</artifactId>
     <version>3.2-SNAPSHOT</version>
   </parent>
-  <artifactId>editor-tool-highlighting</artifactId>
-  <name>Editor Tools - Highlighting - Parent POM</name>
-  <packaging>pom</packaging>
+  <artifactId>editor-tool-highlighting-ui-code</artifactId>
+  <name>Editor Tools - Highlighting UI - Code</name>
+  <packaging>xar</packaging>
   <description>Provides Syntax Highlighting</description>
-  <modules>
-    <module>editor-tool-highlighting-ui-code</module>
-    <module>editor-tool-highlighting-ui</module>
-  </modules>
+  <properties>
+    <!-- Don't run CLIRR here since there's no Java code. -->
+    <xwiki.clirr.skip>true</xwiki.clirr.skip>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>codemirror</artifactId>
+      <version>5.8</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rendering-macro-velocity</artifactId>
+      <version>${platform.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-webjars</artifactId>
+      <version>${platform.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+  </dependencies>
 </project>

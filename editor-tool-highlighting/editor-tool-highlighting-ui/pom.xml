@@ -26,7 +26,7 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.contrib.editortool</groupId>
-    <artifactId>editor-tools-highlighting</artifactId>
+    <artifactId>editor-tool-highlighting</artifactId>
     <version>3.2-SNAPSHOT</version>
   </parent>
   <artifactId>editor-tool-highlighting-ui</artifactId>
@@ -37,7 +37,7 @@
     <!-- Don't run CLIRR here since there's no Java code. -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
     <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
-    <xwiki.extension.features>enygma:syntax-highlighting-application,org.xwiki.contrib.editortool:editor-tools-highlighting</xwiki.extension.features>
+    <xwiki.extension.features>enygma:syntax-highlighting-application,org.xwiki.contrib.editortool:editor-tool-highlighting</xwiki.extension.features>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Syntax Highlighting Application</xwiki.extension.name>
   </properties>

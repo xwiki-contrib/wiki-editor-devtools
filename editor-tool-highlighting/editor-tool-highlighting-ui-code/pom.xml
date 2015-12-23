@@ -30,9 +30,9 @@
     <version>3.3-SNAPSHOT</version>
   </parent>
   <artifactId>editor-tool-highlighting-ui-code</artifactId>
-  <name>Editor Tools - Highlighting UI - Code</name>
+  <name>Syntax Highlighting Common Library</name>
   <packaging>xar</packaging>
-  <description>Provides Syntax Highlighting</description>
+  <description>Provides a Syntax Highlighting library</description>
   <properties>
     <!-- Don't run CLIRR here since there's no Java code. -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>

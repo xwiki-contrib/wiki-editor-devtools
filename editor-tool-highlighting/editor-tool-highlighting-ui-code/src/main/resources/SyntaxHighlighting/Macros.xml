@@ -44,8 +44,8 @@
   <hidden>true</hidden>
   <content>{{velocity output="false"}}
 ## Always ending in '/', remember not to add it twice.
-#set ($codeMirrorBaseURL = $services.webjars.url('codemirror', ''))
-#if ($codeMirrorBaseURL.contains('?'))
+#set ($codeMirrorBaseURL = $services.webjars.url('codemirror'))
+#if ($codeMirrorBaseURL.contains('?') || "$!codeMirrorBaseURL" == "")
   ## Workaround for XWiki versions pre 7.1M1 that do not have http://jira.xwiki.org/browse/XWIKI-10881 fixed so that syntax highlighting works on older versions as well.
   #set ($codeMirrorBaseURL = "${xwiki.getURL('SyntaxHighlighting.RequireJSRequestRouter')}/codemirror/")
 #end

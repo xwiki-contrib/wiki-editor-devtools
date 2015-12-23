@@ -164,8 +164,9 @@ define(['jquery'], function ($) {
 
   var initSingleCodeMirror = function (textarea, codeMirrorMode, extraAddons) {
     // FIXME: Until a better way comes up, we`ll just reuse the xwiki 2.1 syntax mode for 2.0 as well.
-    if (codeMirrorMode == 'xwiki/2.0') {
-      codeMirrorMode = 'xwiki/2.1';
+    // We also have to remove / and . from the mode name because of WIKIEDITOR-29
+    if (codeMirrorMode == 'xwiki/2.0' || codeMirrorMode == 'xwiki/2.1') {
+      codeMirrorMode = 'xwiki21';
     }
 
     var modeDependency = configureRequireJsPaths(codeMirrorMode);
@@ -277,7 +278,7 @@ define(['jquery'], function ($) {
       }, extraParameters));
 
       // Disable the XWiki "Ctrl+G" shortcut in input fields so that it can be used in the search box to find the next result
-      if(Object.keys(shortcut.all_shortcuts).indexOf('ctrl+g') > 0) {
+      if(Object.keys(shortcut.all_shortcuts).indexOf('ctrl+g') &gt; 0) {
         var callback = shortcut.all_shortcuts['ctrl+g'].callback;
         shortcut.remove('ctrl+g');
         shortcut.add('ctrl+g', callback, {
@@ -341,7 +342,7 @@ define(['jquery'], function ($) {
     pathsConfig[modeDependency] = [modeDependencyFallback];
     // This is a hack to improve performance and avoid useless failures for the xwiki mode, which we will be using a lot.
     // Basically, the XWiki mode is defined in the fallback location (wiki page) so no need to look in the codemirror directory.
-    if (codeMirrorMode != 'xwiki/2.1') {
+    if (codeMirrorMode != 'xwiki21') {
       // Any other mode has to go through a fallback mechanism.
       var codeMirrorModeDependency = codeMirrorWebjarHome + 'mode/' + codeMirrorMode + '/' + codeMirrorMode;
       // We have already added the fallback, now we are prepeding the list of lookup locations with the codeMirror directory, since it should be checked first.

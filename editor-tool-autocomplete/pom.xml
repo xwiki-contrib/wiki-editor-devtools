@@ -37,6 +37,7 @@
     <!-- Sorted Alphabetically -->
     <module>editor-tool-autocomplete-api</module>
     <module>editor-tool-autocomplete-ui</module>
+    <module>editor-tool-autocomplete-ui-code</module>
   </modules>
   <profiles>
     <profile>

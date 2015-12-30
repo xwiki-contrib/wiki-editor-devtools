@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
@@ -49,6 +50,8 @@ import org.xwiki.velocity.internal.util.VelocityParserContext;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.api.Document;
 
 /**
  * REST Resource for returning autocompletion hints. The content to autocomplete is passed in the request body, the
@@ -66,6 +69,12 @@ public class AutoCompletionResource implements XWikiRestComponent
      */
     @Inject
     private VelocityManager velocityManager;
+
+    /**
+     * Used to create fake documents and add "doc", "tdoc", and "sdoc" in the velocity context.
+     */
+    @Inject
+    private Provider<XWikiContext> xcontextProvider;
 
     /**
      * Used to dynamically find Autocompletion Method finder to handle specific cases.
@@ -353,11 +362,12 @@ public class AutoCompletionResource implements XWikiRestComponent
     protected VelocityContext getVelocityContext()
     {
         VelocityContext velocityContext = this.velocityManager.getVelocityContext();
+        XWikiContext context = this.xcontextProvider.get();
 
         // We add the "doc", "tdoc" and "sdoc" mappings since we don't get them from the Velocity Manager as they are
         // normally added based on the document passed in the request. However since we return the same method names
         // whatever the doc, we can manually add them.
-        XWikiDocument fakeDocument = createFakeXWikiDocument();
+        Document fakeDocument = createFakeXWikiDocument().newDocument(context);
         velocityContext.put("doc", fakeDocument);
         velocityContext.put("sdoc", fakeDocument);
         velocityContext.put("tdoc", fakeDocument);

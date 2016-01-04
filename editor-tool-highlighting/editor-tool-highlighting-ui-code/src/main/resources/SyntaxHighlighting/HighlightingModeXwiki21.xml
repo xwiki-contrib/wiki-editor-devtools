@@ -22,7 +22,7 @@
 
 <xwikidoc version="1.1">
   <web>SyntaxHighlighting</web>
-  <name>HighlightingModeXwiki/2.1</name>
+  <name>HighlightingModeXwiki21</name>
   <language/>
   <defaultLanguage>en</defaultLanguage>
   <translation>0</translation>
@@ -39,14 +39,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>Defines the "xwiki/2.1" [[CodeMirror&gt;&gt;http://codemirror.net/]] mode.
-
-It is a mixed mode that forwards to each of the contained modes (for any script or html macro) or to the "xwiki/2.1tags" mode that handles the XWiki syntax itself.</content>
   <object>
-    <name>SyntaxHighlighting.HighlightingModeXwiki/2\.1</name>
-    <number>0</number>
-    <className>XWiki.JavaScriptExtension</className>
-    <guid>9ca52698-e043-42da-b744-59590377ac2d</guid>
     <class>
       <name>XWiki.JavaScriptExtension</name>
       <customClass/>
@@ -118,19 +111,23 @@ It is a mixed mode that forwards to each of the contained modes (for any script 
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
+    <name>SyntaxHighlighting.HighlightingModeXwiki21</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>40ce82a0-fec7-48bb-9245-fde2b3a3b5a4</guid>
     <property>
       <cache>long</cache>
     </property>
     <property>
       <code>define(['SyntaxHighlighting_cm/lib/codemirror',
-        new XWiki.Document('HighlightingModeXwiki/2.1tags', 'SyntaxHighlighting').getURL('jsx', 'minify=false'),
+        new XWiki.Document('HighlightingModeXwiki21tags', 'SyntaxHighlighting').getURL('jsx', 'minify=false'),
         'SyntaxHighlighting_cm/mode/htmlmixed/htmlmixed',
         'SyntaxHighlighting_cm/mode/velocity/velocity',
         'SyntaxHighlighting_cm/mode/groovy/groovy',
         'SyntaxHighlighting_cm/mode/python/python'
        ], function (CodeMirror) {
-  CodeMirror.defineMode("xwiki/2.1", function(config, parserConfig) {
-    var xwikitagsMode = CodeMirror.getMode(config, "xwiki/2.1tags");
+  CodeMirror.defineMode("xwiki21", function(config, parserConfig) {
+    var xwikitagsMode = CodeMirror.getMode(config, "xwiki21tags");
     var htmlMode      = CodeMirror.getMode(config, "htmlmixed");
     var velocityMode  = CodeMirror.getMode(config, "velocity");
     var groovyMode    = CodeMirror.getMode(config, "groovy");
@@ -288,4 +285,7 @@ It is a mixed mode that forwards to each of the contained modes (for any script 
       <use>onDemand</use>
     </property>
   </object>
+  <content>Defines the "xwiki21" [[CodeMirror&gt;&gt;http://codemirror.net/]] mode.
+
+It is a mixed mode that forwards to each of the contained modes (for any script or html macro) or to the "xwiki/2.1tags" mode that handles the XWiki syntax itself.</content>
 </xwikidoc>

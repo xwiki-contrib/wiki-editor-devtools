@@ -22,7 +22,7 @@
 
 <xwikidoc version="1.1">
   <web>SyntaxHighlighting</web>
-  <name>HighlightingModeXwiki/2.1tags</name>
+  <name>HighlightingModeXwiki21tags</name>
   <language/>
   <defaultLanguage>en</defaultLanguage>
   <translation>0</translation>
@@ -39,14 +39,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>Defines the "xwiki/2.1tags" [[CodeMirror&gt;&gt;http://codemirror.net/]] mode.
-
-Handles the XWiki syntax itself.</content>
   <object>
-    <name>SyntaxHighlighting.HighlightingModeXwiki/2\.1tags</name>
-    <number>0</number>
-    <className>XWiki.JavaScriptExtension</className>
-    <guid>3ba0e177-70c7-40cd-b8af-47638134dafc</guid>
     <class>
       <name>XWiki.JavaScriptExtension</name>
       <customClass/>
@@ -118,12 +111,16 @@ Handles the XWiki syntax itself.</content>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
+    <name>SyntaxHighlighting.HighlightingModeXwiki21tags</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>07723397-bbd4-4e37-8435-064f67fd71eb</guid>
     <property>
       <cache>long</cache>
     </property>
     <property>
       <code>define(['SyntaxHighlighting_cm/lib/codemirror'], function (CodeMirror) {
-  CodeMirror.defineMode("xwiki/2.1tags", function(config, parserConfig) {
+  CodeMirror.defineMode("xwiki21tags", function(config, parserConfig) {
     var indentUnit = config.indentUnit;
     var multilineTagIndentFactor = parserConfig.multilineTagIndentFactor || 1;
 
@@ -381,4 +378,7 @@ Handles the XWiki syntax itself.</content>
       <use>onDemand</use>
     </property>
   </object>
+  <content>Defines the "xwiki21tags" [[CodeMirror&gt;&gt;http://codemirror.net/]] mode.
+
+Handles the XWiki syntax itself.</content>
 </xwikidoc>

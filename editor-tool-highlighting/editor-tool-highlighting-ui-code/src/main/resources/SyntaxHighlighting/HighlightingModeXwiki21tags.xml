@@ -24,7 +24,7 @@
   <web>SyntaxHighlighting</web>
   <name>HighlightingModeXwiki21tags</name>
   <language/>
-  <defaultLanguage>en</defaultLanguage>
+  <defaultLanguage></defaultLanguage>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
   <creationDate>1428667612000</creationDate>

@@ -29,31 +29,34 @@
     <artifactId>editor-tool-autocomplete</artifactId>
     <version>3.3-SNAPSHOT</version>
   </parent>
-  <artifactId>editor-tool-autocomplete-ui</artifactId>
-  <name>Editor Tools - Auto Complete - UI</name>
+  <artifactId>editor-tool-autocomplete-ui-code</artifactId>
+  <name>Editor Tools - Auto Complete - UI - Code</name>
   <packaging>xar</packaging>
-  <description>Provides AutoCompletion for Velocity and JavaScript</description>
+  <description>Provides AutoCompletion library for Velocity and JavaScript</description>
   <properties>
     <!-- Don't run CLIRR here since there's no Java code. -->
     <xwiki.clirr.skip>true</xwiki.clirr.skip>
-    <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
-    <xwiki.extension.features>enygma:syntax-highlighting---autocompletion</xwiki.extension.features>
     <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>AutoCompletion Application</xwiki.extension.name>
+    <xwiki.extension.name>AutoCompletion Application Common Library</xwiki.extension.name>
   </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.contrib.editortool</groupId>
-      <artifactId>editor-tool-autocomplete-ui-code</artifactId>
+      <artifactId>editor-tool-highlighting-ui-code</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.contrib.editortool</groupId>
-      <artifactId>editor-tool-highlighting-ui</artifactId>
+      <artifactId>editor-tool-autocomplete-api</artifactId>
       <version>${project.version}</version>
-      <type>xar</type>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-webjars</artifactId>
+      <version>${platform.version}</version>
       <scope>runtime</scope>
     </dependency>
   </dependencies>

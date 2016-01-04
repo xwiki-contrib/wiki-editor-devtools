@@ -46,7 +46,17 @@
 #set ($webjarId = $stringtool.substringBefore($resource, '/'))
 #set ($resource = $stringtool.substringAfter($resource, '/'))
 #if ("$!webjarId" != '' &amp;&amp; "$!resource" != '')
-  $response.sendRedirect($services.webjars.url($webjarId, $resource))
+  #if("$!services.webjars.url($webjarId, $resource)" != "")
+    $response.sendRedirect($services.webjars.url($webjarId,$resource))
+  #else
+    ## In XWiki &lt; 6.3, $services.webjars.url() works only with one parameter
+    #set ($extensionsList = $services.extension.installed.getInstalledExtensions().toString())
+    #set ($codemirrorVersion = $stringtool.substringBetween($extensionsList, 'org.webjars:codemirror-', ','))
+    #if(!$stringtool.startWith($resource, '/'))
+      #set ($codemirrorVersion = "$codemirrorVersion/")
+    #end
+    $response.sendRedirect($services.webjars.url("$webjarId/$codemirrorVersion$resource"))
+  #end
 #else
 Routes Webjar resource requests in a way that is compatible with RequireJS relative path dependencies.
 #end

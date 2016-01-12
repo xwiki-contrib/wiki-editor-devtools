@@ -256,22 +256,6 @@ define(['jquery'], function ($) {
           'Tab' : whitespaceIndentation,
           // Fix for findNext because Ctrl-G is not available (already taken by the go to page feature).
           'F3' : 'findNext',
-          // Fullscreen on
-          'F11' : function(cm) {
-            var editorDiv = cm.getWrapperElement();
-            if (!editorDiv.hasClassName('CodeMirror-fullscreen')) {
-              var fullScreenActivatorElement = editorDiv.up().select('.fullScreenEditButton', '.fullScreenEditLink')[0];
-              fullScreenActivatorElement.click();
-            }
-          },
-          // Fullscreen off
-          'Esc' : function(cm) {
-            var editorDiv = cm.getWrapperElement();
-            if (editorDiv.hasClassName('CodeMirror-fullscreen')) {
-              var fullScreenDeactivatorElement = $$('.bottombuttons')[0].down('.button');
-              fullScreenDeactivatorElement.click();
-            }
-          },
           // Enable persistent search
           'Alt-F': 'findPersistent'
         }

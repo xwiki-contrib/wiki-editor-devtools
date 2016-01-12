@@ -152,17 +152,37 @@ require(['jquery', '$xwiki.getURL('SyntaxHighlighting.SyntaxHighlighting', 'jsx'
     if(!theme) theme = 'default';
     SH.setTheme(theme);
 
+    var options = [[], {
+      extraKeys : {
+        // Fullscreen on
+        'F11' : function(cm) {
+          var editorDiv = cm.getWrapperElement();
+          if (!editorDiv.hasClassName('CodeMirror-fullscreen')) {
+            var fullScreenActivatorElement = editorDiv.up().select('.fullScreenEditButton', '.fullScreenEditLink')[0];
+            fullScreenActivatorElement.click();
+          }
+        },
+        // Fullscreen off
+        'Esc' : function(cm) {
+          var editorDiv = cm.getWrapperElement();
+          if (editorDiv.hasClassName('CodeMirror-fullscreen')) {
+            var fullScreenDeactivatorElement = $$('.bottombuttons')[0].down('.button');
+            fullScreenDeactivatorElement.click();
+          }
+        }
+      }
+    }];
     if (XWiki.editor == 'object' || XWiki.editor == 'inline') {
       // Object editor highlighting support
-      SH.initCodeMirror("textarea[id^='XWiki.StyleSheetExtension_'][id$='_code']", 'css');
-      SH.initCodeMirror("textarea[id^='XWiki.JavaScriptExtension_'][id$='_code']", 'javascript');
-      SH.initCodeMirror("textarea[id^='XWiki.XWikiSkins_'][id$='.css']", 'css');
-      SH.initCodeMirror("textarea[id^='XWiki.XWikiSkins_'][id$='.js']", 'javascript');
-      SH.initCodeMirror("textarea[id^='XWiki.XWikiSkins_'][id$='.vm']", 'velocity');
-      SH.initCodeMirror("textarea[id^='XWiki.WikiMacroClass_'][id$='_code']", XWiki.docsyntax);
+      SH.initCodeMirror("textarea[id^='XWiki.StyleSheetExtension_'][id$='_code']", 'css', options);
+      SH.initCodeMirror("textarea[id^='XWiki.JavaScriptExtension_'][id$='_code']", 'javascript', options);
+      SH.initCodeMirror("textarea[id^='XWiki.XWikiSkins_'][id$='.css']", 'css', options);
+      SH.initCodeMirror("textarea[id^='XWiki.XWikiSkins_'][id$='.js']", 'javascript', options);
+      SH.initCodeMirror("textarea[id^='XWiki.XWikiSkins_'][id$='.vm']", 'velocity', options);
+      SH.initCodeMirror("textarea[id^='XWiki.WikiMacroClass_'][id$='_code']", XWiki.docsyntax, options);
     } else if (XWiki.editor == 'wiki') {
       // Document content editor highlighting support using the document's syntax.
-      SH.initCodeMirror("textarea[id='content']", XWiki.docsyntax);
+      SH.initCodeMirror("textarea[id='content']", XWiki.docsyntax, options);
     }
   }
   /**
@@ -181,10 +201,12 @@ require(['jquery', '$xwiki.getURL('SyntaxHighlighting.SyntaxHighlighting', 'jsx'
 
 (function() {
 if (XWiki.contextaction == 'edit') {
+
   /* Synchronize the original textareas' contents with the codemirrors' contents just before saving the page. */
   document.observe('xwiki:actions:save', function(event){
+    var codeMirrors = $$('.CodeMirror');
     for (var i=0; i &lt; codeMirrors.length; ++i) {
-      codeMirrors[i].save();
+      codeMirrors[i].CodeMirror.save();
     }
   });
 
@@ -231,16 +253,22 @@ if (XWiki.contextaction == 'edit') {
   });
 
   var getCodeMirrorFromFullScreenEvent = function(event) {
-    var originalTextArea = event.memo.target;
-    var codeMirrorTextArea = originalTextArea.up().down('.CodeMirror textarea');
-
+    var codeMirrorTextArea;
+    if(event.memo) {
+      var originalTextArea = event.memo.target;
+      codeMirrorTextArea = originalTextArea.up().down('.CodeMirror textarea');
+    }
+    else if(event.explicitOriginalTarget) {
+      codeMirrorTextArea = event.explicitOriginalTarget;
+    }
+    var codeMirrors = $$('.CodeMirror');
     var codeMirror = getCodeMirrorFromInternalTextArea(codeMirrorTextArea, codeMirrors);
     return codeMirror;
   }
 
   var getCodeMirrorFromInternalTextArea = function(textArea, codeMirrors) {
     for(var j=0; j&lt;codeMirrors.length; ++j) {
-      var codeMirror = codeMirrors[j];
+      var codeMirror = codeMirrors[j].CodeMirror;
       var codeMirrorTextArea = codeMirror.getInputField();
       if (textArea == codeMirrorTextArea) {
         return codeMirror;
@@ -307,6 +335,7 @@ if (XWiki.contextaction == 'edit') {
   });
 }
 })();
+
 #end ## enabled check</code>
     </property>
     <property>

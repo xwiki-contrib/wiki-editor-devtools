@@ -42,7 +42,7 @@
   <scm>
     <connection>scm:git:git://github.com/xwiki-contrib/wiki-editor-devtools.git</connection>
     <developerConnection>scm:git:git@github.com:xwiki-contrib/wiki-editor-devtools.git</developerConnection>
-    <url>https://github.com/xwiki-contrib/wiki-editor-devtools</url>
+    <url>https://github.com/xwiki-contrib/wiki-editor-devtools/tree/master</url>
     <tag>HEAD</tag>
   </scm>
   <developers>

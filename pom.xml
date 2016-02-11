@@ -32,7 +32,7 @@
   <groupId>org.xwiki.contrib.editortool</groupId>
   <artifactId>editor-tools</artifactId>
   <packaging>pom</packaging>
-  <version>3.5-SNAPSHOT</version>
+  <version>3.4-SNAPSHOT</version>
   <name>Editor Tools - Parent POM</name>
   <description>Editor Tools - Parent POM</description>
   <properties>

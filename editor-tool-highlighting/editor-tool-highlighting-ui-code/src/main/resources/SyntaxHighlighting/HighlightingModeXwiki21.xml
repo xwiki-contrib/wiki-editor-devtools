@@ -123,7 +123,7 @@ It is a mixed mode that forwards to each of the contained modes (for any script 
     </property>
     <property>
       <code>define(['SyntaxHighlighting_cm/lib/codemirror',
-        new XWiki.Document('HighlightingModeXwiki21tags', 'SyntaxHighlighting').getURL('jsx', 'minify=false'),
+        new XWiki.Document('HighlightingModeXwiki21tags', 'SyntaxHighlighting').getURL('jsx', "minify=$!{services.debug.minify}"),
         'SyntaxHighlighting_cm/mode/htmlmixed/htmlmixed',
         'SyntaxHighlighting_cm/mode/velocity/velocity',
         'SyntaxHighlighting_cm/mode/groovy/groovy',
@@ -282,7 +282,7 @@ It is a mixed mode that forwards to each of the contained modes (for any script 
       <name>xwiki.js - Mixed mode that uses XWiki/Velocity/Groovy/etc. syntaxes based on htmlmixed.js</name>
     </property>
     <property>
-      <parse>0</parse>
+      <parse>1</parse>
     </property>
     <property>
       <use>onDemand</use>

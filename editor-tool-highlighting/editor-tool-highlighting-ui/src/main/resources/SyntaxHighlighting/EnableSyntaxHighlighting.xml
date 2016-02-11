@@ -125,7 +125,7 @@
 ## Only do work if the extension is enabled.
 #if ($configuration.getValue('enabled') == 1)
 
-require(['jquery', '$xwiki.getURL('SyntaxHighlighting.SyntaxHighlighting', 'jsx')', 'xwiki-events-bridge'], function($, SH) {
+require(['jquery', '$xwiki.getURL('SyntaxHighlighting.SyntaxHighlighting', 'jsx', "minify=$!services.debug.minify")', 'xwiki-events-bridge'], function($, SH) {
   /* Initialize the CodeMirror library and then start registering the extra modules. */
   var initCodeMirrorInternals = function() {
     initCodeMirrors();

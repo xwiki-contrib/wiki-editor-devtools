@@ -141,7 +141,7 @@ Currently supporting the following modes:
 
     var capitalizedModeName = mode.charAt(0).toUpperCase() + mode.substring(1);
     var autocompleteDocName = 'Autocomplete' + capitalizedModeName;
-    var autocompleteModule = new XWiki.Document(autocompleteDocName, 'SyntaxHighlighting').getURL('jsx', 'minify=false')
+    var autocompleteModule = new XWiki.Document(autocompleteDocName, 'SyntaxHighlighting').getURL('jsx', "minify=$!{services.debug.minify}");
 
     // console.log('Delegating to hinting module: ' + autocompleteModule);
 
@@ -167,7 +167,7 @@ Currently supporting the following modes:
       <name>Support for autocompletion in the CodeMirror editor</name>
     </property>
     <property>
-      <parse>0</parse>
+      <parse>1</parse>
     </property>
     <property>
       <use>onDemand</use>

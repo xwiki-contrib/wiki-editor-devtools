@@ -208,7 +208,7 @@ define(['jquery'], function ($) {
       // console.log('Initializing CodeMirror instance...');
 
       // Enable optional autocomplete support.
-      var autocompleteSupportModule = new XWiki.Document('Autocomplete', 'SyntaxHighlighting').getURL('jsx');
+      var autocompleteSupportModule = new XWiki.Document('Autocomplete', 'SyntaxHighlighting').getURL('jsx', "minify=$!{services.debug.minify}");
       // console.log('Loading autocomplete support to module: ' + autocompleteSupportModule);
 
       require([autocompleteSupportModule], function () {
@@ -313,8 +313,8 @@ define(['jquery'], function ($) {
     // Compute a fallback for custom modes defined by us in wiki pages.
     var capitalizedModeName = codeMirrorMode.charAt(0).toUpperCase() + codeMirrorMode.substring(1);
     var modeDocName = 'HighlightingMode' + capitalizedModeName;
-    // Note: the 'discard' query parameter is there just to make sure requirejs does not add any .js suffix to the module's path
-    var modeDependencyFallback = new XWiki.Document(modeDocName, 'SyntaxHighlighting').getURL('jsx', 'discard');
+    // Note: Remember to always pass a query parameter (even a fake 'discard' one) just to make sure requirejs does not add any .js suffix to the module's path.
+    var modeDependencyFallback = new XWiki.Document(modeDocName, 'SyntaxHighlighting').getURL('jsx', "minify=$!{services.debug.minify}");
 
     /*
      * Configure a path for the current mode.

@@ -20,29 +20,31 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc reference="SyntaxHighlighting.SyntaxHighlighting" locale="">
+<xwikidoc version="1.2" reference="SyntaxHighlighting.SyntaxHighlighting" locale="">
   <web>SyntaxHighlighting</web>
   <name>SyntaxHighlighting</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>SyntaxHighlighting.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
+  <parent>SyntaxHighlighting.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
-  <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <creationDate>1373562578000</creationDate>
   <date>1429307054000</date>
   <contentUpdateDate>1429291731000</contentUpdateDate>
   <version>1.1</version>
   <title>Syntax Highlighting Code</title>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
+  <content/>
   <object>
+    <name>SyntaxHighlighting.SyntaxHighlighting</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>ae324f77-9a39-4a22-b789-fb02e302d54f</guid>
     <class>
       <name>XWiki.JavaScriptExtension</name>
       <customClass/>
@@ -114,10 +116,6 @@
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>SyntaxHighlighting.SyntaxHighlighting</name>
-    <number>0</number>
-    <className>XWiki.JavaScriptExtension</className>
-    <guid>ae324f77-9a39-4a22-b789-fb02e302d54f</guid>
     <property>
       <cache>long</cache>
     </property>
@@ -402,6 +400,10 @@ define(['jquery'], function ($) {
     </property>
   </object>
   <object>
+    <name>SyntaxHighlighting.SyntaxHighlighting</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>9334660a-c618-45ea-a091-bb6464c08962</guid>
     <class>
       <name>XWiki.StyleSheetExtension</name>
       <customClass/>
@@ -489,10 +491,6 @@ define(['jquery'], function ($) {
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>SyntaxHighlighting.SyntaxHighlighting</name>
-    <number>0</number>
-    <className>XWiki.StyleSheetExtension</className>
-    <guid>9334660a-c618-45ea-a091-bb6464c08962</guid>
     <property>
       <cache>long</cache>
     </property>
@@ -545,5 +543,4 @@ define(['jquery'], function ($) {
       <use>currentPage</use>
     </property>
   </object>
-  <content/>
 </xwikidoc>

@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
+<xwikidoc version="1.2" reference="SyntaxHighlighting.HighlightingModeXwiki21" locale="">
   <web>SyntaxHighlighting</web>
   <name>HighlightingModeXwiki21</name>
   <language/>
@@ -39,7 +39,14 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
+  <content>Defines the "xwiki21" [[CodeMirror&gt;&gt;http://codemirror.net/]] mode.
+
+It is a mixed mode that forwards to each of the contained modes (for any script or html macro) or to the "xwiki/2.1tags" mode that handles the XWiki syntax itself.</content>
   <object>
+    <name>SyntaxHighlighting.HighlightingModeXwiki21</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>40ce82a0-fec7-48bb-9245-fde2b3a3b5a4</guid>
     <class>
       <name>XWiki.JavaScriptExtension</name>
       <customClass/>
@@ -111,10 +118,6 @@
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>SyntaxHighlighting.HighlightingModeXwiki21</name>
-    <number>0</number>
-    <className>XWiki.JavaScriptExtension</className>
-    <guid>40ce82a0-fec7-48bb-9245-fde2b3a3b5a4</guid>
     <property>
       <cache>long</cache>
     </property>
@@ -285,7 +288,4 @@
       <use>onDemand</use>
     </property>
   </object>
-  <content>Defines the "xwiki21" [[CodeMirror&gt;&gt;http://codemirror.net/]] mode.
-
-It is a mixed mode that forwards to each of the contained modes (for any script or html macro) or to the "xwiki/2.1tags" mode that handles the XWiki syntax itself.</content>
 </xwikidoc>

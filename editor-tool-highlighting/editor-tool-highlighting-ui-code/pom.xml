@@ -30,7 +30,7 @@
     <version>3.4-SNAPSHOT</version>
   </parent>
   <artifactId>editor-tool-highlighting-ui-code</artifactId>
-  <name>Syntax Highlighting Common Library</name>
+  <name>Editor Tools - Highlighting - UI - Code</name>
   <packaging>xar</packaging>
   <description>Provides a Syntax Highlighting library</description>
   <properties>

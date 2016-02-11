@@ -170,7 +170,7 @@
         }
 
         // show the error message at the bottom
-        editor._x_notification.replace(new XWiki.widgets.Notification('Failed to get autocompletion: ' + failureReason, 'error', {timeout : 5}));
+        new XWiki.widgets.Notification('Failed to get autocompletion: ' + failureReason, 'error', {timeout : 5});
       },
 
       on0: function (response) {

@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.contrib.editortool</groupId>
     <artifactId>editor-tool-highlighting</artifactId>
-    <version>3.5-SNAPSHOT</version>
+    <version>4.0</version>
   </parent>
   <artifactId>editor-tool-highlighting-ui-code</artifactId>
   <name>Editor Tools - Highlighting - UI - Code</name>

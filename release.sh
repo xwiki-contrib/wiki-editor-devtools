@@ -1,4 +1,4 @@
 #!/bin/bash
-PARAMETERS="-DskipTests=true"
+PARAMETERS="-Pintegration-tests -DskipTests=true"
 
 mvn release:prepare -U ${PARAMETERS} -DautoVersionSubmodules=true -Darguments="${PARAMETERS}" && mvn release:perform ${PARAMETERS} -Darguments="${PARAMETERS}"

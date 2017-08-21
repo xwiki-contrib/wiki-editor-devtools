@@ -54,7 +54,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-webjars</artifactId>
+      <artifactId>xwiki-platform-webjars-api</artifactId>
       <version>${platform.version}</version>
       <scope>runtime</scope>
     </dependency>

@@ -25,9 +25,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.xwiki.commons</groupId>
-    <artifactId>xwiki-commons-pom</artifactId>
-    <version>6.0</version>
+    <groupId>org.xwiki.contrib</groupId>
+    <artifactId>parent-commons</artifactId>
+    <version>8.4-8</version>
   </parent>
   <groupId>org.xwiki.contrib.editortool</groupId>
   <artifactId>editor-tools</artifactId>
@@ -69,17 +69,9 @@
       <plugin>
         <groupId>org.xwiki.commons</groupId>
         <artifactId>xwiki-commons-tool-xar-plugin</artifactId>
-        <version>${commons.version}</version>
       </plugin>
     </plugins>
   </build>
-  <distributionManagement>
-    <repository>
-      <id>xwiki-staging</id>
-      <name>XWiki Staging Repository</name>
-      <url>http://nexus.xwiki.org/nexus/service/local/staging/deploy/maven2/</url>
-    </repository>
-  </distributionManagement>
   <modules>
     <module>editor-tool-autocomplete</module>
     <module>editor-tool-highlighting</module>

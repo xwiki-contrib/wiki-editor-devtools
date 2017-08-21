@@ -19,54 +19,32 @@
  */
 package org.xwiki.editor.tool.autocomplete.internal;
 
-import org.junit.Before;
+import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.editor.tool.autocomplete.TargetContent;
 import org.xwiki.editor.tool.autocomplete.TargetContentLocator;
 import org.xwiki.editor.tool.autocomplete.TargetContentType;
-import org.xwiki.rendering.internal.parser.reference.type.URLResourceReferenceTypeParser;
-import org.xwiki.rendering.internal.parser.xwiki20.XWiki20ImageReferenceParser;
-import org.xwiki.rendering.internal.parser.xwiki20.XWiki20LinkReferenceParser;
-import org.xwiki.rendering.internal.parser.xwiki20.XWiki20Parser;
-import org.xwiki.rendering.internal.renderer.plain.PlainTextRendererFactory;
-import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
-import org.xwiki.test.annotation.ComponentList;
-import org.xwiki.test.jmock.annotation.MockingRequirement;
+import org.xwiki.test.annotation.AllComponents;
+import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
-import junit.framework.Assert;
-
-@ComponentList({
-    XWiki20Parser.class,
-    XWiki20LinkReferenceParser.class,
-    XWiki20ImageReferenceParser.class,
-    URLResourceReferenceTypeParser.class,
-    PlainTextRendererFactory.class
-})
-@MockingRequirement(value = DefaultTargetContentLocator.class, exceptions = { ComponentManager.class, Parser.class })
-public class DefaultTargetContentLocatorTest extends AbstractMockingComponentTestCase<TargetContentLocator>
+@AllComponents
+public class DefaultTargetContentLocatorTest
 {
-    private DefaultTargetContentLocator locator;
+    @Rule
+    public MockitoComponentMockingRule<TargetContentLocator> mocker =
+        new MockitoComponentMockingRule<>(DefaultTargetContentLocator.class);
 
-    @Before
-    public void configure() throws Exception
-    {
-        this.locator = (DefaultTargetContentLocator) getMockedComponent();
-    }
-    
     @Test
     public void locateVelocityMacroContent() throws Exception
     {
-        String content = ""
-            + "some wiki content here\n\n"
-            + "{{velocity}}\n"
-            + "cursor here\n";
+        String content = "" + "some wiki content here\n\n" + "{{velocity}}\n" + "cursor here\n";
 
-        TargetContent targetContent = this.locator.locate(content, Syntax.XWIKI_2_0.toIdString(), content.length());
+        TargetContent targetContent =
+            mocker.getComponentUnderTest().locate(content, Syntax.XWIKI_2_0.toIdString(), content.length());
         Assert.assertNotNull(targetContent);
-        Assert.assertEquals(
-            new TargetContent("cursor here\n", "cursor here\n".length(), TargetContentType.VELOCITY), targetContent);
+        Assert.assertEquals(new TargetContent("cursor here\n", "cursor here\n".length(), TargetContentType.VELOCITY),
+            targetContent);
     }
 }

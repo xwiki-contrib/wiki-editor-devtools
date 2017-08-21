@@ -25,6 +25,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
@@ -48,10 +49,10 @@ import org.xwiki.velocity.internal.util.InvalidVelocityException;
 import org.xwiki.velocity.internal.util.VelocityParser;
 import org.xwiki.velocity.internal.util.VelocityParserContext;
 
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Document;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * REST Resource for returning autocompletion hints. The content to autocomplete is passed in the request body, the
@@ -60,6 +61,7 @@ import com.xpn.xwiki.api.Document;
  * @version $Id$
  */
 @Component("org.xwiki.editor.tool.autocomplete.internal.AutoCompletionResource")
+@Singleton
 @Path("/autocomplete")
 public class AutoCompletionResource implements XWikiRestComponent
 {
@@ -259,7 +261,7 @@ public class AutoCompletionResource implements XWikiRestComponent
                 break;
             } else {
                 // Find the returned type for method "methodName".
-                List<Class> returnTypes = new ArrayList<Class>();
+                List<Class> returnTypes = new ArrayList<>();
                 for (Class methodClass : methodClasses) {
                     returnTypes.addAll(methodFinder.findMethodReturnTypes(methodClass, methodName));
                 }

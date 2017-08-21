@@ -23,28 +23,29 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-import junit.framework.Assert;
-
-import org.junit.*;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 import org.xwiki.editor.tool.autocomplete.HintData;
 import org.xwiki.editor.tool.autocomplete.Hints;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import com.xpn.xwiki.util.Programming;
 
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+
 /**
  * Unit tests for {@link DefaultAutoCompletionMethodFinder}.
- * 
+ *
  * @version $Id$
  */
 public class DefaultAutoCompletionMethodFinderTest
 {
     @Rule
     public MockitoComponentMockingRule<DefaultAutoCompletionMethodFinder> mocker =
-        new MockitoComponentMockingRule<DefaultAutoCompletionMethodFinder>(DefaultAutoCompletionMethodFinder.class);
+        new MockitoComponentMockingRule<>(DefaultAutoCompletionMethodFinder.class);
 
     private DefaultAutoCompletionMethodFinder finder;
 
@@ -53,7 +54,7 @@ public class DefaultAutoCompletionMethodFinderTest
     {
         this.finder = mocker.getComponentUnderTest();
     }
-    
+
     private class AncillaryTestClass
     {
         public void method()
@@ -118,7 +119,7 @@ public class DefaultAutoCompletionMethodFinderTest
     {
         Hints hints = this.finder.findMethods(TestClass.class, "getSo");
 
-        SortedSet<HintData> expected = new TreeSet<HintData>();
+        SortedSet<HintData> expected = new TreeSet<>();
         expected.add(new HintData("getSomething", "getSomething() String"));
         expected.add(new HintData("getSomething", "getSomething(String) String"));
         assertEquals(expected, hints.getHints());

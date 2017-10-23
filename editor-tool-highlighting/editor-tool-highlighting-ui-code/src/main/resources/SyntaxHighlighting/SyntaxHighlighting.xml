@@ -275,7 +275,17 @@ define(['jquery'], function ($) {
         if (event.key == '.' || event.key == '$') {
           editor.execCommand('autocomplete');
         }
-      }),
+      });
+
+      // Save the CodeMirror's content to the augmented textarea whenever it looses focus, to keep it up to date.
+      codeMirror.on('blur', function(cm) {
+        cm.save();
+      });
+
+      // Listen to changes of the underlying textarea and update the editor to display them to the user.
+      $(textarea).on('change', function (event) {
+        codeMirror.getDoc().setValue(textarea.value);
+      });
 
       // Set the width of the codemirror editor equal to the one of the wrapped textarea. Value is computed before
       // attaching the codemirror instance, otherwise it will not report it correctly since the textarea will be hidden.

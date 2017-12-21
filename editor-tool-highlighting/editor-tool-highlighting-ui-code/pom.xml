@@ -43,7 +43,7 @@
     <dependency>
       <groupId>org.webjars</groupId>
       <artifactId>codemirror</artifactId>
-      <version>5.8</version>
+      <version>5.24.2</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>

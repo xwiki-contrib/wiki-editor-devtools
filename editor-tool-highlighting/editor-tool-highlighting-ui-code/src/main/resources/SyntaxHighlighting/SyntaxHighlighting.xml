@@ -313,6 +313,12 @@ define(['jquery'], function ($) {
   var configureRequireJsPaths = function(codeMirrorMode) {
     var codeMirrorWebjarHome = "$codeMirrorBaseURL";
 
+    // Clear any trailing slash to avoid double slashes in the URL of the webjar's dependency paths that may
+    // cause problems on sensitive containers.
+    if (codeMirrorWebjarHome.match(/\/$/)) {
+      codeMirrorWebjarHome = codeMirrorWebjarHome.substr(0, codeMirrorWebjarHome.length - 1);
+    }
+
     // The general path to be used in our modules.
     var pathsConfig = {
       SyntaxHighlighting_cm : codeMirrorWebjarHome

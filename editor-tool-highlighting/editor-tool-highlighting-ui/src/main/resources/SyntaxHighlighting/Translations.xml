@@ -45,6 +45,8 @@ SyntaxHighlighting.ConfigurationClass_theme=Theme
 SyntaxHighlighting.ConfigurationClass_theme.hint=The theme to style the editor with.
 SyntaxHighlighting.ConfigurationClass_highlightColor=Highlight Color
 SyntaxHighlighting.ConfigurationClass_highlightColor.hint=The color to use when highlighting the curretly selected word or piece of text. Any CSS color format is accepted.
+SyntaxHighlighting.ConfigurationClass_lineWrapping=Line Wrapping
+SyntaxHighlighting.ConfigurationClass_lineWrapping.hint=Enable to wrap long lines of text that do not fit in the editor's window or disable to view them by scrolling horizontally.
 
 admin.syntaxhighlighting=Syntax Highlighting
 

@@ -165,7 +165,8 @@
             fullScreenDeactivatorElement.click();
           }
         }
-      }
+      },
+      lineWrapping : "$!{request.lineWrapping}" == 'true'
     }];
     if (XWiki.editor == 'object' || XWiki.editor == 'inline') {
       // Object editor highlighting support
@@ -428,7 +429,8 @@ if (XWiki.contextaction == 'edit') {
     ## JavaScript.
     ## Pass the configured theme.
     #set ($theme = "$!{configuration.getValue('theme')}")
-    #set ($discard = $xwiki.jsx.use('SyntaxHighlighting.EnableSyntaxHighlighting', {'theme' : $theme}))
+    #set ($lineWrapping = ${configuration.getValue('lineWrapping')} == 1)
+    #set ($discard = $xwiki.jsx.use('SyntaxHighlighting.EnableSyntaxHighlighting', {'theme' : $theme, 'lineWrapping' : $lineWrapping}))
 
     ## Styling.
     ## Pass the configured highlightColor.

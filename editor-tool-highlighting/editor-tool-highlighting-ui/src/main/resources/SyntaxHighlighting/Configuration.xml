@@ -81,6 +81,20 @@
         <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </highlightColor>
+      <lineWrapping>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayFormType>checkbox</displayFormType>
+        <displayType/>
+        <name>lineWrapping</name>
+        <number>4</number>
+        <prettyName>Line Wrapping</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </lineWrapping>
       <theme>
         <cache>0</cache>
         <customDisplay/>
@@ -108,6 +122,9 @@
     </property>
     <property>
       <highlightColor>#FFFF44</highlightColor>
+    </property>
+    <property>
+      <lineWrapping>1</lineWrapping>
     </property>
     <property>
       <theme>default</theme>
@@ -328,6 +345,7 @@
     <property>
       <propertiesToShow>
         <value>enabled</value>
+        <value>lineWrapping</value>
       </propertiesToShow>
     </property>
     <property>

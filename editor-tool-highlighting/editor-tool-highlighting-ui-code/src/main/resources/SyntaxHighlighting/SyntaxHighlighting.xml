@@ -344,7 +344,7 @@ define(['jquery'], function ($) {
     // Basically, the XWiki mode is defined in the fallback location (wiki page) so no need to look in the codemirror directory.
     if (codeMirrorMode != 'xwiki21') {
       // Any other mode has to go through a fallback mechanism.
-      var codeMirrorModeDependency = codeMirrorWebjarHome + 'mode/' + codeMirrorMode + '/' + codeMirrorMode;
+      var codeMirrorModeDependency = codeMirrorWebjarHome + '/mode/' + codeMirrorMode + '/' + codeMirrorMode;
       // We have already added the fallback, now we are prepeding the list of lookup locations with the codeMirror directory, since it should be checked first.
       pathsConfig[modeDependency].unshift(codeMirrorModeDependency);
     }

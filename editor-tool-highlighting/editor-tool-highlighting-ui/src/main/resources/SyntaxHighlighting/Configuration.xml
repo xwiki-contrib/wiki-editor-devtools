@@ -328,7 +328,7 @@
       <displayBeforeCategory/>
     </property>
     <property>
-      <displayInCategory/>
+      <displayInCategory>edit</displayInCategory>
     </property>
     <property>
       <displayInSection>SyntaxHighlighting</displayInSection>
@@ -550,7 +550,7 @@
       <displayBeforeCategory/>
     </property>
     <property>
-      <displayInCategory/>
+      <displayInCategory>edit</displayInCategory>
     </property>
     <property>
       <displayInSection>SyntaxHighlighting</displayInSection>

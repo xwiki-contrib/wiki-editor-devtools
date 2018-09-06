@@ -125,7 +125,7 @@ public class AutoCompletionResource implements XWikiRestComponent
 
         // Only support autocompletion on Velocity ATM
         TargetContent targetContent = this.targetContentLocator.locate(content, syntaxId, offset);
-        if (targetContent.getType() == TargetContentType.VELOCITY) {
+        if (targetContent != null && targetContent.getType() == TargetContentType.VELOCITY) {
             hints = getHints(targetContent.getContent(), targetContent.getPosition());
         }
 

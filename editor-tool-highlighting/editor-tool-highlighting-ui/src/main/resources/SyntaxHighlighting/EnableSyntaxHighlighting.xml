@@ -177,6 +177,10 @@
       SH.initCodeMirror("textarea[id^='XWiki.XWikiSkins_'][id$='.vm']", 'velocity', options);
       SH.initCodeMirror("textarea[id^='XWiki.WikiMacroClass_'][id$='_code']", XWiki.docsyntax, options);
       SH.initCodeMirror("textarea[id^='Panels.PanelClass_'][id$='_content']", XWiki.docsyntax, options);
+      SH.initCodeMirror("textarea[id^='XWiki.UIExtensionClass_'][id$='_content']", XWiki.docsyntax, options);
+      SH.initCodeMirror("textarea[id^='XWiki.SchedulerJobClass_'][id$='_script']", 'groovy', options);
+      SH.initCodeMirror("textarea[id^='XWiki.ComponentMethodClass_'][id$='_code']", XWiki.docsyntax, options);
+      SH.initCodeMirror("textarea[id^='XWiki.ConfigurableClass_'][id$='_codeToExecute']", XWiki.docsyntax, options);
     } else if (XWiki.editor == 'wiki') {
       // Document content editor highlighting support using the document's syntax.
       SH.initCodeMirror("textarea[id='content']", XWiki.docsyntax, options);

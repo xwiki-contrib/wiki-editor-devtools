@@ -420,9 +420,9 @@ if (XWiki.contextaction == 'edit') {
 ## UIX on a well-known and stable UIXP meant to explicitly activate and initialize Syntax Highlighting, based
 ## on the configuration, instead of risking to cache the configuration values when using a parsed JSX/SSX.
 ##
-## Syntax highlighting is enabled only in edit mode.
-## Consider enabling syntax highlighting only in edit mode.
-#if ($xcontext.action == 'edit')
+## Syntax highlighting is enabled only in edit mode, but not for mobiles (which are not well supported by CodeMirror 5.x and below).
+#set ($isMobile = $request.getHeader("User-Agent").matches(".*(Android|webOS|iPhone|iPad|iPod|Opera Mini).*"))
+#if ($xcontext.action == 'edit' &amp;&amp; !$isMobile)
   #includeMacros('SyntaxHighlighting.GetConfiguration')
 
   ## Only do work if the extension is enabled.

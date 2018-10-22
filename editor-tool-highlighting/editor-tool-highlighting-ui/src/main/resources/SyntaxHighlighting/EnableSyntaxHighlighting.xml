@@ -435,7 +435,7 @@ if (XWiki.contextaction == 'edit') {
 
     ## Styling.
     ## Pass the configured highlightColor.
-    #set ($highlightColor = "$!{configuration.getValue('highlightColor')}"))
+    #set ($highlightColor = "$!{configuration.getValue('highlightColor')}")
     #set ($discard = $xwiki.ssx.use('SyntaxHighlighting.SyntaxHighlighting', {'highlightColor' : $highlightColor}))
   #end ## enabled check
 #end

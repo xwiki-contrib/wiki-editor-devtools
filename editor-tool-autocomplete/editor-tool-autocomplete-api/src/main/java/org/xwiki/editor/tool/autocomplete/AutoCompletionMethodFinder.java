@@ -39,7 +39,7 @@ public interface AutoCompletionMethodFinder
      * @param fragmentToMatch the filter to only return methods matching the passed string
      * @return the autocompletion hints
      */
-    Hints findMethods(Class variableClass, String fragmentToMatch);
+    Hints findMethods(Class<?> variableClass, String fragmentToMatch);
 
     /**
      * @param propertyClass the class for which to find the return type for the passed "method name"
@@ -47,5 +47,5 @@ public interface AutoCompletionMethodFinder
      *        etc)
      * @return the return type of the method represented by {@code methodReferenceName} applied on {@code propertyClass}
      */
-    List<Class> findMethodReturnTypes(Class propertyClass, String methodReferenceName);
+    List<Class<?>> findMethodReturnTypes(Class<?> propertyClass, String methodReferenceName);
 }

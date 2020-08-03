@@ -48,7 +48,7 @@ public class DefaultAutoCompletionMethodFinder extends AbstractAutoCompletionMet
     private static final String ASPECTJ_METHOD_PREFIX = "ajc$";
 
     @Override
-    public Hints findMethods(Class propertyClass, String fragmentToMatch)
+    public Hints findMethods(Class<?> propertyClass, String fragmentToMatch)
     {
         Hints hints = new Hints();
         String lowerCaseFragment = fragmentToMatch.toLowerCase();

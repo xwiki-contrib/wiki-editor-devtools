@@ -79,7 +79,7 @@ public abstract class AbstractAutoCompletionMethodFinder implements AutoCompleti
      * @param returnType the class return type
      * @return the pretty printed string representing the shorthand hint
      */
-    protected String printShorthand(String methodName, Class returnType)
+    protected String printShorthand(String methodName, Class<?> returnType)
     {
         // Step 1: Add method name
         // Step 2: Add return type (Don't print void return types!)
@@ -116,15 +116,9 @@ public abstract class AbstractAutoCompletionMethodFinder implements AutoCompleti
      */
     private StringBuilder getReturnType(Method method)
     {
-        StringBuilder builder = new StringBuilder();
-
-        String returnType = method.getReturnType().getSimpleName();
-        if (returnType != null) {
-            builder.append(' ');
-            builder.append(returnType);
-        }
-
-        return builder;
+        return new StringBuilder()
+            .append(' ')
+            .append(method.getReturnType().getSimpleName());
     }
 
     /**
@@ -145,7 +139,7 @@ public abstract class AbstractAutoCompletionMethodFinder implements AutoCompleti
     }
 
     @Override
-    public List<Class> findMethodReturnTypes(Class propertyClass, String methodName)
+    public List<Class<?>> findMethodReturnTypes(Class<?> propertyClass, String methodName)
     {
         return findMatchingReturnTypes(propertyClass, methodName);
     }
@@ -155,9 +149,9 @@ public abstract class AbstractAutoCompletionMethodFinder implements AutoCompleti
      * @param methodName the name of the method to find
      * @return all methods (ie all signatures) named with {@code methodName} in class {@code propertyClass}
      */
-    private List<Method> findMatchingMethods(Class propertyClass, String methodName)
+    private List<Method> findMatchingMethods(Class<?> propertyClass, String methodName)
     {
-        List<Method> methods = new ArrayList<Method>();
+        List<Method> methods = new ArrayList<>();
         for (Method method : propertyClass.getMethods()) {
             if (method.getName().equals(methodName)) {
                 methods.add(method);
@@ -172,9 +166,9 @@ public abstract class AbstractAutoCompletionMethodFinder implements AutoCompleti
      * @return the classes returned by the method signatures matching the passed {@code methodName} for class
      *         {@code propertyClass}
      */
-    private List<Class> findMatchingReturnTypes(Class propertyClass, String methodName)
+    private List<Class<?>> findMatchingReturnTypes(Class<?> propertyClass, String methodName)
     {
-        List<Class> returnTypes = new ArrayList<Class>();
+        List<Class<?>> returnTypes = new ArrayList<>();
         List<Method> methods = findMatchingMethods(propertyClass, methodName);
         for (Method method : methods) {
             returnTypes.add(method.getReturnType());

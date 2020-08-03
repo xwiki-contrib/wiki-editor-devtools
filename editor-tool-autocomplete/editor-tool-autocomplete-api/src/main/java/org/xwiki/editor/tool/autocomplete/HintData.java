@@ -27,7 +27,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
- * Represents hint data (name of hint and description of hint).
+ * Represents completion hint data (name of hint and description of hint).
  *
  * @version $Id$
  */

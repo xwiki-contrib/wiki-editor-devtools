@@ -54,7 +54,7 @@ public class ScriptServicesAutoCompletionMethodFinder extends AbstractAutoComple
     private ComponentManager componentManager;
 
     @Override
-    public Hints findMethods(Class variableClass, String fragmentToMatch)
+    public Hints findMethods(Class<?> variableClass, String fragmentToMatch)
     {
         Hints results = new Hints();
 
@@ -71,17 +71,17 @@ public class ScriptServicesAutoCompletionMethodFinder extends AbstractAutoComple
     }
 
     @Override
-    public List<Class> findMethodReturnTypes(Class propertyClass, String serviceHint)
+    public List<Class<?>> findMethodReturnTypes(Class<?> propertyClass, String serviceHint)
     {
-        List<Class> returnTypes;
+        List<Class<?>> returnTypes;
 
         // Find the SS with hint = serviceHint
         try {
             ScriptService scriptService = this.componentManager.getInstance(ScriptService.class, serviceHint);
-            returnTypes = Collections.<Class>singletonList(scriptService.getClass());
+            returnTypes = Collections.singletonList(scriptService.getClass());
         } catch (ComponentLookupException e) {
             // Hint doesn't correspond to an existing ScriptService, ignore it!
-            returnTypes = Collections.EMPTY_LIST;
+            returnTypes = Collections.emptyList();
         }
 
         return returnTypes;

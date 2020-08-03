@@ -136,7 +136,7 @@ public class DefaultAutoCompletionMethodFinderTest
     @Test
     public void findMethodReturnTypes()
     {
-        List<Class> types = this.finder.findMethodReturnTypes(TestClass.class, "doWork");
+        List<Class<?>> types = this.finder.findMethodReturnTypes(TestClass.class, "doWork");
         assertEquals(1, types.size());
         assertEquals(AncillaryTestClass.class, types.get(0));
     }

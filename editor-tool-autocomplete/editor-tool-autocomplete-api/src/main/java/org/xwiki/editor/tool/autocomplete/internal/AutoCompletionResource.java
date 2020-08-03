@@ -20,12 +20,12 @@
 package org.xwiki.editor.tool.autocomplete.internal;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
-import javax.inject.Singleton;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
@@ -34,6 +34,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.annotation.InstantiationStrategy;
+import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.editor.tool.autocomplete.AutoCompletionMethodFinder;
@@ -60,8 +62,9 @@ import com.xpn.xwiki.web.Utils;
  *
  * @version $Id$
  */
-@Component("org.xwiki.editor.tool.autocomplete.internal.AutoCompletionResource")
-@Singleton
+@Component
+@Named("org.xwiki.editor.tool.autocomplete.internal.AutoCompletionResource")
+@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 @Path("/autocomplete")
 public class AutoCompletionResource implements XWikiRestComponent
 {
@@ -114,8 +117,8 @@ public class AutoCompletionResource implements XWikiRestComponent
      *
      * @param offset the position of the cursor in the full content
      * @param syntaxId the syntax in which the content is written in
-     * @param content the full wiki content
-     * @return the list of autocompletion hints
+     * @param content the full content on which we need to return completion hints for the offset position
+     * @return the list of autocompletion hints at the offset position
      */
     @POST
     public Hints getAutoCompletionHints(@QueryParam("offset") int offset, @QueryParam("syntax") String syntaxId,
@@ -123,8 +126,8 @@ public class AutoCompletionResource implements XWikiRestComponent
     {
         Hints hints = new Hints();
 
-        // Only support autocompletion on Velocity ATM
         TargetContent targetContent = this.targetContentLocator.locate(content, syntaxId, offset);
+        // Only support autocompletion on Velocity ATM
         if (targetContent != null && targetContent.getType() == TargetContentType.VELOCITY) {
             hints = getHints(targetContent.getContent(), targetContent.getPosition());
         }
@@ -201,8 +204,8 @@ public class AutoCompletionResource implements XWikiRestComponent
                     }
                 }
             } catch (InvalidVelocityException e) {
-                this.logger.debug("Failed to get autocomplete hints for content [{}] at offset [{}]", new Object[] {
-                    content, offset, e});
+                this.logger.debug("Failed to get autocomplete hints for content [{}] at offset [{}]",
+                    content, offset, e);
             }
         }
 
@@ -235,7 +238,7 @@ public class AutoCompletionResource implements XWikiRestComponent
         }
 
         AutoCompletionMethodFinder methodFinder = getMethodFinder(variableName);
-        List<Class> methodClasses = Arrays.asList((Class) contextVariable.getClass());
+        List<Class<?>> methodClasses = Collections.singletonList(contextVariable.getClass());
 
         do {
             // Handle the special case when the cursor is after the dot ('.')
@@ -251,7 +254,7 @@ public class AutoCompletionResource implements XWikiRestComponent
 
             if (pos == chars.length) {
                 // Find all methods matching methodName in methodClasses
-                for (Class methodClass : methodClasses) {
+                for (Class<?> methodClass : methodClasses) {
                     results.withHints(methodFinder.findMethods(methodClass, methodName));
                 }
 
@@ -261,8 +264,8 @@ public class AutoCompletionResource implements XWikiRestComponent
                 break;
             } else {
                 // Find the returned type for method "methodName".
-                List<Class> returnTypes = new ArrayList<>();
-                for (Class methodClass : methodClasses) {
+                List<Class<?>> returnTypes = new ArrayList<>();
+                for (Class<?> methodClass : methodClasses) {
                     returnTypes.addAll(methodFinder.findMethodReturnTypes(methodClass, methodName));
                 }
                 methodClasses = returnTypes;

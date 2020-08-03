@@ -47,7 +47,7 @@ public class XWikiAutoCompletionMethodFinder extends AbstractXWikiContextAutoCom
     private AutoCompletionMethodFinder defaultAutoCompletionMethodFinder;
 
     @Override
-    public Hints findMethods(Class variableClass, String fragmentToMatch)
+    public Hints findMethods(Class<?> variableClass, String fragmentToMatch)
     {
         Hints hints = this.defaultAutoCompletionMethodFinder.findMethods(variableClass, fragmentToMatch);
 

@@ -76,7 +76,7 @@ public class ScriptServicesAutoCompletionMethodFinderTest
         MockitoComponentMockingRule cm = mocker.getInstance(ComponentManager.class);
         ScriptService scriptService = cm.registerMockComponent(ScriptService.class, "query");
 
-        List<Class> types = mocker.getComponentUnderTest().findMethodReturnTypes(null, "query");
+        List<Class<?>> types = mocker.getComponentUnderTest().findMethodReturnTypes(null, "query");
         assertEquals(1, types.size());
         assertEquals(scriptService.getClass(), types.get(0));
     }
@@ -86,7 +86,7 @@ public class ScriptServicesAutoCompletionMethodFinderTest
     {
         // "unknown" is supposed to be a hint for a ScriptService that doesn't exist. We verify we don't throw any
         // exception and return an empty result.
-        List<Class> types = mocker.getComponentUnderTest().findMethodReturnTypes(null, "unknown");
+        List<Class<?>> types = mocker.getComponentUnderTest().findMethodReturnTypes(null, "unknown");
         assertEquals(0, types.size());
     }
 }

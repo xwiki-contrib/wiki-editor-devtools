@@ -29,7 +29,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- * Represents a list of hints that are returned.
+ * Represents a list of completion hints that are returned in the REST response.
  * 
  * @version $Id$
  */

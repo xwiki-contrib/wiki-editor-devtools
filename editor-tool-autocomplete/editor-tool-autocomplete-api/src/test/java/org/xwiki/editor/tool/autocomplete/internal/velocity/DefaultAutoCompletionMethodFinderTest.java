@@ -124,8 +124,7 @@ class DefaultAutoCompletionMethodFinderTest
         Hints hints = this.methodFinder.findMethods(TestClass.class, "so");
 
         assertThat(hints.getHints(), containsInAnyOrder(
-            new HintData("something", "something String"),
-            new HintData("getSomething", "getSomething(String) String")));
+            new HintData("something", "something String")));
     }
 
     @Test

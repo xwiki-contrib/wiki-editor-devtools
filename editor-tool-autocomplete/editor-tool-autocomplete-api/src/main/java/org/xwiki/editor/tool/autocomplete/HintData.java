@@ -75,7 +75,8 @@ public class HintData implements Comparable<HintData>
     @Override
     public int compareTo(HintData hintData)
     {
-        return getName().compareTo(hintData.getName());
+
+        return toString().compareTo(hintData.toString());
     }
 
     @Override

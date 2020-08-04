@@ -70,6 +70,27 @@ class DefaultAutoCompletionMethodFinderTest
             return "";
         }
 
+        public String display()
+        {
+            return "";
+        }
+
+        public String display(String param1)
+        {
+            return "";
+        }
+
+        public String display(String param1, String param2)
+        {
+            return "";
+        }
+
+        public String display(String param1, Object param2)
+        {
+            return "";
+        }
+
+
         public void method1(String param1, AncillaryTestClass param2, int param3)
         {
         }
@@ -102,7 +123,9 @@ class DefaultAutoCompletionMethodFinderTest
     {
         Hints hints = this.methodFinder.findMethods(TestClass.class, "so");
 
-        assertThat(hints.getHints(), containsInAnyOrder(new HintData("something", "something String")));
+        assertThat(hints.getHints(), containsInAnyOrder(
+            new HintData("something", "something String"),
+            new HintData("getSomething", "getSomething(String) String")));
     }
 
     @Test
@@ -114,6 +137,19 @@ class DefaultAutoCompletionMethodFinderTest
         expected.add(new HintData("getSomething", "getSomething() String"));
         expected.add(new HintData("getSomething", "getSomething(String) String"));
         assertEquals(expected, hints.getHints());
+    }
+
+    @Test
+    void findMethodsWithSameNameDifferentParameters()
+    {
+        Hints hints = this.methodFinder.findMethods(TestClass.class, "display");
+
+        assertEquals(4, hints.getHints().size());
+        assertThat(hints.getHints(), containsInAnyOrder(
+            new HintData("display", "display() String"),
+            new HintData("display", "display(String) String"),
+            new HintData("display", "display(String, String) String"),
+            new HintData("display", "display(String, Object) String")));
     }
 
     @Test

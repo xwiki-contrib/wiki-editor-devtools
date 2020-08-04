@@ -36,6 +36,9 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
 import com.xpn.xwiki.plugin.XWikiPluginManager;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.in;
+import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -78,7 +81,9 @@ class XWikiAutoCompletionMethodFinderTest
 
         Hints hints = this.methodFinder.findMethods(TestClass.class, "t");
 
-        assertEquals(1, hints.getHints().size());
-        assertEquals(new HintData("tag", "tag"), hints.getHints().first());
+        // 2 because it also contains
+        // name = [tag], description = [tag XWikiPluginInterface$MockitoMock$675869742]
+        assertEquals(2, hints.getHints().size());
+        assertThat(new HintData("tag", "tag"), is(in(hints.getHints())));
     }
 }

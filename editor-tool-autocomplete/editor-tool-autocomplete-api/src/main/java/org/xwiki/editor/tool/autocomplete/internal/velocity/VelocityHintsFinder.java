@@ -19,6 +19,7 @@
  */
 package org.xwiki.editor.tool.autocomplete.internal.velocity;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -30,6 +31,7 @@ import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.velocity.VelocityContext;
+import org.apache.velocity.context.Context;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -177,6 +179,19 @@ public class VelocityHintsFinder implements HintsFinder
         return result;
     }
 
+    private Object[] getKeys(Context velocityContext)
+    {
+        // We call getKeys() using reflevity because
+        // before Velocity 2.0 it was returning Object[]
+        // and after it's returning String[].
+        try {
+            Method getKeys = VelocityContext.class.getMethod("getKeys");
+            return (Object[]) getKeys.invoke(velocityContext);
+        } catch (Exception e) {
+            throw new RuntimeException("Error while trying to call AbstractContext#getKeys", e);
+        }
+    }
+
     /**
      * Find out all Velocity variable names bound in the Velocity Context.
      *
@@ -189,9 +204,9 @@ public class VelocityHintsFinder implements HintsFinder
     {
         Hints hints = new Hints();
 
-        addVelocityKeys(hints, velocityContext.getKeys(), fragmentToMatch);
+        addVelocityKeys(hints, getKeys(velocityContext), fragmentToMatch);
         if (velocityContext.getChainedContext() != null) {
-            addVelocityKeys(hints, velocityContext.getChainedContext().getKeys(), fragmentToMatch);
+            addVelocityKeys(hints, getKeys(velocityContext.getChainedContext()), fragmentToMatch);
         }
 
         // Set the hints offset to be able to determine where the completion should be inserted.

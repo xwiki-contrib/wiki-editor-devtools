@@ -22,20 +22,17 @@ package org.xwiki.editor.tool.autocomplete;
 import org.xwiki.component.annotation.Role;
 
 /**
- * Allows discovering the syntax of the content under the current cursor position. See {@link TargetContent}.
+ * Find autocompletion hints.
  *
  * @version $Id$
+ * @since 4.5
  */
 @Role
-public interface TargetContentLocator
+public interface HintsFinder
 {
     /**
-     * @param content the whole content from which we need to extract the content and type at the cursor position
-     *                (e.g. the whole content could be written in XWiki Syntax Syntax 2.1 and the content at the
-     *                cursor position could be Velocity content inside a {@code {{velocity}}} macro)
-     * @param syntaxId the syntax in which the whole content is written in (e.g. {@code xwiki/2.0})
-     * @param currentPosition the position of the cursor
-     * @return the content and type at the cursor position
+     * @param targetContent the content for which to return hints for
+     * @return the autcompletion hints
      */
-    TargetContent locate(String content, String syntaxId, int currentPosition);
+    Hints findHints(TargetContent targetContent);
 }

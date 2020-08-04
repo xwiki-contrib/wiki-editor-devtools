@@ -17,17 +17,18 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.editor.tool.autocomplete.internal;
+package org.xwiki.editor.tool.autocomplete.internal.velocity;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.editor.tool.autocomplete.AutoCompletionMethodFinder;
 import org.xwiki.editor.tool.autocomplete.HintData;
 import org.xwiki.editor.tool.autocomplete.Hints;
 
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.plugin.XWikiPluginManager;
 
 /**
@@ -38,13 +39,16 @@ import com.xpn.xwiki.plugin.XWikiPluginManager;
 @Component
 @Named("xwiki")
 @Singleton
-public class XWikiAutoCompletionMethodFinder extends AbstractXWikiContextAutoCompletionMethodFinder
+public class XWikiAutoCompletionMethodFinder extends AbstractAutoCompletionMethodFinder
 {
     /**
      * Used to find all methods.
      */
     @Inject
     private AutoCompletionMethodFinder defaultAutoCompletionMethodFinder;
+
+    @Inject
+    private Provider<XWikiContext> xwikiContextProvider;
 
     @Override
     public Hints findMethods(Class<?> variableClass, String fragmentToMatch)
@@ -72,6 +76,6 @@ public class XWikiAutoCompletionMethodFinder extends AbstractXWikiContextAutoCom
      */
     protected XWikiPluginManager getPluginManager()
     {
-        return getXWikiContext().getWiki().getPluginManager();
+        return this.xwikiContextProvider.get().getWiki().getPluginManager();
     }
 }

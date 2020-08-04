@@ -19,32 +19,33 @@
  */
 package org.xwiki.editor.tool.autocomplete.internal;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.editor.tool.autocomplete.TargetContent;
-import org.xwiki.editor.tool.autocomplete.TargetContentLocator;
 import org.xwiki.editor.tool.autocomplete.TargetContentType;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.test.annotation.AllComponents;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+@ComponentTest
 @AllComponents
-public class DefaultTargetContentLocatorTest
+class DefaultTargetContentLocatorTest
 {
-    @Rule
-    public MockitoComponentMockingRule<TargetContentLocator> mocker =
-        new MockitoComponentMockingRule<>(DefaultTargetContentLocator.class);
+    @InjectMockComponents
+    private DefaultTargetContentLocator targetContentLocator;
 
     @Test
-    public void locateVelocityMacroContent() throws Exception
+    void locateVelocityMacroContent()
     {
         String content = "" + "some wiki content here\n\n" + "{{velocity}}\n" + "cursor here\n";
 
         TargetContent targetContent =
-            mocker.getComponentUnderTest().locate(content, Syntax.XWIKI_2_0.toIdString(), content.length());
-        Assert.assertNotNull(targetContent);
-        Assert.assertEquals(new TargetContent("cursor here\n", "cursor here\n".length(), TargetContentType.VELOCITY),
+            this.targetContentLocator.locate(content, Syntax.XWIKI_2_0.toIdString(), content.length());
+        assertNotNull(targetContent);
+        assertEquals(new TargetContent("cursor here\n", "cursor here\n".length(), TargetContentType.VELOCITY),
             targetContent);
     }
 }

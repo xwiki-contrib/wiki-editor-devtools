@@ -17,34 +17,26 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.editor.tool.autocomplete.internal;
+package org.xwiki.editor.tool.autocomplete.internal.velocity;
 
-import javax.inject.Inject;
+import com.xpn.xwiki.doc.XWikiDocument;
 
-import org.xwiki.context.Execution;
-import org.xwiki.model.internal.DefaultModelContext;
-
-import com.xpn.xwiki.XWikiContext;
+import static org.mockito.Mockito.*;
 
 /**
- * To be extended by method finders that require getting the XWiki Context.
+ * Fakes the creation of a XWiki Document. We do this since otherwise the {@link VelocityHintsFinder} implementation
+ * will try to create a real XWiki Document and this will in turn try to inject several components that are not
+ * registered in the unit tests at the moment (and we don't really care about them).
+ * <p>
+ * This component overrides the {@link VelocityHintsFinder} one (by having a more important priority).
  *
- * @version $Id$
+ * @version $Id:$
  */
-public abstract class AbstractXWikiContextAutoCompletionMethodFinder extends AbstractAutoCompletionMethodFinder
+public class TestableVelocityHintsFinder extends VelocityHintsFinder
 {
-    /**
-     * @see #getXWikiContext()
-     */
-    @Inject
-    private Execution execution;
-
-    /**
-     * @return the XWiki Context from which we get the XWiki Object which in turn allows us to get the XWiki Plugin
-     *         Manager to get the list of plugins and the plugin types.
-     */
-    protected XWikiContext getXWikiContext()
+    @Override
+    protected XWikiDocument createFakeXWikiDocument()
     {
-        return (XWikiContext) this.execution.getContext().getProperty(DefaultModelContext.XCONTEXT_KEY);
+        return mock(XWikiDocument.class);
     }
 }

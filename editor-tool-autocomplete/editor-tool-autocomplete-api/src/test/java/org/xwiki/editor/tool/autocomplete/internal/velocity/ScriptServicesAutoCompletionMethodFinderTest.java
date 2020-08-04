@@ -17,76 +17,77 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.editor.tool.autocomplete.internal;
+package org.xwiki.editor.tool.autocomplete.internal.velocity;
 
 import java.util.List;
 
-import org.junit.*;
-import org.xwiki.component.manager.ComponentManager;
+import org.junit.jupiter.api.Test;
 import org.xwiki.editor.tool.autocomplete.HintData;
 import org.xwiki.editor.tool.autocomplete.Hints;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.mockito.MockitoComponentManager;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit tests for {@link ScriptServicesAutoCompletionMethodFinder}.
  *
  * @version $Id:$
  */
-public class ScriptServicesAutoCompletionMethodFinderTest
+@ComponentTest
+class ScriptServicesAutoCompletionMethodFinderTest
 {
-    @Rule
-    public MockitoComponentMockingRule<ScriptServicesAutoCompletionMethodFinder> mocker =
-        new MockitoComponentMockingRule<ScriptServicesAutoCompletionMethodFinder>(
-            ScriptServicesAutoCompletionMethodFinder.class);
+    @InjectMockComponents
+    private ScriptServicesAutoCompletionMethodFinder methodFinder;
+
+    @InjectComponentManager
+    private MockitoComponentManager componentManager;
 
     @Test
-    public void findMethodsWhenMatchingService() throws Exception
+    void findMethodsWhenMatchingService() throws Exception
     {
-        MockitoComponentMockingRule cm = mocker.getInstance(ComponentManager.class);
-        cm.registerMockComponent(ScriptService.class, "query");
+        this.componentManager.registerMockComponent(ScriptService.class, "query");
 
-        Hints hints = mocker.getComponentUnderTest().findMethods(null, "q");
+        Hints hints = this.methodFinder.findMethods(null, "q");
         assertEquals(1, hints.getHints().size());
         assertEquals(new HintData("query", "query"), hints.getHints().first());
     }
 
     @Test
-    public void findMethodsWhenNotMatchingService() throws Exception
+    void findMethodsWhenNotMatchingService() throws Exception
     {
-        MockitoComponentMockingRule cm = mocker.getInstance(ComponentManager.class);
-        cm.registerMockComponent(ScriptService.class);
+        this.componentManager.registerMockComponent(ScriptService.class);
 
-        Hints hints = mocker.getComponentUnderTest().findMethods(null, "q");
+        Hints hints = this.methodFinder.findMethods(null, "q");
         assertEquals(0, hints.getHints().size());
     }
 
     @Test
-    public void findMethodsWhenNoScriptService() throws Exception
+    void findMethodsWhenNoScriptService()
     {
-        Hints hints = mocker.getComponentUnderTest().findMethods(null, "");
+        Hints hints = this.methodFinder.findMethods(null, "");
         assertEquals(0, hints.getHints().size());
     }
 
     @Test
-    public void findMethodReturnTypesWhenExists() throws Exception
+    void findMethodReturnTypesWhenExists() throws Exception
     {
-        MockitoComponentMockingRule cm = mocker.getInstance(ComponentManager.class);
-        ScriptService scriptService = cm.registerMockComponent(ScriptService.class, "query");
+        ScriptService scriptService = this.componentManager.registerMockComponent(ScriptService.class, "query");
 
-        List<Class<?>> types = mocker.getComponentUnderTest().findMethodReturnTypes(null, "query");
+        List<Class<?>> types = this.methodFinder.findMethodReturnTypes(null, "query");
         assertEquals(1, types.size());
         assertEquals(scriptService.getClass(), types.get(0));
     }
 
     @Test
-    public void findMethodReturnTypesWhenDoesntExists() throws Exception
+    void findMethodReturnTypesWhenDoesntExists()
     {
         // "unknown" is supposed to be a hint for a ScriptService that doesn't exist. We verify we don't throw any
         // exception and return an empty result.
-        List<Class<?>> types = mocker.getComponentUnderTest().findMethodReturnTypes(null, "unknown");
+        List<Class<?>> types = this.methodFinder.findMethodReturnTypes(null, "unknown");
         assertEquals(0, types.size());
     }
 }

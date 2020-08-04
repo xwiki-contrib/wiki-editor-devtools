@@ -17,13 +17,13 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.editor.tool.autocomplete.internal;
+package org.xwiki.editor.tool.autocomplete.internal.velocity;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.editor.tool.autocomplete.AutoCompletionMethodFinder;
 import org.xwiki.editor.tool.autocomplete.HintData;
 import org.xwiki.editor.tool.autocomplete.Hints;
 
@@ -37,13 +37,16 @@ import com.xpn.xwiki.XWikiContext;
  */
 @Component(hints = { "context", "xcontext" })
 @Singleton
-public class ContextAutoCompletionMethodFinder extends AbstractXWikiContextAutoCompletionMethodFinder
+public class ContextAutoCompletionMethodFinder extends AbstractAutoCompletionMethodFinder
 {
     /**
      * Used to find all methods.
      */
     @Inject
     private AutoCompletionMethodFinder defaultAutoCompletionMethodFinder;
+
+    @Inject
+    private Provider<XWikiContext> xwikiContextProvider;
 
     @Override
     public Hints findMethods(Class<?> variableClass, String fragmentToMatch)
@@ -52,7 +55,7 @@ public class ContextAutoCompletionMethodFinder extends AbstractXWikiContextAutoC
 
         // Add context keys matching the passed fragment
         String lowerCaseFragment = fragmentToMatch.toLowerCase();
-        XWikiContext context = getXWikiContext();
+        XWikiContext context = this.xwikiContextProvider.get();
         for (Object key : context.keySet()) {
             if (key instanceof String && ((String) key).toLowerCase().startsWith(lowerCaseFragment)) {
                 String shorthand = printShorthand((String) key, context.get(key).getClass());

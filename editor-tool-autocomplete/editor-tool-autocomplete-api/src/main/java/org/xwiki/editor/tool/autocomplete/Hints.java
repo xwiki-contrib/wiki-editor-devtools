@@ -95,7 +95,7 @@ public class Hints
      */
     public int getStartOffset()
     {
-        return startOffset;
+        return this.startOffset;
     }
 
     /**

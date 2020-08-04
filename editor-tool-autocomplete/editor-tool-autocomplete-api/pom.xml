@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
- *
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -19,7 +18,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
 -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
@@ -103,6 +101,32 @@
         <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.revapi</groupId>
+        <artifactId>revapi-maven-plugin</artifactId>
+        <configuration>
+          <analysisConfiguration><![CDATA[
+            {
+              "revapi": {
+                "filter": {
+                  // We're ignoring all API incompatibilities from XWiki dependencies (i.e. commons and rendering)
+                  // since they're already covered by their own builds and we release all of them together.
+                  "archives": {
+                    "exclude": ["org\\.xwiki\\.commons:.*:.*", "org\\.xwiki\\.rendering:.*:.*"]
+                  }
+                },
+                "ignore" : [
+                  {
+                    "code": "java.class.removed",
+                    "old": "interface org.xwiki.editor.tool.autocomplete.AutoCompletionMethodFinder",
+                    "justification": "Moved under a velocity package to make way for autocompletion of more than just Velocity code"
+                  }
+                ]
+              }
+            }
+          ]]></analysisConfiguration>
+        </configuration>
       </plugin>
     </plugins>
   </build>

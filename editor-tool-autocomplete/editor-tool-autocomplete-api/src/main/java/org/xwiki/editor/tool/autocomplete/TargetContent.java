@@ -23,9 +23,9 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 /**
- * Represents the content and type at the cursor position (eg the whole content could be written in wiki syntax and
- * the content at the cursor position could be Velocity content). Also provides the position of the cursor relative
- * to the content.
+ * Represents the content and type at the cursor position (e.g. the whole content could be written in XWiki Syntax
+ * Syntax 2.1 and the content at the cursor position could be Velocity content inside a {@code {{velocity}}} macro).
+ * Also provides the position of the cursor relative to the content.
  *
  * @version $Id$
  */

@@ -17,73 +17,66 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.editor.tool.autocomplete.internal;
+package org.xwiki.editor.tool.autocomplete.internal.velocity;
 
 import java.util.Arrays;
 import java.util.Vector;
 
-import org.junit.*;
-import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContext;
-import org.xwiki.editor.tool.autocomplete.AutoCompletionMethodFinder;
+import javax.inject.Provider;
+
+import org.junit.jupiter.api.Test;
 import org.xwiki.editor.tool.autocomplete.HintData;
 import org.xwiki.editor.tool.autocomplete.Hints;
-import org.xwiki.model.internal.DefaultModelContext;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
 import com.xpn.xwiki.plugin.XWikiPluginManager;
 
-import static org.mockito.Mockito.*;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link XWikiAutoCompletionMethodFinder}.
  * 
  * @version $Id$
  */
-public class XWikiAutoCompletionMethodFinderTest
+@ComponentTest
+class XWikiAutoCompletionMethodFinderTest
 {
-    @Rule
-    public MockitoComponentMockingRule<XWikiAutoCompletionMethodFinder> mocker =
-        new MockitoComponentMockingRule<XWikiAutoCompletionMethodFinder>(
-            XWikiAutoCompletionMethodFinder.class);
+    @InjectMockComponents
+    private XWikiAutoCompletionMethodFinder methodFinder;
 
-    private XWikiAutoCompletionMethodFinder finder;
+    @MockComponent
+    private AutoCompletionMethodFinder defaultMethodFinder;
+
+    @MockComponent
+    private Provider<XWikiContext> xwikiContextProvider;
 
     private class TestClass
     {
     }
 
-    @Before
-    public void setUp() throws Exception
-    {
-        this.finder = mocker.getComponentUnderTest();
-    }
-
     @Test
-    public void findMethodsWhenMatching() throws Exception
+    void findMethodsWhenMatching()
     {
-        Execution execution = mocker.getInstance(Execution.class);
-        ExecutionContext executionContext = mock(ExecutionContext.class);
-        when(execution.getContext()).thenReturn(executionContext);
-        XWikiContext xwikiContext = mock(XWikiContext.class);
-        when(executionContext.getProperty(DefaultModelContext.XCONTEXT_KEY)).thenReturn(xwikiContext);
+        XWikiContext xcontext = mock(XWikiContext.class);
+        when(this.xwikiContextProvider.get()).thenReturn(xcontext);
         XWiki xwiki = mock(XWiki.class);
-        when(xwikiContext.getWiki()).thenReturn(xwiki);
+        when(xcontext.getWiki()).thenReturn(xwiki);
         XWikiPluginManager xwikiPluginManager = mock(XWikiPluginManager.class);
         when(xwiki.getPluginManager()).thenReturn(xwikiPluginManager);
-        when(xwikiPluginManager.getPlugins()).thenReturn(new Vector<String>(Arrays.asList("tag", "query")));
+        when(xwikiPluginManager.getPlugins()).thenReturn(new Vector<>(Arrays.asList("tag", "query")));
         XWikiPluginInterface tagPlugin = mock(XWikiPluginInterface.class);
         when(xwikiPluginManager.getPlugin("tag")).thenReturn(tagPlugin);
-
-        AutoCompletionMethodFinder defaultMethodFinder = mocker.getInstance(AutoCompletionMethodFinder.class);
-        when(defaultMethodFinder.findMethods(TestClass.class, "t")).thenReturn(
+        when(this.defaultMethodFinder.findMethods(TestClass.class, "t")).thenReturn(
             new Hints().withHints(new HintData("tag", "tag")));
 
-        Hints hints = this.finder.findMethods(TestClass.class, "t");
+        Hints hints = this.methodFinder.findMethods(TestClass.class, "t");
 
         assertEquals(1, hints.getHints().size());
         assertEquals(new HintData("tag", "tag"), hints.getHints().first());

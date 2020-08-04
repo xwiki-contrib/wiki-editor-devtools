@@ -17,13 +17,11 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.editor.tool.autocomplete.internal;
+package org.xwiki.editor.tool.autocomplete.internal.velocity;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.xwiki.editor.tool.autocomplete.AutoCompletionMethodFinder;
 
 import com.xpn.xwiki.util.Programming;
 
@@ -46,12 +44,10 @@ public abstract class AbstractAutoCompletionMethodFinder implements AutoCompleti
         // Step 1: Add method name
         // Step 2: Add parameters
         // Step 3: Add return type (Don't print void return types!)
-        return new StringBuilder()
-            .append(methodName)
-            .append(getParameters(method))
-            .append(getReturnType(method))
-            .append(getProgrammingRights(method))
-            .toString();
+        return methodName
+            + getParameters(method)
+            + getReturnType(method)
+            + getProgrammingRights(method);
     }
 
     /**
@@ -65,11 +61,9 @@ public abstract class AbstractAutoCompletionMethodFinder implements AutoCompleti
     {
         // Step 1: Add method name
         // Step 2: Add return type (Don't print void return types!)
-        return new StringBuilder()
-            .append(methodName)
-            .append(getReturnType(method))
-            .append(getProgrammingRights(method))
-            .toString();
+        return methodName
+            + getReturnType(method)
+            + getProgrammingRights(method);
     }
 
     /**
@@ -83,10 +77,8 @@ public abstract class AbstractAutoCompletionMethodFinder implements AutoCompleti
     {
         // Step 1: Add method name
         // Step 2: Add return type (Don't print void return types!)
-        return new StringBuilder()
-            .append(methodName)
-            .append(returnType == null ? "" : " " + returnType.getSimpleName())
-            .toString();
+        return methodName
+            + (returnType == null ? "" : " " + returnType.getSimpleName());
     }
 
     /**

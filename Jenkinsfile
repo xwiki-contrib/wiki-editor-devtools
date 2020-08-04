@@ -17,24 +17,12 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.editor.tool.autocomplete.internal;
 
-import com.xpn.xwiki.doc.XWikiDocument;
+// It's assumed that Jenkins has been configured to implicitly load the vars/xwikiModule.groovy library which exposes
+// the "xwikiModule" global function/DSL.
+// Note that the version used is the one defined in Jenkins but it can be overridden as follows:
+// @Library("XWiki@<branch, tag, sha1>") _
+// See https://github.com/jenkinsci/workflow-cps-global-lib-plugin for details.
 
-import static org.mockito.Mockito.*;
-
-/**
- * Fakes the creation of a XWiki Document. We do this since otherwise the {@link AutoCompletionResource} implementation
- * will try to create a real XWiki Document and this will in turn try to inject several components that are not
- * registered in the unit tests at the moment (and we don't really care about them).
- *
- * @version $Id$
- */
-public class TestableAutoCompletionResource extends AutoCompletionResource
-{
-    @Override
-    protected XWikiDocument createFakeXWikiDocument()
-    {
-        return mock(XWikiDocument.class);
-    }
+xwikiModule {
 }

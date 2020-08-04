@@ -27,12 +27,9 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <creationDate>1428667612000</creationDate>
   <parent>SyntaxHighlighting.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <date>1429293624000</date>
-  <contentUpdateDate>1429180932000</contentUpdateDate>
   <version>1.1</version>
   <title>XWiki 2.1 Tags Syntax Highlighting Mode</title>
   <comment/>

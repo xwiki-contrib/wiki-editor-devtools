@@ -70,7 +70,6 @@ public class DefaultTargetContentLocator implements TargetContentLocator
     @Inject
     private Logger logger;
 
-    // TODO: Only supports Velocity at the moment
     @Override
     public TargetContent locate(String content, String syntaxId, int currentPosition)
     {
@@ -89,7 +88,7 @@ public class DefaultTargetContentLocator implements TargetContentLocator
             try {
                 XDOM xdom = parser.parse(new StringReader(modifiedContent.toString()));
 
-                // Find the matching Velocity macro
+                // Find the Velocity macro that contains the marker.
                 List<Block> velocityMacroBlocks = xdom.getBlocks(VELOCITY_MACRO_MATCHER, Block.Axes.DESCENDANT);
                 for (Block velocityMacroBlock : velocityMacroBlocks) {
                     MacroBlock macroBlock = (MacroBlock) velocityMacroBlock;
@@ -103,7 +102,7 @@ public class DefaultTargetContentLocator implements TargetContentLocator
                     }
                 }
             } catch (ParseException e) {
-                // Failed to parser content for some reason, don't do autocompletion
+                // Failed to parse content for some reason, don't do autocompletion
                 this.logger.debug("Failed to locate the content [{}] with syntax [{}] at the cursor position [{}]",
                     content, syntaxId, currentPosition, e);
             }

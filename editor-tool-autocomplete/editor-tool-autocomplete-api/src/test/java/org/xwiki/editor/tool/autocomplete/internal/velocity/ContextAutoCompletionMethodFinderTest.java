@@ -17,57 +17,58 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.editor.tool.autocomplete.internal;
+package org.xwiki.editor.tool.autocomplete.internal.velocity;
+
+import java.util.Collections;
 
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import org.junit.jupiter.api.Test;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.editor.tool.autocomplete.Hints;
-import org.xwiki.editor.tool.autocomplete.HintsFinder;
-import org.xwiki.editor.tool.autocomplete.TargetContent;
-import org.xwiki.editor.tool.autocomplete.TargetContentLocator;
-import org.xwiki.editor.tool.autocomplete.TargetContentType;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+
+import com.xpn.xwiki.XWikiContext;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Unit tests for {@link AutoCompletionResource}.
+ * Unit tests for {@link ContextAutoCompletionMethodFinder}.
  * 
  * @version $Id:$
  */
 @ComponentTest
-public class AutoCompletionResourceTest
+class ContextAutoCompletionMethodFinderTest
 {
     @InjectMockComponents
-    private AutoCompletionResource autoCompletionResource;
-
-    @MockComponent
-    private TargetContentLocator targetContentLocator;
-
-    @MockComponent
     @Named("context")
-    private ComponentManager contextComponentManager;
+    private ContextAutoCompletionMethodFinder methodFinder;
+
+    @MockComponent
+    private AutoCompletionMethodFinder defaultMethodFinder;
+
+    @MockComponent
+    private Provider<XWikiContext> xwikiContextProvider;
+
+    private class TestClass
+    {
+    }
 
     @Test
-    void getAutoCompletionHints() throws Exception
+    void findMethodsWhenMatching()
     {
-        String content = "whatever";
-        TargetContent targetContent = new TargetContent("new content", 3, TargetContentType.VELOCITY);
-        when(this.targetContentLocator.locate(content, "xwiki/2.1", content.length())).thenReturn(targetContent);
-        HintsFinder finder = mock(HintsFinder.class);
-        when(this.contextComponentManager.getInstance(HintsFinder.class, "velocity")).thenReturn(finder);
-        Hints expectedHints = new Hints();
-        expectedHints.withStartOffset(5);
-        when(finder.findHints(targetContent)).thenReturn(expectedHints);
+        XWikiContext xcontext = mock(XWikiContext.class);
+        when(this.xwikiContextProvider.get()).thenReturn(xcontext);
+        when(this.defaultMethodFinder.findMethods(TestClass.class, "")).thenReturn(new Hints());
+        when(xcontext.keySet()).thenReturn(Collections.singleton("doc"));
+        when(xcontext.get("doc")).thenReturn(new TestClass());
 
-        Hints hints = this.autoCompletionResource.getAutoCompletionHints(content.length(), "xwiki/2.1", content);
+        Hints hints = this.methodFinder.findMethods(TestClass.class, "");
 
-        assertEquals(content.length() - 5, hints.getStartOffset());
+        assertEquals(1, hints.getHints().size());
     }
 }

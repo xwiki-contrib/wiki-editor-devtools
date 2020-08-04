@@ -17,11 +17,12 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.editor.tool.autocomplete;
+package org.xwiki.editor.tool.autocomplete.internal.velocity;
 
 import java.util.List;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.editor.tool.autocomplete.Hints;
 
 /**
  * Allows contributing special hints. For example for Script Services, instead of returning a hint of {@code get} which

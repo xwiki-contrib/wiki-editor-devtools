@@ -17,43 +17,34 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.editor.tool.autocomplete.internal;
+package org.xwiki.editor.tool.autocomplete.internal.velocity;
 
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.editor.tool.autocomplete.HintData;
 import org.xwiki.editor.tool.autocomplete.Hints;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
 
 import com.xpn.xwiki.util.Programming;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit tests for {@link DefaultAutoCompletionMethodFinder}.
  *
  * @version $Id$
  */
-public class DefaultAutoCompletionMethodFinderTest
+@ComponentTest
+class DefaultAutoCompletionMethodFinderTest
 {
-    @Rule
-    public MockitoComponentMockingRule<DefaultAutoCompletionMethodFinder> mocker =
-        new MockitoComponentMockingRule<>(DefaultAutoCompletionMethodFinder.class);
-
-    private DefaultAutoCompletionMethodFinder finder;
-
-    @Before
-    public void setUp() throws Exception
-    {
-        this.finder = mocker.getComponentUnderTest();
-    }
+    @InjectMockComponents
+    private DefaultAutoCompletionMethodFinder methodFinder;
 
     private class AncillaryTestClass
     {
@@ -96,9 +87,9 @@ public class DefaultAutoCompletionMethodFinderTest
     }
 
     @Test
-    public void findMethodsWhenMatching()
+    void findMethodsWhenMatching()
     {
-        Hints hints = this.finder.findMethods(TestClass.class, "m");
+        Hints hints = this.methodFinder.findMethods(TestClass.class, "m");
 
         assertThat(
             hints.getHints(),
@@ -107,17 +98,17 @@ public class DefaultAutoCompletionMethodFinderTest
     }
 
     @Test
-    public void findMethodsWhenMatchingGetter()
+    void findMethodsWhenMatchingGetter()
     {
-        Hints hints = this.finder.findMethods(TestClass.class, "so");
+        Hints hints = this.methodFinder.findMethods(TestClass.class, "so");
 
         assertThat(hints.getHints(), containsInAnyOrder(new HintData("something", "something String")));
     }
 
     @Test
-    public void findMethodsWhenCamelCaseMatching()
+    void findMethodsWhenCamelCaseMatching()
     {
-        Hints hints = this.finder.findMethods(TestClass.class, "getSo");
+        Hints hints = this.methodFinder.findMethods(TestClass.class, "getSo");
 
         SortedSet<HintData> expected = new TreeSet<>();
         expected.add(new HintData("getSomething", "getSomething() String"));
@@ -126,17 +117,17 @@ public class DefaultAutoCompletionMethodFinderTest
     }
 
     @Test
-    public void excludeAspectJMethods()
+    void excludeAspectJMethods()
     {
-        Hints hints = this.finder.findMethods(TestClass.class, "a");
+        Hints hints = this.methodFinder.findMethods(TestClass.class, "a");
 
         assertEquals(0, hints.getHints().size());
     }
 
     @Test
-    public void findMethodReturnTypes()
+    void findMethodReturnTypes()
     {
-        List<Class<?>> types = this.finder.findMethodReturnTypes(TestClass.class, "doWork");
+        List<Class<?>> types = this.methodFinder.findMethodReturnTypes(TestClass.class, "doWork");
         assertEquals(1, types.size());
         assertEquals(AncillaryTestClass.class, types.get(0));
     }

@@ -120,7 +120,7 @@ public class VelocityHintsFinder implements HintsFinder
         // Special case for when there's no variable after the dollar position since the Velocity Parser doesn't
         // support parsing this case.
         if (isCursorDirectlyAfterDollar(chars, dollarPos, targetContent.getPosition())) {
-            results = getVariableHints(targetContent.getContent(), "", velocityContext);
+            results = getVariableHints(targetContent, "", velocityContext);
         } else {
             // The cursor is not directly after the dollar sign.
             try {
@@ -147,7 +147,7 @@ public class VelocityHintsFinder implements HintsFinder
                         results = getHintsForMethodCall(chars, dollarPos + methodPos, identifier.toString());
                     } else {
                         // Autocomplete a variable! Find all matching variables.
-                        results = getVariableHints(targetContent.getContent(), identifier.toString(), velocityContext);
+                        results = getVariableHints(targetContent, identifier.toString(), velocityContext);
                     }
                 }
             } catch (InvalidVelocityException e) {
@@ -223,10 +223,15 @@ public class VelocityHintsFinder implements HintsFinder
      *   <li>all the defined velocity variables in the current content</li>
      * </ul>
      */
-    private Hints getVariableHints(String fullContent, String fragmentToMatch, VelocityContext velocityContext)
+    private Hints getVariableHints(TargetContent content, String fragmentToMatch, VelocityContext velocityContext)
     {
         Hints hints = getVelocityContextKeys(fragmentToMatch, velocityContext);
-        hints.withHints(getVelocityVariableHints(fullContent));
+        if (content.getContextData() != null) {
+            for (String previousVelocityMacroContent : (List<String>) content.getContextData()) {
+                hints.withHints(getVelocityVariableHints(previousVelocityMacroContent));
+            }
+        }
+        hints.withHints(getVelocityVariableHints(content.getContent()));
         return hints;
     }
 

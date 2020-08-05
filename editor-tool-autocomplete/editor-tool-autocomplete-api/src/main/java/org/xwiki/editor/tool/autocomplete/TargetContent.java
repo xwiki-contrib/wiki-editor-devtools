@@ -47,6 +47,11 @@ public class TargetContent
     private int position;
 
     /**
+     * @see #getContextData()
+     */
+    private Object contextData;
+
+    /**
      * @param content see {@link #getContent()}
      * @param position see {@link #getPosition()}
      * @param type see {@link #getType()}
@@ -56,6 +61,20 @@ public class TargetContent
         this.content = content;
         this.position = position;
         this.type = type;
+    }
+
+    /**
+     * @param content see {@link #getContent()}
+     * @param position see {@link #getPosition()}
+     * @param type see {@link #getType()}
+     * @param contextData see {@link #getContextData()}
+     */
+    public TargetContent(String content, int position, TargetContentType type, Object contextData)
+    {
+        this.content = content;
+        this.position = position;
+        this.type = type;
+        this.contextData = contextData;
     }
 
     /**
@@ -72,6 +91,16 @@ public class TargetContent
     public TargetContentType getType()
     {
         return this.type;
+    }
+
+    /**
+     * @return the context data (specific to the {@link HintsFinder}, for example for the Velocity Hints Finder, it
+     *         contains the velocity content for all the velocity rendering macros before the current one that has the
+     *         cursor). Can be null.
+     */
+    public Object getContextData()
+    {
+        return this.contextData;
     }
 
     /**
@@ -95,20 +124,30 @@ public class TargetContent
             return false;
         }
         TargetContent rhs = (TargetContent) object;
-        return new EqualsBuilder()
+        EqualsBuilder builder = new EqualsBuilder()
             .append(this.content, rhs.content)
             .append(this.type, rhs.type)
-            .append(this.position, rhs.position)
-            .isEquals();
+            .append(this.position, rhs.position);
+
+        if (getContextData() != null) {
+            builder.append(getContextData(), rhs.getContextData());
+        }
+
+        return builder.isEquals();
     }
 
     @Override
     public int hashCode()
     {
-        return new HashCodeBuilder(5, 5)
+        HashCodeBuilder builder = new HashCodeBuilder(5, 5)
             .append(this.content)
             .append(this.type)
-            .append(this.position)
-            .toHashCode();
+            .append(this.position);
+
+        if (getContextData() != null) {
+            builder.append(getContextData());
+        }
+
+        return builder.toHashCode();
     }
 }

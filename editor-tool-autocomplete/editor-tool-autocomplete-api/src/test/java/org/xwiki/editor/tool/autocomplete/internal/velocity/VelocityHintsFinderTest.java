@@ -556,13 +556,35 @@ class VelocityHintsFinderTest
             + "#if ($var == \"test\")\n"
             + "whatever\n"
             + "#end\n"
-            + "#set ($var2 = \"toto\")\n"
+            + "#set ($var2 = \"test\")\n"
             + "$";
         Hints hints =
             this.hintsFinder.findHints(new TargetContent(content, content.length(), TargetContentType.VELOCITY));
         assertEquals(5, hints.getHints().size());
         assertTrue(hints.getHints().contains(new HintData("var", "$var")));
         assertTrue(hints.getHints().contains(new HintData("var2", "$var2")));
+    }
+
+    @Test
+    void findHintsWhenVelocityVariableDefinedInSeveralVelocityRenderingMacros()
+    {
+        when(this.velocityManager.getVelocityContext()).thenReturn(new VelocityContext());
+
+        String previousContent = "#set ($var3 = \"whatever\")\n";
+        String mainContent = "##comment\n"
+            + "#set ($var = $services.wiki.all)\n"
+            + "$var\n"
+            + "#if ($var == \"test\")\n"
+            + "whatever\n"
+            + "#end\n"
+            + "#set ($var2 = \"test\")\n"
+            + "$";
+        Hints hints = this.hintsFinder.findHints(new TargetContent(mainContent, mainContent.length(),
+            TargetContentType.VELOCITY, Arrays.asList(previousContent)));
+        assertEquals(6, hints.getHints().size());
+        assertTrue(hints.getHints().contains(new HintData("var", "$var")));
+        assertTrue(hints.getHints().contains(new HintData("var2", "$var2")));
+        assertTrue(hints.getHints().contains(new HintData("var3", "$var3")));
     }
 
     private VelocityContext createTestVelocityContext(Object... properties)

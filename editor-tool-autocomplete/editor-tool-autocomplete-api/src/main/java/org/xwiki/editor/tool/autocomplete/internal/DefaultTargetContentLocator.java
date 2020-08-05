@@ -20,6 +20,7 @@
 package org.xwiki.editor.tool.autocomplete.internal;
 
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -89,6 +90,7 @@ public class DefaultTargetContentLocator implements TargetContentLocator
                 XDOM xdom = parser.parse(new StringReader(modifiedContent.toString()));
 
                 // Find the Velocity macro that contains the marker.
+                List<String> previousVelocityContents = new ArrayList<>();
                 List<Block> velocityMacroBlocks = xdom.getBlocks(VELOCITY_MACRO_MATCHER, Block.Axes.DESCENDANT);
                 for (Block velocityMacroBlock : velocityMacroBlocks) {
                     MacroBlock macroBlock = (MacroBlock) velocityMacroBlock;
@@ -97,8 +99,11 @@ public class DefaultTargetContentLocator implements TargetContentLocator
                         // We've found it, exit!
                         // Remove the marker...
                         String cleanContent = macroBlock.getContent().substring(0, pos);
-                        targetContent = new TargetContent(cleanContent, pos, TargetContentType.VELOCITY);
+                        targetContent =
+                            new TargetContent(cleanContent, pos, TargetContentType.VELOCITY, previousVelocityContents);
                         break;
+                    } else {
+                        previousVelocityContents.add(macroBlock.getContent());
                     }
                 }
             } catch (ParseException e) {

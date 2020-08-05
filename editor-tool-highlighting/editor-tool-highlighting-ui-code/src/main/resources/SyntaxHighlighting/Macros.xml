@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -20,28 +20,25 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc reference="SyntaxHighlighting.Macros" locale="">
+<xwikidoc version="1.4" reference="SyntaxHighlighting.Macros" locale="">
   <web>SyntaxHighlighting</web>
   <name>Macros</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
-  <parent>SyntaxHighlighting.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
+  <parent>SyntaxHighlighting.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
-  <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
   <title>Macros</title>
-  <defaultTemplate/>
-  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity output="false"}}
 ## Always ending in '/', remember not to add it twice.
-#set ($codeMirrorBaseURL = $services.webjars.url('codemirror', ''))
+#set ($codeMirrorBaseURL = $services.webjars.url('org.webjars.npm:codemirror', ''))
 #if ($codeMirrorBaseURL.contains('?') || "$!codeMirrorBaseURL" == "")
   ## Workaround for XWiki versions pre 7.1M1 that do not have http://jira.xwiki.org/browse/XWIKI-10881 fixed so that syntax highlighting works on older versions as well.
   #set ($codeMirrorBaseURL = "${xwiki.getURL('SyntaxHighlighting.RequireJSRequestRouter')}/codemirror/")

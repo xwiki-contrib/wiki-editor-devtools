@@ -124,6 +124,8 @@ class DefaultAutoCompletionMethodFinderTest
         Hints hints = this.methodFinder.findMethods(TestClass.class, "so");
 
         assertThat(hints.getHints(), containsInAnyOrder(
+            new HintData("getSomething", "getSomething() String"),
+            new HintData("getSomething", "getSomething(String) String"),
             new HintData("something", "something String")));
     }
 
@@ -136,6 +138,34 @@ class DefaultAutoCompletionMethodFinderTest
         expected.add(new HintData("getSomething", "getSomething() String"));
         expected.add(new HintData("getSomething", "getSomething(String) String"));
         assertEquals(expected, hints.getHints());
+    }
+
+    @Test
+    void findMethods()
+    {
+        Hints hints = this.methodFinder.findMethods(TestClass.class, "");
+
+        assertThat(hints.getHints(), containsInAnyOrder(
+            new HintData("class", "class Class"),
+            new HintData("getClass", "getClass() Class"),
+            new HintData("equals", "equals(Object) boolean"),
+            new HintData("hashCode", "hashCode() int"),
+            new HintData("notify", "notify() void"),
+            new HintData("notifyAll", "notifyAll() void"),
+            new HintData("toString", "toString() String"),
+            new HintData("wait", "wait() void"),
+            new HintData("wait", "wait(long) void"),
+            new HintData("wait", "wait(long, int) void"),
+            new HintData("doWork", "doWork() AncillaryTestClass"),
+            new HintData("method1", "method1(String, AncillaryTestClass, int) void"),
+            new HintData("method2", "method2() String (Programming Rights)"),
+            new HintData("getSomething", "getSomething() String"),
+            new HintData("getSomething", "getSomething(String) String"),
+            new HintData("something", "something String"),
+            new HintData("display", "display() String"),
+            new HintData("display", "display(String) String"),
+            new HintData("display", "display(String, String) String"),
+            new HintData("display", "display(String, Object) String")));
     }
 
     @Test

@@ -267,7 +267,7 @@ Currently supporting the following modes:
     </property>
     <property>
       <code>/* show-hint.css required to properly display the autocomplete hints. */
-@import "$services.webjars.url('codemirror', 'addon/hint/show-hint.css')";
+@import "$services.webjars.url('org.webjars.npm:codemirror', 'addon/hint/show-hint.css')";
 
 /* Overrides for the hint containers */
 .CodeMirror-hint {

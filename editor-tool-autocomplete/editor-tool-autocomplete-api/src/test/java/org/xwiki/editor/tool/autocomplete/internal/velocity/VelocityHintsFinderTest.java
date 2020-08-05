@@ -545,6 +545,26 @@ class VelocityHintsFinderTest
         assertEquals(new HintData("method1", "method1"), hints.getHints().first());
     }
 
+    @Test
+    void findHintsWhenVelocityVariableDefined()
+    {
+        when(this.velocityManager.getVelocityContext()).thenReturn(new VelocityContext());
+
+        String content = "##comment\n"
+            + "#set ($var = $services.wiki.all)\n"
+            + "$var\n"
+            + "#if ($var == \"test\")\n"
+            + "whatever\n"
+            + "#end\n"
+            + "#set ($var2 = \"toto\")\n"
+            + "$";
+        Hints hints =
+            this.hintsFinder.findHints(new TargetContent(content, content.length(), TargetContentType.VELOCITY));
+        assertEquals(5, hints.getHints().size());
+        assertTrue(hints.getHints().contains(new HintData("var", "$var")));
+        assertTrue(hints.getHints().contains(new HintData("var2", "$var2")));
+    }
+
     private VelocityContext createTestVelocityContext(Object... properties)
     {
         final VelocityContext context = new VelocityContext();

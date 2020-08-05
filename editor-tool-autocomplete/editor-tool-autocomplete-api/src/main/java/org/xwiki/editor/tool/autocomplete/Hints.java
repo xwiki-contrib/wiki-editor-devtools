@@ -55,7 +55,7 @@ public class Hints
     public SortedSet<HintData> getHints()
     {
         if (this.hints == null) {
-            this.hints = new TreeSet<HintData>();
+            this.hints = new TreeSet<>();
         }
         return this.hints;
     }

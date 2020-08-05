@@ -19,6 +19,8 @@
  */
 package org.xwiki.editor.tool.autocomplete.internal.velocity;
 
+import java.io.BufferedReader;
+import java.io.StringReader;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -118,9 +120,7 @@ public class VelocityHintsFinder implements HintsFinder
         // Special case for when there's no variable after the dollar position since the Velocity Parser doesn't
         // support parsing this case.
         if (isCursorDirectlyAfterDollar(chars, dollarPos, targetContent.getPosition())) {
-            // Find all objects bound to the Velocity Context. We need to also look in the chained context since
-            // this is where we store Velocity Tools
-            results = getVelocityContextKeys("", velocityContext);
+            results = getVariableHints(targetContent.getContent(), "", velocityContext);
         } else {
             // The cursor is not directly after the dollar sign.
             try {
@@ -147,7 +147,7 @@ public class VelocityHintsFinder implements HintsFinder
                         results = getHintsForMethodCall(chars, dollarPos + methodPos, identifier.toString());
                     } else {
                         // Autocomplete a variable! Find all matching variables.
-                        results = getVelocityContextKeys(identifier.toString(), velocityContext);
+                        results = getVariableHints(targetContent.getContent(), identifier.toString(), velocityContext);
                     }
                 }
             } catch (InvalidVelocityException e) {
@@ -212,6 +212,21 @@ public class VelocityHintsFinder implements HintsFinder
         // Set the hints offset to be able to determine where the completion should be inserted.
         hints = hints.withStartOffset(fragmentToMatch.length());
 
+        return hints;
+    }
+
+    /**
+     * Find:
+     * <ul>
+     *   <li>all objects bound to the Velocity Context. We need to also look in the chained context since
+     *       this is where we store Velocity Tools</li>
+     *   <li>all the defined velocity variables in the current content</li>
+     * </ul>
+     */
+    private Hints getVariableHints(String fullContent, String fragmentToMatch, VelocityContext velocityContext)
+    {
+        Hints hints = getVelocityContextKeys(fragmentToMatch, velocityContext);
+        hints.withHints(getVelocityVariableHints(fullContent));
         return hints;
     }
 
@@ -350,6 +365,42 @@ public class VelocityHintsFinder implements HintsFinder
         // unfortunately...
         Utils.setComponentManager(this.contextComponentManager);
         return new XWikiDocument(new DocumentReference("notusedwiki", "notusedspace", "notusedpage"));
+    }
+
+    protected Hints getVelocityVariableHints(String content)
+    {
+        Hints hints = new Hints();
+        for (String velocityVariable : getVelocityVariables(content)) {
+            hints.withHints(new HintData(velocityVariable, "$" + velocityVariable));
+        }
+        return hints;
+    }
+
+    private List<String> getVelocityVariables(String content)
+    {
+        List<String> variables = new ArrayList<>();
+        new BufferedReader(new StringReader(content))
+            .lines().forEach(line -> {
+                String trimmedLine = StringUtils.trim(line);
+                if (trimmedLine.startsWith("#")) {
+                    try {
+                        VelocityParserContext context = new VelocityParserContext();
+                        StringBuffer buffer = new StringBuffer();
+                        parser.getDirective(trimmedLine.toCharArray(), 0, buffer, context);
+                        String text = buffer.toString();
+                        if (text.startsWith("#set")) {
+                            int pos = text.indexOf('$', 4);
+                            if (pos > -1) {
+                                String variable = StringUtils.substringBefore(text.substring(pos + 1), "=").trim();
+                                variables.add(variable);
+                            }
+                        }
+                    } catch (Exception e) {
+                        // Ignore
+                    }
+                }
+            });
+        return variables;
     }
 }
 

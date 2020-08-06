@@ -50,7 +50,7 @@ class AutoCompleteIT
 
         // Start creating a velocity macro and trigger autocompletion
         WikiEditPage wep = vp.editWiki();
-        wep.setContent("{{velocity}}$");
+        //wep.setContent("{{velocity}}$");
 
         // TODO: Continue test by triggering autocompletion here and asserting results!
     }

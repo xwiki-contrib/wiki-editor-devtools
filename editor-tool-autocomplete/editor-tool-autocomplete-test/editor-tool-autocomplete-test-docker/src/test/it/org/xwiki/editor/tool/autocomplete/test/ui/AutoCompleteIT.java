@@ -19,8 +19,10 @@
  */
 package org.xwiki.editor.tool.autocomplete.test.ui;
 
-import org.junit.*;
-import org.xwiki.test.ui.AbstractTest;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
+import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
 
@@ -29,19 +31,22 @@ import org.xwiki.test.ui.po.editor.WikiEditPage;
  * 
  * @version $Id$
  */
-public class AutoCompleteTest extends AbstractTest
+@UITest
+class AutoCompleteIT
 {
     @Test
-    public void autoComplete() throws Exception
+    void autoComplete(TestUtils setup, TestInfo info)
     {
         // Register a test user
-        getUtil().deletePage("XWiki", "TestUser");
+        setup.deletePage("XWiki", "TestUser");
+
         // Create a test user. Note that we create it as an advanced user so that he gets the Edit Wiki edit menu that
         // we need to edit in wiki mode below.
-        getUtil().createUser("TestUser", "TestPassword", "usertype", "Advanced");
+        setup.createUserAndLogin("TestUser", "TestPassword", "usertype", "Advanced");
 
         // Create test page in which we're going to test autocompletion
-        ViewPage vp = getUtil().createPage(getClass().getSimpleName(), getTestMethodName(), "", "AutoCompletion Test");
+        ViewPage vp = setup.createPage(info.getTestClass().get().getSimpleName(), info.getTestMethod().get().getName(),
+            "", "AutoCompletion Test");
 
         // Start creating a velocity macro and trigger autocompletion
         WikiEditPage wep = vp.editWiki();

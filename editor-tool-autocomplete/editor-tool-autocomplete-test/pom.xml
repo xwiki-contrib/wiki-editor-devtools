@@ -24,24 +24,24 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.contrib.editortool</groupId>
-    <artifactId>editor-tools</artifactId>
+    <artifactId>editor-tool-autocomplete</artifactId>
     <version>4.5-SNAPSHOT</version>
   </parent>
-  <artifactId>editor-tool-autocomplete</artifactId>
-  <name>Editor Tools - Auto Complete - Parent POM</name>
+  <artifactId>editor-tool-autocomplete-test</artifactId>
+  <name>Editor Tools - Auto Complete - Tests - Parent POM</name>
   <packaging>pom</packaging>
-  <description>Editor Tool - Auto Complete - Parent POM</description>
-  <modules>
-    <!-- Sorted Alphabetically -->
-    <module>editor-tool-autocomplete-api</module>
-    <module>editor-tool-autocomplete-ui</module>
-    <module>editor-tool-autocomplete-ui-code</module>
-  </modules>
+  <description>Tests for the AutoComplete Application</description>
+  <properties>
+    <!-- Don't run backward-compatibility checks in test modules since we don't consider them as public APIs -->
+    <xwiki.revapi.skip>true</xwiki.revapi.skip>
+    <!-- Don't run Checkstyle in test modules -->
+    <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
+  </properties>
   <profiles>
     <profile>
-      <id>integration-tests</id>
+      <id>docker</id>
       <modules>
-        <module>editor-tool-autocomplete-test</module>
+        <module>editor-tool-autocomplete-test-docker</module>
       </modules>
     </profile>
   </profiles>

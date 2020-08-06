@@ -443,6 +443,49 @@ class VelocityHintsFinderTest
         assertTrue(hints.getHints().contains(new HintData("method", "method")));
     }
 
+    @Test
+    void findScriptServiceHintWhenUsingADot() throws Exception
+    {
+        when(this.contextComponentManager.hasComponent(AutoCompletionMethodFinder.class, "services")).thenReturn(true);
+        ScriptServicesAutoCompletionMethodFinder scriptServiceFinder =
+            mock(ScriptServicesAutoCompletionMethodFinder.class);
+        when(this.contextComponentManager.getInstance(AutoCompletionMethodFinder.class, "services")).thenReturn(
+            scriptServiceFinder);
+        ScriptServiceManager scriptServiceManager = mock(ScriptServiceManager.class);
+        when(this.velocityManager.getVelocityContext()).thenReturn(
+            createTestVelocityContext("services", scriptServiceManager));
+        when(scriptServiceFinder.findMethodReturnTypes(scriptServiceManager.getClass(), "security.authorization"))
+            .thenReturn(Arrays.asList(TestClass.class));
+        when(this.defaultMethodFinder.findMethods(TestClass.class, "")).thenReturn(
+            new Hints().withHints(new HintData("method", "method")));
+
+        String content = "$services.security.authorization.";
+        Hints hints =
+            this.hintsFinder.findHints(new TargetContent(content, content.length(), TargetContentType.VELOCITY));
+
+        assertEquals(1, hints.getHints().size());
+        assertTrue(hints.getHints().contains(new HintData("method", "method")));
+    }
+
+    @Test
+    void findScriptServiceHintWithDotNoResult() throws Exception
+    {
+        when(this.contextComponentManager.hasComponent(AutoCompletionMethodFinder.class, "services")).thenReturn(true);
+        ScriptServicesAutoCompletionMethodFinder scriptServiceFinder =
+            mock(ScriptServicesAutoCompletionMethodFinder.class);
+        when(this.contextComponentManager.getInstance(AutoCompletionMethodFinder.class, "services")).thenReturn(
+            scriptServiceFinder);
+        ScriptServiceManager scriptServiceManager = mock(ScriptServiceManager.class);
+        when(this.velocityManager.getVelocityContext()).thenReturn(
+            createTestVelocityContext("services", scriptServiceManager));
+
+        String content = "$services.security.authorization.something";
+        Hints hints =
+            this.hintsFinder.findHints(new TargetContent(content, content.length(), TargetContentType.VELOCITY));
+
+        assertTrue(hints.getHints().isEmpty());
+    }
+
     @Test()
     @Disabled("Not working yet")
     void findHintsWhenSetDoneAbove()

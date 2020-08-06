@@ -58,6 +58,9 @@ import com.xpn.xwiki.web.Utils;
 @Singleton
 public class VelocityHintsFinder implements HintsFinder
 {
+    private static final String SCRIPT_SERVICE_IDENTIFIER = "services.";
+    private static final String DOT = ".";
+
     @Inject
     private Logger logger;
 
@@ -141,7 +144,7 @@ public class VelocityHintsFinder implements HintsFinder
                 }
                 if (endPos == targetContent.getPosition()) {
                     // Find out if we're autocompleting a variable. In this case there's no "." in the reference
-                    int methodPos = reference.indexOf(".");
+                    int methodPos = reference.indexOf(DOT);
                     if (methodPos > -1) {
                         // Autocomplete a method!
                         results = getHintsForMethodCall(chars, dollarPos + methodPos, identifier.toString());
@@ -322,12 +325,31 @@ public class VelocityHintsFinder implements HintsFinder
         AutoCompletionMethodFinder methodFinder = getMethodFinder(variableName);
         List<Class<?>> methodClasses = Collections.singletonList(contextVariable.getClass());
 
+        // true if we are trying to identify the hint of a script service.
+        boolean isScriptService = (methodFinder instanceof ScriptServicesAutoCompletionMethodFinder);
+        int nextDot = -1;
         do {
             // Handle the special case when the cursor is after the dot ('.')
             String methodName;
             if (pos == chars.length - 1) {
                 methodName = "";
                 pos++;
+            // Special handling for identifying the hint of a script service since the hint could contain a dot
+            // the idea here is to check first what's after "services." until first dot and to iterate on each
+            // following dots until a script service component is actually found.
+            // The until part is managed by below.
+            } else if (isScriptService) {
+                String identifier = new String(chars);
+                int servicesDot = identifier.indexOf(SCRIPT_SERVICE_IDENTIFIER) + SCRIPT_SERVICE_IDENTIFIER.length();
+                nextDot = (nextDot == -1) ? identifier.indexOf(DOT, servicesDot) : identifier.indexOf(DOT, nextDot + 1);
+
+                if (nextDot != -1) {
+                    pos = nextDot;
+                    methodName = identifier.substring(servicesDot, nextDot);
+                } else {
+                    isScriptService = false;
+                    continue;
+                }
             } else {
                 StringBuffer method = new StringBuffer();
                 pos = this.parser.getMethodOrProperty(chars, pos, method, context);
@@ -350,10 +372,20 @@ public class VelocityHintsFinder implements HintsFinder
                 for (Class<?> methodClass : methodClasses) {
                     returnTypes.addAll(methodFinder.findMethodReturnTypes(methodClass, methodName));
                 }
-                methodClasses = returnTypes;
 
-                // Reset the method finder since we use a specialized finder only for the first autocompletion method
-                methodFinder = this.defaultAutoCompletionMethodFinder;
+                // This is the "until" part of the script service hint finding mechanism.
+                // If we are searching for a script service, we want to keep searching until either:
+                //   - a return type is found (i.e. a script service component has been found)
+                //   - we already reached the latest dots
+                if (!isScriptService || !returnTypes.isEmpty() || nextDot == new String(chars).lastIndexOf(DOT)) {
+                    methodClasses = returnTypes;
+
+                    // Reset the method finder since we use a specialized finder only for the first autocompletion
+                    // method
+                    methodFinder = this.defaultAutoCompletionMethodFinder;
+
+                    isScriptService = false;
+                }
             }
         } while (true);
 

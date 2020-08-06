@@ -20,6 +20,8 @@
 package org.xwiki.editor.tool.autocomplete.internal.velocity;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,6 +34,8 @@ import com.xpn.xwiki.util.Programming;
  */
 public abstract class AbstractAutoCompletionMethodFinder implements AutoCompletionMethodFinder
 {
+    private static final String COMMA_AND_SPACE = ", ";
+
     /**
      * Pretty print a method hint.
      *
@@ -90,11 +94,11 @@ public abstract class AbstractAutoCompletionMethodFinder implements AutoCompleti
         StringBuilder builder = new StringBuilder();
 
         builder.append('(');
-        Class<?>[] parameterTypes = method.getParameterTypes();
+        Type[] parameterTypes = method.getGenericParameterTypes();
         for (int i = 0; i < parameterTypes.length; i++) {
-            builder.append(parameterTypes[i].getSimpleName());
+            builder.append(serializeType(parameterTypes[i]));
             if (i < parameterTypes.length - 1) {
-                builder.append(", ");
+                builder.append(COMMA_AND_SPACE);
             }
         }
         builder.append(')');
@@ -108,9 +112,10 @@ public abstract class AbstractAutoCompletionMethodFinder implements AutoCompleti
      */
     private StringBuilder getReturnType(Method method)
     {
+        // If the return type has generics, make sure we print them
         return new StringBuilder()
             .append(' ')
-            .append(method.getReturnType().getSimpleName());
+            .append(serializeType(method.getGenericReturnType()));
     }
 
     /**
@@ -166,5 +171,78 @@ public abstract class AbstractAutoCompletionMethodFinder implements AutoCompleti
             returnTypes.add(method.getReturnType());
         }
         return returnTypes;
+    }
+
+    // Code copied from ReflectionsUtils because:
+    // - ReflectionUtils doesn't support displaying simple names
+    // - ReflectionUtils has static methods and this cannot be overridden :(
+
+    private String getTypeName(Type type)
+    {
+        return type instanceof Class ? ((Class) type).getSimpleName() : type.getTypeName();
+    }
+
+    private String serializeType(Type type)
+    {
+        if (type == null) {
+            return null;
+        } else {
+            StringBuilder sb = new StringBuilder();
+            if (type instanceof ParameterizedType) {
+                ParameterizedType parameterizedType = (ParameterizedType) type;
+                String rawTypeName = getTypeName(parameterizedType.getRawType());
+                handleOwnerTypeSerialization(parameterizedType, rawTypeName, sb);
+                handleActualTypeArguments(parameterizedType, sb);
+            } else {
+                sb.append(getTypeName(type));
+            }
+
+            return sb.toString();
+        }
+    }
+
+    private void handleActualTypeArguments(ParameterizedType parameterizedType, StringBuilder sb)
+    {
+        if (parameterizedType.getActualTypeArguments() != null
+            && parameterizedType.getActualTypeArguments().length > 0)
+        {
+            sb.append("<");
+            boolean first = true;
+            Type[] var5 = parameterizedType.getActualTypeArguments();
+            int var6 = var5.length;
+
+            for (int var7 = 0; var7 < var6; ++var7) {
+                Type typeArgument = var5[var7];
+                if (!first) {
+                    sb.append(COMMA_AND_SPACE);
+                }
+
+                sb.append(getTypeName(typeArgument));
+                first = false;
+            }
+
+            sb.append(">");
+        }
+    }
+
+    private void handleOwnerTypeSerialization(ParameterizedType parameterizedType, String rawTypeName, StringBuilder sb)
+    {
+        if (parameterizedType.getOwnerType() != null) {
+            if (parameterizedType.getOwnerType() instanceof Class) {
+                sb.append(((Class) parameterizedType.getOwnerType()).getName());
+            } else {
+                sb.append(parameterizedType.getOwnerType().toString());
+            }
+
+            sb.append('.');
+            if (parameterizedType.getOwnerType() instanceof ParameterizedType) {
+                sb.append(rawTypeName.replace(((Class) ((ParameterizedType) parameterizedType.getOwnerType())
+                    .getRawType()).getName() + '$', ""));
+            } else {
+                sb.append(rawTypeName);
+            }
+        } else {
+            sb.append(rawTypeName);
+        }
     }
 }

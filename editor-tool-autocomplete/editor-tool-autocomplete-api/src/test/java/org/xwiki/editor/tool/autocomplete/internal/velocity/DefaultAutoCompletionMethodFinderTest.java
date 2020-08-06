@@ -65,7 +65,7 @@ class DefaultAutoCompletionMethodFinderTest
             return "";
         }
 
-        public String getSomething(String parameter)
+        public String getSomething(List<String> parameter)
         {
             return "";
         }
@@ -112,10 +112,9 @@ class DefaultAutoCompletionMethodFinderTest
     {
         Hints hints = this.methodFinder.findMethods(TestClass.class, "m");
 
-        assertThat(
-            hints.getHints(),
-            containsInAnyOrder(new HintData("method2", "method2() String (Programming Rights)"), new HintData(
-                "method1", "method1(String, AncillaryTestClass, int) void")));
+        assertThat(hints.getHints(), containsInAnyOrder(
+            new HintData("method2", "method2() String (Programming Rights)"),
+            new HintData("method1", "method1(String, AncillaryTestClass, int) void")));
     }
 
     @Test
@@ -125,7 +124,7 @@ class DefaultAutoCompletionMethodFinderTest
 
         assertThat(hints.getHints(), containsInAnyOrder(
             new HintData("getSomething", "getSomething() String"),
-            new HintData("getSomething", "getSomething(String) String"),
+            new HintData("getSomething", "getSomething(List<String>) String"),
             new HintData("something", "something String")));
     }
 
@@ -136,7 +135,7 @@ class DefaultAutoCompletionMethodFinderTest
 
         SortedSet<HintData> expected = new TreeSet<>();
         expected.add(new HintData("getSomething", "getSomething() String"));
-        expected.add(new HintData("getSomething", "getSomething(String) String"));
+        expected.add(new HintData("getSomething", "getSomething(List<String>) String"));
         assertEquals(expected, hints.getHints());
     }
 
@@ -146,8 +145,8 @@ class DefaultAutoCompletionMethodFinderTest
         Hints hints = this.methodFinder.findMethods(TestClass.class, "");
 
         assertThat(hints.getHints(), containsInAnyOrder(
-            new HintData("class", "class Class"),
-            new HintData("getClass", "getClass() Class"),
+            new HintData("class", "class Class<?>"),
+            new HintData("getClass", "getClass() Class<?>"),
             new HintData("equals", "equals(Object) boolean"),
             new HintData("hashCode", "hashCode() int"),
             new HintData("notify", "notify() void"),
@@ -160,7 +159,7 @@ class DefaultAutoCompletionMethodFinderTest
             new HintData("method1", "method1(String, AncillaryTestClass, int) void"),
             new HintData("method2", "method2() String (Programming Rights)"),
             new HintData("getSomething", "getSomething() String"),
-            new HintData("getSomething", "getSomething(String) String"),
+            new HintData("getSomething", "getSomething(List<String>) String"),
             new HintData("something", "something String"),
             new HintData("display", "display() String"),
             new HintData("display", "display(String) String"),

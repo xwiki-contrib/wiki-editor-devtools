@@ -84,7 +84,7 @@ public class AutoCompletionResource implements XWikiRestComponent
                 hints = finder.findHints(targetContent);
                 // Subtract the temporary user input size from the initial offset to get the absolute start offset of
                 // the user's input.
-                hints.withStartOffset(offset - hints.getStartOffset());
+                hints.withStartOffset(offset + hints.getStartOffset() - targetContent.getPosition());
             } catch (ComponentLookupException e) {
                 this.logger.error("No Autocompletion support for content type [{}]", targetContent.getType(), e);
             }

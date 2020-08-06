@@ -23,6 +23,7 @@ import javax.inject.Named;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.editor.tool.autocomplete.HintData;
 import org.xwiki.editor.tool.autocomplete.Hints;
 import org.xwiki.editor.tool.autocomplete.HintsFinder;
 import org.xwiki.editor.tool.autocomplete.TargetContent;
@@ -57,17 +58,20 @@ public class AutoCompletionResourceTest
     @Test
     void getAutoCompletionHints() throws Exception
     {
-        String content = "whatever";
-        TargetContent targetContent = new TargetContent("new content", 3, TargetContentType.VELOCITY);
-        when(this.targetContentLocator.locate(content, "xwiki/2.1", content.length())).thenReturn(targetContent);
+        String content = "Something\n{{velocity}}$v{{/velocity}}";
+        TargetContent targetContent = new TargetContent("$v", 2, TargetContentType.VELOCITY);
+        when(this.targetContentLocator.locate(content, "xwiki/2.1", "Something\n{{velocity}}$v".length())).thenReturn(
+            targetContent);
         HintsFinder finder = mock(HintsFinder.class);
         when(this.contextComponentManager.getInstance(HintsFinder.class, "velocity")).thenReturn(finder);
         Hints expectedHints = new Hints();
-        expectedHints.withStartOffset(5);
+        expectedHints.withHints(new HintData("var", "description"));
+        expectedHints.withStartOffset(1);
         when(finder.findHints(targetContent)).thenReturn(expectedHints);
 
-        Hints hints = this.autoCompletionResource.getAutoCompletionHints(content.length(), "xwiki/2.1", content);
+        Hints hints = this.autoCompletionResource.getAutoCompletionHints("Something\n{{velocity}}$v".length(),
+            "xwiki/2.1", content);
 
-        assertEquals(content.length() - 5, hints.getStartOffset());
+        assertEquals("Something\n{{velocity}}$".length(), hints.getStartOffset());
     }
 }

@@ -124,6 +124,9 @@ public class VelocityHintsFinder implements HintsFinder
         // support parsing this case.
         if (isCursorDirectlyAfterDollar(chars, dollarPos, targetContent.getPosition())) {
             results = getVariableHints(targetContent, "", velocityContext);
+            // Set the offset to be just after the dollar so that the completion replaces everything after it.
+            results = results.withStartOffset(dollarPos + getDollarLength(targetContent.getContent(),
+                dollarPos) + 1);
         } else {
             // The cursor is not directly after the dollar sign.
             try {
@@ -137,7 +140,7 @@ public class VelocityHintsFinder implements HintsFinder
                 // If endPos matches the current cursor position then it means we have a valid token for
                 // autocompletion. Otherwise we don't autocomplete (for example there could be spaces between the
                 // reference and the cursor position).
-                // Note: We need to handle the special when the cursor is just after the '.' char.
+                // Note: We need to handle the special case when the cursor is just after the '.' char.
                 if (endPos + 1 == targetContent.getPosition() && chars[endPos] == '.') {
                     endPos++;
                     reference.append('.');
@@ -151,6 +154,10 @@ public class VelocityHintsFinder implements HintsFinder
                     } else {
                         // Autocomplete a variable! Find all matching variables.
                         results = getVariableHints(targetContent, identifier.toString(), velocityContext);
+                        // Set the offset to be just after the dollar sign so that the completion replaces everything
+                        // after it.
+                        results = results.withStartOffset(dollarPos + getDollarLength(targetContent.getContent(),
+                            dollarPos) + 1);
                     }
                 }
             } catch (InvalidVelocityException e) {
@@ -182,6 +189,22 @@ public class VelocityHintsFinder implements HintsFinder
         return result;
     }
 
+    private int getDollarLength(String content, int dollarPos)
+    {
+        int pos = 0;
+        if (content.length() > dollarPos + 1) {
+            if (content.charAt(dollarPos + 1) == '!') {
+                pos++;
+                if (content.length() > dollarPos + 2 && content.charAt(dollarPos + 2) == '{') {
+                    pos++;
+                }
+            } else if (content.charAt(dollarPos + 1) == '{') {
+                pos++;
+            }
+        }
+        return pos;
+    }
+
     private Object[] getKeys(Context velocityContext)
     {
         // We call getKeys() using reflevity because
@@ -211,9 +234,6 @@ public class VelocityHintsFinder implements HintsFinder
         if (velocityContext.getChainedContext() != null) {
             addVelocityKeys(hints, getKeys(velocityContext.getChainedContext()), fragmentToMatch);
         }
-
-        // Set the hints offset to be able to determine where the completion should be inserted.
-        hints = hints.withStartOffset(fragmentToMatch.length());
 
         return hints;
     }
@@ -362,8 +382,9 @@ public class VelocityHintsFinder implements HintsFinder
                     results.withHints(methodFinder.findMethods(methodClass, methodName));
                 }
 
-                // Set the hints offset to be able to determine where the completion should be inserted.
-                results = results.withStartOffset(methodName.length());
+                // Set the offset to be just after the last dot so that the completion replaces everything
+                // after it.
+                results = results.withStartOffset(pos - methodName.length());
 
                 break;
             } else {

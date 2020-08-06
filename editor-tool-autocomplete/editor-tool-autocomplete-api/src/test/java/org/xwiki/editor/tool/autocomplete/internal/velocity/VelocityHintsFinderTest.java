@@ -23,7 +23,6 @@ import java.util.Arrays;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.apache.velocity.VelocityContext;
@@ -121,6 +120,7 @@ class VelocityHintsFinderTest
             this.hintsFinder.findHints(new TargetContent(content, content.length(), TargetContentType.VELOCITY));
 
         assertEquals(0, hints.getHints().size());
+        assertEquals(0, hints.getStartOffset());
     }
 
     @Test
@@ -152,6 +152,7 @@ class VelocityHintsFinderTest
             new HintData("tdoc", "tdoc")
         ));
         assertEquals(expected, hints.getHints());
+        assertEquals("$".length(), hints.getStartOffset());
     }
 
     @Test
@@ -167,6 +168,7 @@ class VelocityHintsFinderTest
         assertEquals(5, hints.getHints().size());
         assertTrue(hints.getHints().contains(new HintData("key", "key")));
         assertTrue(hints.getHints().contains(new HintData("otherKey", "otherKey")));
+        assertEquals("$!".length(), hints.getStartOffset());
     }
 
     @Test
@@ -180,6 +182,7 @@ class VelocityHintsFinderTest
 
         assertEquals(4, hints.getHints().size());
         assertTrue(hints.getHints().contains(new HintData("key", "key")));
+        assertEquals("${".length(), hints.getStartOffset());
     }
 
     @Test
@@ -193,6 +196,7 @@ class VelocityHintsFinderTest
 
         assertEquals(4, hints.getHints().size());
         assertTrue(hints.getHints().contains(new HintData("key", "key")));
+        assertEquals("$!{".length(), hints.getStartOffset());
     }
 
     @Test
@@ -207,6 +211,7 @@ class VelocityHintsFinderTest
 
         assertEquals(1, hints.getHints().size());
         assertTrue(hints.getHints().contains(new HintData("key", "key")));
+        assertEquals("$".length(), hints.getStartOffset());
     }
 
     @Test
@@ -221,6 +226,7 @@ class VelocityHintsFinderTest
 
         assertEquals(1, hints.getHints().size());
         assertTrue(hints.getHints().contains(new HintData("key", "key")));
+        assertEquals("$!".length(), hints.getStartOffset());
     }
 
     @Test
@@ -235,6 +241,7 @@ class VelocityHintsFinderTest
 
         assertEquals(1, hints.getHints().size());
         assertTrue(hints.getHints().contains(new HintData("key", "key")));
+        assertEquals("${".length(), hints.getStartOffset());
     }
 
     @Test
@@ -249,6 +256,7 @@ class VelocityHintsFinderTest
 
         assertEquals(1, hints.getHints().size());
         assertTrue(hints.getHints().contains(new HintData("key", "key")));
+        assertEquals("$!{".length(), hints.getStartOffset());
     }
 
 
@@ -262,6 +270,7 @@ class VelocityHintsFinderTest
             this.hintsFinder.findHints(new TargetContent(content, content.length(), TargetContentType.VELOCITY));
 
         assertEquals(0, hints.getHints().size());
+        assertEquals("$".length(), hints.getStartOffset());
     }
 
     /**
@@ -277,6 +286,7 @@ class VelocityHintsFinderTest
             this.hintsFinder.findHints(new TargetContent(content, content.length(), TargetContentType.VELOCITY));
 
         assertEquals(0, hints.getHints().size());
+        assertEquals(0, hints.getStartOffset());
     }
 
     @Test
@@ -289,6 +299,7 @@ class VelocityHintsFinderTest
             this.hintsFinder.findHints(new TargetContent(content, content.length(), TargetContentType.VELOCITY));
 
         assertEquals(0, hints.getHints().size());
+        assertEquals(0, hints.getStartOffset());
     }
 
     @Test
@@ -320,6 +331,7 @@ class VelocityHintsFinderTest
         expected.add(new HintData("method2", "method2(...) String"));
         expected.add(new HintData("something", "something String"));
         assertEquals(expected, hints.getHints());
+        assertEquals("$key.".length(), hints.getStartOffset());
     }
 
     @Test
@@ -341,6 +353,7 @@ class VelocityHintsFinderTest
         SortedSet<HintData> expected = new TreeSet<>();
         expected.add(new HintData("doWork", "doWork(...) AncillaryTestClass"));
         assertEquals(expected, hints.getHints());
+        assertEquals("$key.".length(), hints.getStartOffset());
     }
 
     @Test
@@ -362,6 +375,7 @@ class VelocityHintsFinderTest
         SortedSet<HintData> expected = new TreeSet<>();
         expected.add(new HintData("doWork", "doWork(...) AncillaryTestClass"));
         assertEquals(expected, hints.getHints());
+        assertEquals("$key.".length(), hints.getStartOffset());
     }
 
     @Test
@@ -378,6 +392,7 @@ class VelocityHintsFinderTest
             this.hintsFinder.findHints(new TargetContent(content, content.length(), TargetContentType.VELOCITY));
 
         assertEquals(1, hints.getHints().size());
+        assertEquals("$key.".length(), hints.getStartOffset());
     }
 
     @Test
@@ -397,6 +412,7 @@ class VelocityHintsFinderTest
             this.hintsFinder.findHints(new TargetContent(content, content.length(), TargetContentType.VELOCITY));
 
         assertEquals(2, hints.getHints().size());
+        assertEquals("$key.".length(), hints.getStartOffset());
     }
 
     @Test
@@ -418,6 +434,7 @@ class VelocityHintsFinderTest
 
         assertEquals(1, hints.getHints().size());
         assertTrue(hints.getHints().contains(new HintData("test", "test")));
+        assertEquals("$services.".length(), hints.getStartOffset());
     }
 
     @Test
@@ -441,6 +458,7 @@ class VelocityHintsFinderTest
 
         assertEquals(1, hints.getHints().size());
         assertTrue(hints.getHints().contains(new HintData("method", "method")));
+        assertEquals("$services.query.".length(), hints.getStartOffset());
     }
 
     @Test
@@ -521,6 +539,7 @@ class VelocityHintsFinderTest
         assertEquals(2, hints.getHints().size());
         assertEquals(new HintData("method1", "method1"), hints.getHints().first());
         assertEquals(new HintData("method2", "method2"), hints.getHints().last());
+        assertEquals("$key.doWork().".length(), hints.getStartOffset());
     }
 
     @Test
@@ -544,6 +563,7 @@ class VelocityHintsFinderTest
         assertEquals(2, hints.getHints().size());
         assertEquals(new HintData("method1", "method1"), hints.getHints().first());
         assertEquals(new HintData("method2", "method2"), hints.getHints().last());
+        assertEquals("$key.doWork().".length(), hints.getStartOffset());
     }
 
     @Test
@@ -567,6 +587,7 @@ class VelocityHintsFinderTest
 
         assertEquals(1, hints.getHints().size());
         assertEquals(new HintData("split", "split"), hints.getHints().first());
+        assertEquals("$key.doWork().method1().".length(), hints.getStartOffset());
     }
 
     @Test
@@ -586,6 +607,7 @@ class VelocityHintsFinderTest
 
         assertEquals(1, hints.getHints().size());
         assertEquals(new HintData("method1", "method1"), hints.getHints().first());
+        assertEquals("$var\n$key.".length(), hints.getStartOffset());
     }
 
     @Test
@@ -606,6 +628,7 @@ class VelocityHintsFinderTest
         assertEquals(5, hints.getHints().size());
         assertTrue(hints.getHints().contains(new HintData("var", "$var")));
         assertTrue(hints.getHints().contains(new HintData("var2", "$var2")));
+        assertEquals(content.length(), hints.getStartOffset());
     }
 
     @Test
@@ -628,6 +651,7 @@ class VelocityHintsFinderTest
         assertTrue(hints.getHints().contains(new HintData("var", "$var")));
         assertTrue(hints.getHints().contains(new HintData("var2", "$var2")));
         assertTrue(hints.getHints().contains(new HintData("var3", "$var3")));
+        assertEquals(mainContent.length(), hints.getStartOffset());
     }
 
     private VelocityContext createTestVelocityContext(Object... properties)

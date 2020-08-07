@@ -251,10 +251,10 @@ public class VelocityHintsFinder implements HintsFinder
         Hints hints = getVelocityContextKeys(fragmentToMatch, velocityContext);
         if (content.getContextData() != null) {
             for (String previousVelocityMacroContent : (List<String>) content.getContextData()) {
-                hints.withHints(getVelocityVariableHints(previousVelocityMacroContent));
+                hints.withHints(getVelocityVariableHints(previousVelocityMacroContent, fragmentToMatch));
             }
         }
-        hints.withHints(getVelocityVariableHints(content.getContent()));
+        hints.withHints(getVelocityVariableHints(content.getContent(), fragmentToMatch));
         return hints;
     }
 
@@ -425,11 +425,13 @@ public class VelocityHintsFinder implements HintsFinder
         return new XWikiDocument(new DocumentReference("notusedwiki", "notusedspace", "notusedpage"));
     }
 
-    protected Hints getVelocityVariableHints(String content)
+    protected Hints getVelocityVariableHints(String content, String fragmentToMatch)
     {
         Hints hints = new Hints();
         for (String velocityVariable : getVelocityVariables(content)) {
-            hints.withHints(new HintData(velocityVariable, "$" + velocityVariable));
+            if (fragmentToMatch == null || velocityVariable.startsWith(fragmentToMatch)) {
+                hints.withHints(new HintData(velocityVariable, "$" + velocityVariable));
+            }
         }
         return hints;
     }

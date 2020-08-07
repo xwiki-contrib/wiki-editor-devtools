@@ -632,6 +632,38 @@ class VelocityHintsFinderTest
     }
 
     @Test
+    void findHintsWhenCurrentLineDefinesAVelocityVariableAndEmptyVariable()
+    {
+        when(this.velocityManager.getVelocityContext()).thenReturn(new VelocityContext());
+
+        String content = "#set ($";
+        Hints hints =
+            this.hintsFinder.findHints(new TargetContent(content, content.length(), TargetContentType.VELOCITY));
+        assertEquals(3, hints.getHints().size());
+        // Verify that we don't include an empty autocompletion hint matching the #set...
+        SortedSet<HintData> expected = new TreeSet<>();
+        expected.addAll(Arrays.asList(
+            new HintData("doc", "doc"),
+            new HintData("sdoc", "sdoc"),
+            new HintData("tdoc", "tdoc")
+        ));
+        assertEquals(expected, hints.getHints());
+        assertEquals(content.length(), hints.getStartOffset());
+    }
+
+    @Test
+    void findHintsWhenCurrentLineDefinesAVelocityVariableAndNonEmptyVariable()
+    {
+        when(this.velocityManager.getVelocityContext()).thenReturn(new VelocityContext());
+
+        String content = "#set ($var";
+        Hints hints =
+            this.hintsFinder.findHints(new TargetContent(content, content.length() - 1, TargetContentType.VELOCITY));
+        assertEquals(0, hints.getHints().size());
+        assertEquals(0, hints.getStartOffset());
+    }
+
+    @Test
     void findHintsWhenVelocityVariableDefinedInSeveralVelocityRenderingMacros()
     {
         when(this.velocityManager.getVelocityContext()).thenReturn(new VelocityContext());

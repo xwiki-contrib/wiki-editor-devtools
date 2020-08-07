@@ -251,10 +251,11 @@ public class VelocityHintsFinder implements HintsFinder
         Hints hints = getVelocityContextKeys(fragmentToMatch, velocityContext);
         if (content.getContextData() != null) {
             for (String previousVelocityMacroContent : (List<String>) content.getContextData()) {
-                hints.withHints(getVelocityVariableHints(previousVelocityMacroContent, fragmentToMatch));
+                hints.withHints(
+                    getVelocityVariableHints(previousVelocityMacroContent, fragmentToMatch, content.getPosition()));
             }
         }
-        hints.withHints(getVelocityVariableHints(content.getContent(), fragmentToMatch));
+        hints.withHints(getVelocityVariableHints(content.getContent(), fragmentToMatch, content.getPosition()));
         return hints;
     }
 
@@ -425,10 +426,10 @@ public class VelocityHintsFinder implements HintsFinder
         return new XWikiDocument(new DocumentReference("notusedwiki", "notusedspace", "notusedpage"));
     }
 
-    protected Hints getVelocityVariableHints(String content, String fragmentToMatch)
+    protected Hints getVelocityVariableHints(String content, String fragmentToMatch, int cursorPosition)
     {
         Hints hints = new Hints();
-        for (String velocityVariable : getVelocityVariables(content)) {
+        for (String velocityVariable : getVelocityVariables(content, cursorPosition)) {
             if (fragmentToMatch == null || velocityVariable.startsWith(fragmentToMatch)) {
                 hints.withHints(new HintData(velocityVariable, "$" + velocityVariable));
             }
@@ -436,7 +437,7 @@ public class VelocityHintsFinder implements HintsFinder
         return hints;
     }
 
-    private List<String> getVelocityVariables(String content)
+    private List<String> getVelocityVariables(String content, int cursorPosition)
     {
         List<String> variables = new ArrayList<>();
         new BufferedReader(new StringReader(content))
@@ -452,7 +453,7 @@ public class VelocityHintsFinder implements HintsFinder
                             int pos = text.indexOf('$', 4);
                             if (pos > -1) {
                                 String variable = StringUtils.substringBefore(text.substring(pos + 1), "=").trim();
-                                variables.add(variable);
+                                addVelocityVariable(variable, variables, pos, cursorPosition);
                             }
                         }
                     } catch (Exception e) {
@@ -462,5 +463,13 @@ public class VelocityHintsFinder implements HintsFinder
             });
         return variables;
     }
-}
 
+    private void addVelocityVariable(String variable, List<String> variables, int pos, int cursorPosition)
+    {
+        // If the current cursor is located on this variable, don't include it since we're
+        // trying to do the autocompletion on this!
+        if (cursorPosition <= pos || cursorPosition > pos + 1 + variable.length()) {
+            variables.add(variable);
+        }
+    }
+}

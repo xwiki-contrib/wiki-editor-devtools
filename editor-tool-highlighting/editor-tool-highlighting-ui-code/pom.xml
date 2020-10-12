@@ -41,7 +41,7 @@
     <dependency>
       <groupId>org.webjars.npm</groupId>
       <artifactId>codemirror</artifactId>
-      <version>5.56.0</version>
+      <version>5.56.0-xwiki</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>

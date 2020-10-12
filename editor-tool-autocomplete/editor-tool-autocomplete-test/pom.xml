@@ -28,7 +28,6 @@
     <version>4.6-SNAPSHOT</version>
   </parent>
   <artifactId>editor-tool-autocomplete-test</artifactId>
-  <version>4.5.1</version>
   <name>Editor Tools - Auto Complete - Tests - Parent POM</name>
   <packaging>pom</packaging>
   <description>Tests for the AutoComplete Application</description>

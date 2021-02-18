@@ -30,14 +30,14 @@
   <groupId>org.xwiki.contrib.editortool</groupId>
   <artifactId>editor-tools</artifactId>
   <packaging>pom</packaging>
-  <version>4.6</version>
+  <version>4.7-SNAPSHOT</version>
   <name>Editor Tools - Parent POM</name>
   <description>Editor Tools - Parent POM</description>
   <scm>
     <connection>scm:git:git://github.com/xwiki-contrib/wiki-editor-devtools.git</connection>
     <developerConnection>scm:git:git@github.com:xwiki-contrib/wiki-editor-devtools.git</developerConnection>
     <url>https://github.com/xwiki-contrib/wiki-editor-devtools/tree/master</url>
-    <tag>editor-tools-4.6</tag>
+    <tag>HEAD</tag>
   </scm>
   <developers>
     <developer>

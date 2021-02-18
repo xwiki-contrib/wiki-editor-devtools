@@ -129,16 +129,18 @@ define(['jquery'], function ($) {
    * Initialize a CodeMirror instance and add it to the list of instances.
    * @param propertyPattern : the CSS selector for the textarea to wrap with a CodeMirror instance.
    * @param codeMirrorMode : the mode that will be used by this CodeMirror instance ('css', 'javascript', etc.)
+   * @param parameters: addOns parameters for codeMirror
+   * @param contextSelector: when given, will only match elements belonging to this context selector.
    */
-  var initCodeMirror = function (propertyPattern, codeMirrorMode, parameters) {
+  var initCodeMirror = function (propertyPattern, codeMirrorMode, parameters, contextSelector) {
     //
     // Attach codeMirrors to all the elements matched with the propertyPattern.
     //
-    var textareas = $$(propertyPattern);
+    var textareas = $(propertyPattern, contextSelector);
     for (var i = 0; i&lt;textareas.length; ++i) {
       var textarea = textareas[i];
       // If the textarea is not visible, like the object editor's textareas are when they are not expanded, delay the initialization
-      if (textarea.offsetWidth &gt; 0 || textarea.offsetHeight &gt; 0) {
+      if ($(textarea).is(':visible')) {
         initSingleCodeMirror(textarea, codeMirrorMode, parameters);
       } else {
         var objectDiv = textarea.up('.xobject');

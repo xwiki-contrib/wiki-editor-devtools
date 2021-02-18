@@ -167,17 +167,24 @@
     }];
     if (XWiki.editor == 'object' || XWiki.editor == 'inline') {
       // Object editor highlighting support
-      SH.initCodeMirror("textarea[id^='XWiki.StyleSheetExtension_'][id$='_code']", 'css', options);
-      SH.initCodeMirror("textarea[id^='XWiki.JavaScriptExtension_'][id$='_code']", 'javascript', options);
-      SH.initCodeMirror("textarea[id^='XWiki.XWikiSkins_'][id$='.css']", 'css', options);
-      SH.initCodeMirror("textarea[id^='XWiki.XWikiSkins_'][id$='.js']", 'javascript', options);
-      SH.initCodeMirror("textarea[id^='XWiki.XWikiSkins_'][id$='.vm']", 'velocity', options);
-      SH.initCodeMirror("textarea[id^='XWiki.WikiMacroClass_'][id$='_code']", XWiki.docsyntax, options);
-      SH.initCodeMirror("textarea[id^='Panels.PanelClass_'][id$='_content']", XWiki.docsyntax, options);
-      SH.initCodeMirror("textarea[id^='XWiki.UIExtensionClass_'][id$='_content']", XWiki.docsyntax, options);
-      SH.initCodeMirror("textarea[id^='XWiki.SchedulerJobClass_'][id$='_script']", 'groovy', options);
-      SH.initCodeMirror("textarea[id^='XWiki.ComponentMethodClass_'][id$='_code']", XWiki.docsyntax, options);
-      SH.initCodeMirror("textarea[id^='XWiki.ConfigurableClass_'][id$='_codeToExecute']", XWiki.docsyntax, options);
+      var augmentObjectEditor = function (contextSelector) {
+        SH.initCodeMirror("textarea[id^='XWiki.StyleSheetExtension_'][id$='_code']", 'css', options, contextSelector);
+        SH.initCodeMirror("textarea[id^='XWiki.JavaScriptExtension_'][id$='_code']", 'javascript', options, contextSelector);
+        SH.initCodeMirror("textarea[id^='XWiki.XWikiSkins_'][id$='.css']", 'css', options, contextSelector);
+        SH.initCodeMirror("textarea[id^='XWiki.XWikiSkins_'][id$='.js']", 'javascript', options, contextSelector);
+        SH.initCodeMirror("textarea[id^='XWiki.XWikiSkins_'][id$='.vm']", 'velocity', options, contextSelector);
+        SH.initCodeMirror("textarea[id^='XWiki.WikiMacroClass_'][id$='_code']", XWiki.docsyntax, options, contextSelector);
+        SH.initCodeMirror("textarea[id^='Panels.PanelClass_'][id$='_content']", XWiki.docsyntax, options, contextSelector);
+        SH.initCodeMirror("textarea[id^='XWiki.UIExtensionClass_'][id$='_content']", XWiki.docsyntax, options, contextSelector);
+        SH.initCodeMirror("textarea[id^='XWiki.SchedulerJobClass_'][id$='_script']", 'groovy', options, contextSelector);
+        SH.initCodeMirror("textarea[id^='XWiki.ComponentMethodClass_'][id$='_code']", XWiki.docsyntax, options, contextSelector);
+        SH.initCodeMirror("textarea[id^='XWiki.ConfigurableClass_'][id$='_codeToExecute']", XWiki.docsyntax, options, contextSelector);
+      };
+      augmentObjectEditor();
+      $(document).on('xwiki:dom:updated', function (event, data) {
+        var selector = (data.elements) ? data.elements : undefined;
+        augmentObjectEditor(selector);
+      });
     } else if (XWiki.editor == 'wiki') {
       // Document content editor highlighting support using the document's syntax.
       SH.initCodeMirror("textarea[id='content']", XWiki.docsyntax, options);

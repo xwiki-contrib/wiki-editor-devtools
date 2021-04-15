@@ -11,7 +11,7 @@ Editor dev tools: Syntax Higlighting and Autocompletion for xwiki editors.
 * [Issue Tracker](https://jira.xwiki.org/browse/WIKIEDITOR) 
 * Communication: [Forum](https://forum.xwiki.org/), [Chat](https://dev.xwiki.org/xwiki/bin/view/Community/Chat) 
 * [Development Practices](https://dev.xwiki.org/xwiki/bin/view/Main/WebHome) 
-* Minimal XWiki version supported: XWiki 11.10.4 
+* Minimal XWiki version supported: XWiki 12.10 
 * License: LGPL 2.1 
 * Translations:
   * [Syntax Highlight Application](https://l10n.xwiki.org/projects/xwiki-contrib/developer-tools---syntax-highlighting/) 

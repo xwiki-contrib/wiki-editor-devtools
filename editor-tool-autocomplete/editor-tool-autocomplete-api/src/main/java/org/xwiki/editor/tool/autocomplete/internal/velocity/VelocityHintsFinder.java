@@ -53,6 +53,11 @@ import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
 
+/**
+ * Find autocompletion hints in Velocity code.
+ *
+ * @version $Id$
+ */
 @Component
 @Named("velocity")
 @Singleton

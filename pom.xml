@@ -33,6 +33,10 @@
   <version>4.7-SNAPSHOT</version>
   <name>Editor Tools - Parent POM</name>
   <description>Editor Tools - Parent POM</description>
+  <properties>
+    <xwiki.release.jira.skip>false</xwiki.release.jira.skip>
+    <xwiki.issueManagement.jira.id>WIKIEDITOR</xwiki.issueManagement.jira.id>
+  </properties>
   <scm>
     <connection>scm:git:git://github.com/xwiki-contrib/wiki-editor-devtools.git</connection>
     <developerConnection>scm:git:git@github.com:xwiki-contrib/wiki-editor-devtools.git</developerConnection>

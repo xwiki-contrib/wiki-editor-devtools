@@ -54,6 +54,17 @@ public abstract class AbstractAutoCompletionMethodFinder implements AutoCompleti
             + getProgrammingRights(method);
     }
 
+    protected String printMethod(String methodName, Method method, Type[] parameterTypes)
+    {
+        // Step 1: Add method name
+        // Step 2: Add parameters
+        // Step 3: Add return type (Don't print void return types!)
+        return methodName
+            + getParameters(method, parameterTypes)
+            + getReturnType(method)
+            + getProgrammingRights(method);
+    }
+
     /**
      * Pretty print a shorthand hint.
      *
@@ -91,10 +102,14 @@ public abstract class AbstractAutoCompletionMethodFinder implements AutoCompleti
      */
     private StringBuilder getParameters(Method method)
     {
+        return getParameters(method, method.getGenericParameterTypes());
+    }
+
+    private StringBuilder getParameters(Method method, Type[] parameterTypes)
+    {
         StringBuilder builder = new StringBuilder();
 
         builder.append('(');
-        Type[] parameterTypes = method.getGenericParameterTypes();
         for (int i = 0; i < parameterTypes.length; i++) {
             builder.append(serializeType(parameterTypes[i]));
             if (i < parameterTypes.length - 1) {

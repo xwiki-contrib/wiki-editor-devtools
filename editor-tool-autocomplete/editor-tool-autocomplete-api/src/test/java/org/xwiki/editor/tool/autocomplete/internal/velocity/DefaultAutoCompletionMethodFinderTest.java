@@ -19,15 +19,21 @@
  */
 package org.xwiki.editor.tool.autocomplete.internal.velocity;
 
+import java.awt.Color;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.junit.jupiter.api.Test;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.editor.tool.autocomplete.HintData;
 import org.xwiki.editor.tool.autocomplete.Hints;
+import org.xwiki.properties.internal.converter.ColorConverter;
+import org.xwiki.test.annotation.BeforeComponent;
+import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.mockito.MockitoComponentManager;
 
 import com.xpn.xwiki.util.Programming;
 
@@ -41,6 +47,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @version $Id$
  */
 @ComponentTest
+@ComponentList({
+    ColorConverter.class
+})
 class DefaultAutoCompletionMethodFinderTest
 {
     @InjectMockComponents
@@ -90,7 +99,6 @@ class DefaultAutoCompletionMethodFinderTest
             return "";
         }
 
-
         public void method1(String param1, AncillaryTestClass param2, int param3)
         {
         }
@@ -101,10 +109,28 @@ class DefaultAutoCompletionMethodFinderTest
             return "";
         }
 
+        public String converter1(Color param1, String param2) {
+            return "";
+        }
+
+        public String converter2(String param1, Color param2, String param3) {
+            return "";
+        }
+
+        public String converter2(String param1, String param2, String param3) {
+            return "";
+        }
+
         // Simulates an aspectj method
         public void ajc$something()
         {
         }
+    }
+
+    @BeforeComponent
+    void setupComponent(MockitoComponentManager componentManager) throws Exception
+    {
+        componentManager.registerComponent(ComponentManager.class, "context", componentManager);
     }
 
     @Test
@@ -164,7 +190,11 @@ class DefaultAutoCompletionMethodFinderTest
             new HintData("display", "display() String"),
             new HintData("display", "display(String) String"),
             new HintData("display", "display(String, String) String"),
-            new HintData("display", "display(String, Object) String")));
+            new HintData("display", "display(String, Object) String"),
+            new HintData("converter1", "converter1(Color, String) String"),
+            new HintData("converter1", "converter1(String, String) String (Converter)"),
+            new HintData("converter2", "converter2(String, Color, String) String"),
+            new HintData("converter2", "converter2(String, String, String) String")));
     }
 
     @Test
@@ -194,5 +224,18 @@ class DefaultAutoCompletionMethodFinderTest
         List<Class<?>> types = this.methodFinder.findMethodReturnTypes(TestClass.class, "doWork");
         assertEquals(1, types.size());
         assertEquals(AncillaryTestClass.class, types.get(0));
+    }
+
+    @Test
+    void findMethodsWithExistingConverter()
+    {
+        Hints hints = this.methodFinder.findMethods(TestClass.class, "converter");
+
+        assertEquals(4, hints.getHints().size());
+        assertThat(hints.getHints(), containsInAnyOrder(
+            new HintData("converter1", "converter1(Color, String) String"),
+            new HintData("converter1", "converter1(String, String) String (Converter)"),
+            new HintData("converter2", "converter2(String, Color, String) String"),
+            new HintData("converter2", "converter2(String, String, String) String")));
     }
 }

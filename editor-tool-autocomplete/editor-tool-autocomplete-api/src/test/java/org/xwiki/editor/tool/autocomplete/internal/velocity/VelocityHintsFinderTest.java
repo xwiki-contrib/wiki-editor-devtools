@@ -504,6 +504,28 @@ class VelocityHintsFinderTest
         assertTrue(hints.getHints().isEmpty());
     }
 
+    @Test
+    void findHintsForScriptServiceWhenExistingScriptServiceCallBefore() throws Exception
+    {
+        when(this.contextComponentManager.hasComponent(AutoCompletionMethodFinder.class, "services")).thenReturn(true);
+        AutoCompletionMethodFinder scriptServiceFinder = mock(ScriptServicesAutoCompletionMethodFinder.class);
+        when(this.contextComponentManager.getInstance(AutoCompletionMethodFinder.class, "services")).thenReturn(
+            scriptServiceFinder);
+        ScriptServiceManager scriptServiceManager = mock(ScriptServiceManager.class);
+        when(this.velocityManager.getVelocityContext()).thenReturn(
+            createTestVelocityContext("services", scriptServiceManager));
+        when(scriptServiceFinder.findMethods(scriptServiceManager.getClass(), "t")).thenReturn(
+            new Hints().withHints(new HintData("test", "test")));
+
+        String content = "$services.\n$services.t";
+        Hints hints =
+            this.hintsFinder.findHints(new TargetContent(content, content.length(), TargetContentType.VELOCITY));
+
+        assertEquals(1, hints.getHints().size());
+        assertTrue(hints.getHints().contains(new HintData("test", "test")));
+        assertEquals("$services.\n$services.".length(), hints.getStartOffset());
+    }
+
     @Test()
     @Disabled("Not working yet")
     void findHintsWhenSetDoneAbove()

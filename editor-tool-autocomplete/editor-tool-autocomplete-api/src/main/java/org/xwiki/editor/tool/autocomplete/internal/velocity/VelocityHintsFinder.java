@@ -366,7 +366,8 @@ public class VelocityHintsFinder implements HintsFinder
             // The until part is managed by below.
             } else if (isScriptService) {
                 String identifier = new String(chars);
-                int servicesDot = identifier.indexOf(SCRIPT_SERVICE_IDENTIFIER) + SCRIPT_SERVICE_IDENTIFIER.length();
+                int servicesDot = identifier.lastIndexOf(SCRIPT_SERVICE_IDENTIFIER)
+                    + SCRIPT_SERVICE_IDENTIFIER.length();
                 nextDot = (nextDot == -1) ? identifier.indexOf(DOT, servicesDot) : identifier.indexOf(DOT, nextDot + 1);
 
                 if (nextDot != -1) {

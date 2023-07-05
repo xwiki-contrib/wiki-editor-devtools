@@ -45,13 +45,11 @@ public abstract class AbstractAutoCompletionMethodFinder implements AutoCompleti
      */
     protected String printMethod(String methodName, Method method)
     {
-        // Step 1: Add method name
-        // Step 2: Add parameters
-        // Step 3: Add return type (Don't print void return types!)
         return methodName
             + getParameters(method)
             + getReturnType(method)
-            + getProgrammingRights(method);
+            + getProgrammingRights(method)
+            + getDeprecated(method);
     }
 
     protected String printMethod(String methodName, Method method, Type[] parameterTypes)
@@ -145,6 +143,22 @@ public abstract class AbstractAutoCompletionMethodFinder implements AutoCompleti
         if (programming != null) {
             builder.append(' ');
             builder.append("(Programming Rights)");
+        }
+
+        return builder;
+    }
+
+    private StringBuilder getDeprecated(Method method)
+    {
+        StringBuilder builder = new StringBuilder();
+
+        Deprecated deprecated = method.getAnnotation(Deprecated.class);
+        if (deprecated == null) {
+            deprecated = method.getDeclaringClass().getAnnotation(Deprecated.class);
+        }
+        if (deprecated != null) {
+            builder.append(' ');
+            builder.append("(Deprecated)");
         }
 
         return builder;

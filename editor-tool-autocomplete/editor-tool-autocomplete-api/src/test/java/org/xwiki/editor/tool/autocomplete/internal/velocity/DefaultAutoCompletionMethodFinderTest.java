@@ -109,21 +109,42 @@ class DefaultAutoCompletionMethodFinderTest
             return "";
         }
 
-        public String converter1(Color param1, String param2) {
+        public String converter1(Color param1, String param2)
+        {
             return "";
         }
 
-        public String converter2(String param1, Color param2, String param3) {
+        public String converter2(String param1, Color param2, String param3)
+        {
             return "";
         }
 
-        public String converter2(String param1, String param2, String param3) {
+        public String converter2(String param1, String param2, String param3)
+        {
             return "";
         }
 
         // Simulates an aspectj method
         public void ajc$something()
         {
+        }
+    }
+
+    private class DeprecatedTestClass1
+    {
+        @Deprecated
+        public String deprecated1()
+        {
+            return "";
+        }
+    }
+
+    @Deprecated
+    private class DeprecatedTestClass2
+    {
+        public String deprecated1()
+        {
+            return "";
         }
     }
 
@@ -237,5 +258,25 @@ class DefaultAutoCompletionMethodFinderTest
             new HintData("converter1", "converter1(String, String) String (Converter)"),
             new HintData("converter2", "converter2(String, Color, String) String"),
             new HintData("converter2", "converter2(String, String, String) String")));
+    }
+
+    @Test
+    void findMethodsWithDeprecationsAtMethodLevel()
+    {
+        Hints hints = this.methodFinder.findMethods(DeprecatedTestClass1.class, "deprecated1");
+
+        assertEquals(1, hints.getHints().size());
+        assertThat(hints.getHints(), containsInAnyOrder(
+            new HintData("deprecated1", "deprecated1() String (Deprecated)")));
+    }
+
+    @Test
+    void findMethodsWithDeprecationsAtClassLevel()
+    {
+        Hints hints = this.methodFinder.findMethods(DeprecatedTestClass2.class, "deprecated1");
+
+        assertEquals(1, hints.getHints().size());
+        assertThat(hints.getHints(), containsInAnyOrder(
+            new HintData("deprecated1", "deprecated1() String (Deprecated)")));
     }
 }

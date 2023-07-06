@@ -589,6 +589,27 @@ class VelocityHintsFinderTest
     }
 
     @Test
+    void findHintsForMethodWithParametersAndDotInsideParameters()
+    {
+        when(this.velocityManager.getVelocityContext()).thenReturn(
+            createTestVelocityContext("key", new TestClass()));
+
+        Hints expectedMethods = new Hints().withHints(
+            new HintData("method1", "method1"),
+            new HintData("method2", "method2")
+        );
+        when(this.defaultMethodFinder.findMethods(AncillaryTestClass.class, "")).thenReturn(expectedMethods);
+        when(this.defaultMethodFinder.findMethodReturnTypes(TestClass.class, "doWork")).thenReturn(
+            Arrays.asList(AncillaryTestClass.class));
+
+        String content = "$key.doWork(something.";
+        Hints hints =
+            this.hintsFinder.findHints(new TargetContent(content, content.length(), TargetContentType.VELOCITY));
+
+        assertEquals(0, hints.getHints().size());
+    }
+
+    @Test
     void findHintsForDeepChainedMethod()
     {
         when(this.velocityManager.getVelocityContext()).thenReturn(

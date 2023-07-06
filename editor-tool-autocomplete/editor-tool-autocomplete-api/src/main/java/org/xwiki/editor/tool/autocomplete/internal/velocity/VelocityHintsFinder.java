@@ -379,8 +379,14 @@ public class VelocityHintsFinder implements HintsFinder
                 }
             } else {
                 StringBuffer method = new StringBuffer();
+                int oldPos = pos;
                 pos = this.parser.getMethodOrProperty(chars, pos, method, context);
                 methodName = StringUtils.substringBefore(method.toString(), "(").substring(1);
+                // The getMethodOrProperty() method skips the method parameters, thus, if the dot at the current
+                // position is inside the method parameters, we need to ignore it and not provide autocompletion
+                if (!methodName.equals(method.toString().substring(1)) && oldPos + method.length() == chars.length) {
+                    break;
+                }
             }
 
             if (pos == chars.length) {

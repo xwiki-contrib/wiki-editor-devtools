@@ -179,6 +179,8 @@
         SH.initCodeMirror("textarea[id^='XWiki.SchedulerJobClass_'][id$='_script']", 'groovy', options, contextSelector);
         SH.initCodeMirror("textarea[id^='XWiki.ComponentMethodClass_'][id$='_code']", XWiki.docsyntax, options, contextSelector);
         SH.initCodeMirror("textarea[id^='XWiki.ConfigurableClass_'][id$='_codeToExecute']", XWiki.docsyntax, options, contextSelector);
+        SH.initCodeMirror("textarea[id^='XWiki.Mail_'][id$='_text']", 'velocity', options, contextSelector);
+        SH.initCodeMirror("textarea[id^='XWiki.Mail_'][id$='_html']", 'velocity', options, contextSelector);
       };
       augmentObjectEditor();
       $(document).on('xwiki:dom:updated', function (event, data) {

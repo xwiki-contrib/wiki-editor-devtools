@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
+<xwikidoc version="1.4" reference="SyntaxHighlighting.HighlightingModeXwiki21tags" locale="">
   <web>SyntaxHighlighting</web>
   <name>HighlightingModeXwiki21tags</name>
   <language/>
@@ -36,7 +36,14 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
+  <content>Defines the "xwiki21tags" [[CodeMirror&gt;&gt;http://codemirror.net/]] mode.
+
+Handles the XWiki syntax itself.</content>
   <object>
+    <name>SyntaxHighlighting.HighlightingModeXwiki21tags</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>07723397-bbd4-4e37-8435-064f67fd71eb</guid>
     <class>
       <name>XWiki.JavaScriptExtension</name>
       <customClass/>
@@ -48,8 +55,11 @@
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
@@ -63,7 +73,9 @@
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </cache>
       <code>
+        <contenttype>PureText</contenttype>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
@@ -95,6 +107,8 @@
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>
@@ -108,10 +122,6 @@
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </use>
     </class>
-    <name>SyntaxHighlighting.HighlightingModeXwiki21tags</name>
-    <number>0</number>
-    <className>XWiki.JavaScriptExtension</className>
-    <guid>07723397-bbd4-4e37-8435-064f67fd71eb</guid>
     <property>
       <cache>long</cache>
     </property>
@@ -375,7 +385,4 @@
       <use>onDemand</use>
     </property>
   </object>
-  <content>Defines the "xwiki21tags" [[CodeMirror&gt;&gt;http://codemirror.net/]] mode.
-
-Handles the XWiki syntax itself.</content>
 </xwikidoc>

@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="SyntaxHighlighting.Translations" locale="ja">
+<xwikidoc version="1.4" reference="SyntaxHighlighting.Translations" locale="ja">
   <web>SyntaxHighlighting</web>
   <name>Translations</name>
   <language>ja</language>
@@ -48,4 +48,4 @@ admin.syntaxhighlighting=シンタックスのハイライト
 syntaxHighlighting.configuration.general.title=一般
 syntaxHighlighting.configuration.appearance.title=表示
 </content>
-  </xwikidoc>
+</xwikidoc>

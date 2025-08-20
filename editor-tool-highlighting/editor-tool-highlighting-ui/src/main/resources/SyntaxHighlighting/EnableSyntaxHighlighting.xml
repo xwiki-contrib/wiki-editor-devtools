@@ -131,7 +131,7 @@
 
     // Override the insertTags method for the wiki syntax editor so that we can intercept commands from
     // the attached toolbar and execute them on the CodeMirror instance instead of the simple textarea
-    if (XWiki.editor == 'wiki' &amp;&amp; insertTags) {
+    if (XWiki.editor == 'wiki' &amp;&amp; typeof insertTags !== 'undefined') {
       insertTags = function(tagOpen, tagClose, sampleText) {
         var codeMirror = SH.codeMirrors[0];
         if (!codeMirror) {
@@ -139,6 +139,17 @@
         }
         codeMirror.replaceSelection(tagOpen + (codeMirror.doc.getSelection() || sampleText) + tagClose, 'end');
       }
+    // Starting with XWiki 17.8.0RC1 the toolbar is now defined as an object allowing to replace the insertTag function.
+    } else if (XWiki.editor == 'wiki' &amp;&amp; typeof XWiki.editors.SimpleToolbar !== 'undefined') {
+      let codeMirrorInsertTag = function(textarea, tagOpen, tagClose, sampleText) {
+        for (let codeMirror of SH.codeMirrors) {
+          if (codeMirror.getTextArea() === textarea) {
+            codeMirror.replaceSelection(tagOpen + (codeMirror.doc.getSelection() || sampleText) + tagClose, 'end');
+            break;
+          }
+        }
+      };
+      XWiki.editors.SimpleToolbar.setInsertTagFunction(codeMirrorInsertTag);
     }
   }
 

@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.contrib.editortool</groupId>
     <artifactId>editor-tool-autocomplete</artifactId>
-    <version>4.11-SNAPSHOT</version>
+    <version>4.10.1</version>
   </parent>
   <artifactId>editor-tool-autocomplete-test</artifactId>
   <name>Editor Tools - Auto Complete - Tests - Parent POM</name>

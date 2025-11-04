@@ -284,7 +284,10 @@ define(['jquery'], function ($) {
       // Save the CodeMirror's content to the augmented textarea whenever it looses focus, to keep it up to date.
       codeMirror.on('blur', function(cm) {
         cm.save();
+        let scrollBeforeChange = cm.getScrollInfo();
         $(textarea).trigger('change');
+        // Restore the editor's scrolling position
+        cm.scrollTo(scrollBeforeChange.left, scrollBeforeChange.top);
       });
 
       // Listen to changes of the underlying textarea and update the editor to display them to the user.

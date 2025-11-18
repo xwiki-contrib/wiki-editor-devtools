@@ -127,6 +127,7 @@
       <code>#includeMacros('Macros')
 
 define(['jquery'], function ($) {
+  const codeMirrorInitializationClassName = 'codeMirror-initialization';
   var codeMirrors = [];
   var theme = 'default';
 
@@ -167,6 +168,10 @@ define(['jquery'], function ($) {
   }
 
   var initSingleCodeMirror = function (textarea, codeMirrorMode, extraAddons) {
+    if ($(textarea).hasClass(codeMirrorInitializationClassName)) {
+      return;
+    }
+    $(textarea).addClass(codeMirrorInitializationClassName);
     // FIXME: Until a better way comes up, we`ll just reuse the xwiki 2.1 syntax mode for 2.0 as well.
     // We also have to remove / and . from the mode name because of WIKIEDITOR-29
     if (codeMirrorMode == 'xwiki/2.0' || codeMirrorMode == 'xwiki/2.1') {

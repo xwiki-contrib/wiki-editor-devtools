@@ -290,9 +290,11 @@ define(['jquery'], function ($) {
       codeMirror.on('blur', function(cm) {
         cm.save();
         let scrollBeforeChange = cm.getScrollInfo();
+        let cursorPosition = cm.getCursor();
         $(textarea).trigger('change');
-        // Restore the editor's scrolling position
+        // Restore the editor's scrolling and cursor position
         cm.scrollTo(scrollBeforeChange.left, scrollBeforeChange.top);
+        cm.setCursor(cursorPosition);
       });
 
       // Listen to changes of the underlying textarea and update the editor to display them to the user.

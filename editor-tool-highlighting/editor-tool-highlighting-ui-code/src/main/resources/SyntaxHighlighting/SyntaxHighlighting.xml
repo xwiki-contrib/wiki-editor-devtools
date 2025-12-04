@@ -291,10 +291,12 @@ define(['jquery'], function ($) {
         cm.save();
         let scrollBeforeChange = cm.getScrollInfo();
         let cursorPosition = cm.getCursor();
+        let selections = cm.listSelections();
         $(textarea).trigger('change');
         // Restore the editor's scrolling and cursor position
         cm.scrollTo(scrollBeforeChange.left, scrollBeforeChange.top);
         cm.setCursor(cursorPosition);
+        cm.setSelections(selections);
       });
 
       // Listen to changes of the underlying textarea and update the editor to display them to the user.

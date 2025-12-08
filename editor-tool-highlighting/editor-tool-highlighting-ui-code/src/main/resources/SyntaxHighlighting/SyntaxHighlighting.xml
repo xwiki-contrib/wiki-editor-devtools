@@ -308,6 +308,15 @@ define(['jquery'], function ($) {
       // attaching the codemirror instance, otherwise it will not report it correctly since the textarea will be hidden.
       codeMirror.setSize(textareaWidthPercentage + "%", textareaHeight);
 
+      if (typeof XWiki.editors.SimpleToolbar !== 'undefined') {
+        let codeMirrorInsertTag = function(textarea, tagOpen, tagClose, sampleText) {
+          if (codeMirror.getTextArea() === textarea) {
+            codeMirror.replaceSelection(tagOpen + (codeMirror.doc.getSelection() || sampleText) + tagClose, 'end');
+          }
+        }
+        XWiki.editors.SimpleToolbar.setInsertTagFunction(codeMirrorInsertTag, codeMirror.getTextArea());
+      }
+
       // console.log('CodeMirror instance initialized for mode: ' + codeMirrorMode);
 
       // Track this new instance by adding it to the list of instances.

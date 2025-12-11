@@ -134,7 +134,7 @@ public class DefaultAutoCompletionMethodFinder extends AbstractAutoCompletionMet
         Boolean result = this.stringConverters.get(type);
         if (result == null) {
             Converter<?> converter = getConverterFor(type);
-            result = converter == null ? false : true;
+            result = converter != null;
             this.stringConverters.put(type, result);
         }
         return result;

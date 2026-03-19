@@ -306,7 +306,8 @@ if (XWiki.contextaction == 'edit') {
       editorDiv.addClassName('CodeMirror-fullscreen');
 
       // Set proper dimensions
-      editorDiv.style.height = getNewCodeMirrorHeightInFullscreen() + 'px';
+      let editorMetaContainer = editorDiv.parentNode;
+      editorDiv.style.height = getNewCodeMirrorHeightInFullscreen(editorMetaContainer) + 'px';
       editorDiv.style.width ='100%';
     } else {
       editorDiv.removeClassName('CodeMirror-fullscreen');
@@ -323,12 +324,13 @@ if (XWiki.contextaction == 'edit') {
     codeMirror.focus();
   }
 
-  var getNewCodeMirrorHeightInFullscreen = function() {
+  var getNewCodeMirrorHeightInFullscreen = function(menuContainer) {
     // Should always exist.
     var bottomButtonsHeight = $$('.bottombuttons')[0].getHeight();
 
     // May not always exist (like in the object editor)
-    var toolbarElement = $$('.leftmenu2')[0];
+    // There can be multiple, we want to use the one related to the current editor.
+    var toolbarElement = menuContainer.querySelector('.leftmenu2');
     var toolbarHeight = 0;
     if (toolbarElement) {
       toolbarHeight = toolbarElement.getHeight();

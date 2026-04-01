@@ -42,7 +42,7 @@
       <groupId>org.webjars.npm</groupId>
       <artifactId>codemirror</artifactId>
       <!-- TODO: Remove once https://jira.xwiki.org/browse/XWIKI-17930 is solved -->
-      <version>5.56.0-xwiki</version>
+      <version>6.65.7</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>

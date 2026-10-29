@@ -287,21 +287,19 @@ define(['jquery'], function ($) {
       });
 
       // Save the CodeMirror's content to the augmented textarea whenever it looses focus, to keep it up to date.
+      // Don't modify the editor's content, selection or scroll position from this listener: CodeMirror still considers
+      // itself focused while it notifies the blur, so any such change would give the focus back to the editor.
       codeMirror.on('blur', function(cm) {
         cm.save();
-        let scrollBeforeChange = cm.getScrollInfo();
-        let cursorPosition = cm.getCursor();
-        let selections = cm.listSelections();
         $(textarea).trigger('change');
-        // Restore the editor's scrolling and cursor position
-        cm.scrollTo(scrollBeforeChange.left, scrollBeforeChange.top);
-        cm.setCursor(cursorPosition);
-        cm.setSelections(selections);
       });
 
-      // Listen to changes of the underlying textarea and update the editor to display them to the user.
+      // Listen to changes of the underlying textarea and update the editor to display them to the user. The content
+      // saved on blur is already displayed, so skip it to keep the editor's cursor, selection and scroll position.
       $(textarea).on('change', function (event) {
-        codeMirror.getDoc().setValue(textarea.value);
+        if (textarea.value !== codeMirror.getValue()) {
+          codeMirror.getDoc().setValue(textarea.value);
+        }
       });
 
       // Set the width of the codemirror editor equal to the one of the wrapped textarea. Value is computed before

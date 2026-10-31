@@ -36,16 +36,16 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: SyntaxHighlighting.ConfigurationClass_enabled=
-### Missing: SyntaxHighlighting.ConfigurationClass_enabled.hint=
-### Missing: SyntaxHighlighting.ConfigurationClass_theme=
-### Missing: SyntaxHighlighting.ConfigurationClass_theme.hint=
-### Missing: SyntaxHighlighting.ConfigurationClass_highlightColor=
-### Missing: SyntaxHighlighting.ConfigurationClass_highlightColor.hint=
-### Missing: SyntaxHighlighting.ConfigurationClass_lineWrapping=
-### Missing: SyntaxHighlighting.ConfigurationClass_lineWrapping.hint=
-### Missing: admin.syntaxhighlighting=
-### Missing: syntaxHighlighting.configuration.general.title=
-### Missing: syntaxHighlighting.configuration.appearance.title=
+  <content>SyntaxHighlighting.ConfigurationClass_enabled=Aktiveret
+SyntaxHighlighting.ConfigurationClass_enabled.hint=Slå syntaksfremhævning til eller fra i hele wikien.
+SyntaxHighlighting.ConfigurationClass_theme=Farveskema
+SyntaxHighlighting.ConfigurationClass_theme.hint=Det farveskema, editoren skal vises med.
+SyntaxHighlighting.ConfigurationClass_highlightColor=Fremhævningsfarve
+SyntaxHighlighting.ConfigurationClass_highlightColor.hint=Den farve, der bruges til at fremhæve det markerede ord eller tekststykke. Alle CSS-farveformater accepteres.
+SyntaxHighlighting.ConfigurationClass_lineWrapping=Ombrydning af linjer
+SyntaxHighlighting.ConfigurationClass_lineWrapping.hint=Slå til for at ombryde lange tekstlinjer, der ikke kan være i editorvinduet, eller fra for at se dem ved at rulle vandret.
+admin.syntaxhighlighting=Syntaksfremhævning
+syntaxHighlighting.configuration.general.title=Generelt
+syntaxHighlighting.configuration.appearance.title=Udseende
 </content>
 </xwikidoc>

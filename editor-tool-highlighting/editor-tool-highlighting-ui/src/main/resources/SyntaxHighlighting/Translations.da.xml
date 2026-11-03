@@ -1,0 +1,51 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.4" reference="SyntaxHighlighting.Translations" locale="da">
+  <web>SyntaxHighlighting</web>
+  <name>Translations</name>
+  <language>da</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>SyntaxHighlighting.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>SyntaxHighlighting.ConfigurationClass_enabled=Aktiveret
+SyntaxHighlighting.ConfigurationClass_enabled.hint=Slå syntaksfremhævning til eller fra i hele wikien.
+SyntaxHighlighting.ConfigurationClass_theme=Farveskema
+SyntaxHighlighting.ConfigurationClass_theme.hint=Det farveskema, editoren skal vises med.
+SyntaxHighlighting.ConfigurationClass_highlightColor=Fremhævningsfarve
+SyntaxHighlighting.ConfigurationClass_highlightColor.hint=Den farve, der bruges til at fremhæve det markerede ord eller tekststykke. Alle CSS-farveformater accepteres.
+SyntaxHighlighting.ConfigurationClass_lineWrapping=Ombrydning af linjer
+SyntaxHighlighting.ConfigurationClass_lineWrapping.hint=Slå til for at ombryde lange tekstlinjer, der ikke kan være i editorvinduet, eller fra for at se dem ved at rulle vandret.
+admin.syntaxhighlighting=Syntaksfremhævning
+syntaxHighlighting.configuration.general.title=Generelt
+syntaxHighlighting.configuration.appearance.title=Udseende
+</content>
+</xwikidoc>

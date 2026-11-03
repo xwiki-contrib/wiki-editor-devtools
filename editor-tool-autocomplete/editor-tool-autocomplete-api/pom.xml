@@ -98,13 +98,13 @@
   <build>
     <plugins>
       <plugin>
+        <groupId>org.revapi</groupId>
+        <artifactId>revapi-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
         <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
-      </plugin>
-      <plugin>
-        <groupId>org.revapi</groupId>
-        <artifactId>revapi-maven-plugin</artifactId>
         <configuration>
           <analysisConfiguration><![CDATA[
             {
@@ -127,11 +127,6 @@
             }
           ]]></analysisConfiguration>
         </configuration>
-      </plugin>
-      <plugin>
-        <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-checkstyle-plugin</artifactId>
         <executions>
           <execution>
             <!-- Specify the "default" execution id so that the "blocker" one is always executed -->
